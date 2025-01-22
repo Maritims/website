@@ -9,21 +9,12 @@
     <body>
         <header>
             <nav id="the-main-navigation">
-                <ul>
+                <ul class="horizontal-menu">
                     <li>
                         <a href="index.html">Home</a>
                     </li>
                     <li>
                         <a href="eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
-                    </li>
-                    <li>
-                        <a rel="me" href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>
-                    </li>
-                    <li>
-                        <a rel="me" href="https://github.com/Maritims">GitHub</a>
-                    </li>
-                    <li>
-                        <a rel="me" href="https://www.linkedin.com/in/martin-severin-steffensen/">LinkedIn</a>
                     </li>
                 </ul>
             </nav>
@@ -33,7 +24,15 @@
             <%- htmlContent %>
         </main>
         <footer id="the-main-footer">
-            Last updated: <%= lastUpdated %>
+            <button id="scroll-to-top-button">☝️</button>
+            <ul class="horizontal-menu">
+                <li>Last updated: <%= lastUpdated %></li>
+                <li>
+                    Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
+                </li>
+            </ul>
         </footer>
+
+        <script src="main.js"></script>
     </body>
 </html>
