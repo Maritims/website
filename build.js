@@ -15,12 +15,6 @@ const buildDateTime = formatInTimeZone(new Date(), 'Europe/Oslo', 'yyyy-MM-dd HH
  * @property {string} filename
  */
 
-/**
- * @typedef {object} Page
- * @property {string} title
- * @property {string} description
- * @property {string} htmlContent
- */
 
 /**
  * @type {Page[]}
