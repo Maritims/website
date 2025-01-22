@@ -1,0 +1,22 @@
+{
+  "name": "website",
+  "homepage": "https://clueless.no",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "My personal website.",
+  "main": "build.js",
+  "nodemonConfig": {},
+  "scripts": {
+    "build": "node build.js",
+    "dev": "nodemon build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "ejs": "^3.1.10",
+    "nodemon": "^3.1.9"
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "watch": [
+        "build.js",
+        "src/",
+        "static/"
+    ],
+    "ext": "css,html,js"
+}

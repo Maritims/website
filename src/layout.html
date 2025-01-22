@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Martin Severin Steffensen</title>
+        <title><%= title %></title>
+        <meta name="description" content="<%= description %>">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="stylesheet.css">
     </head>
     <body>
         <header>
-            <h1>Martin Severin Steffensen</h1>
-            <nav>
+            <nav id="the-main-navigation">
                 <ul>
                     <li>
-                        <a href="/eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
+                        <a href="index.html">Home</a>
+                    </li>
+                    <li>
+                        <a href="eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
                     </li>
                     <li>
                         <a rel="me" href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>
@@ -22,9 +27,13 @@
                     </li>
                 </ul>
             </nav>
+            <h1><%= title %></h1>
         </header>
         <main>
-            <p>Hello, World!</p>
+            <%- htmlContent %>
         </main>
+        <footer id="the-main-footer">
+            Last updated: <%= lastUpdated %>
+        </footer>
     </body>
 </html>
