@@ -1,12 +1,9 @@
 import { formatInTimeZone } from 'date-fns-tz';
 import ejs, { render } from 'ejs';
-import fs from 'fs';
-
-const now = new Date();
-const buildDir = 'build';
-const srcDir = 'src';
-const staticDir = 'static';
-const buildDateTime = formatInTimeZone(new Date(), 'Europe/Oslo', 'yyyy-MM-dd HH:mm:ss zzz');
+import * as fs from 'node:fs/promises';
+import { existsSync, stat } from 'node:fs';
+import path from 'path';
+import sharp from 'sharp';
 
 /**
  * @typedef {object} Page
@@ -15,80 +12,241 @@ const buildDateTime = formatInTimeZone(new Date(), 'Europe/Oslo', 'yyyy-MM-dd HH
  * @property {string} name
  */
 
-/**
- * @type {Page[]}
- */
-const pages = [{
-    title: 'Martin Severin Steffensen',
-    description: 'My personal website.',
-    name: 'index'
-}, {
-    title: 'EVE Online: Ninja Hacking Guide',
-    description: 'A comprehensive guide to ninja hacking data and relic sites in C5 wormholes using a Myrmidon. Includes fit, tactics, and site-specific strategies.',
-    name: 'eve-online-ninja-hacking-guide'
-}, {
-    title: 'Gallery',
-    description: 'This used to be my Instagram feed.',
-    name: 'gallery'
-}];
+class ImageProcessor {
+    /**
+     * @type {string}
+     */
+    sourceDirectory;
+    /**
+     * @type {string}
+     */
+    targetDirectory;
 
-const templateHtml = fs.readFileSync(`${srcDir}/layout.html`, 'utf-8');
-const templateFileLastModified = fs.statSync(`${srcDir}/layout.html`).mtimeMs;
+    /**
+     * @param {string} sourceDirectory 
+     * @param {string} targetDirectory 
+     */
+    constructor(sourceDirectory, targetDirectory) {
+        this.sourceDirectory = sourceDirectory;
+        this.targetDirectory = targetDirectory;
+    }
 
-pages.forEach(page => {
-    // Should we build the page?
-    // We should build it if the template is newer than the page.
+    /**
+     * Optimize the image in the source directory and copy it to the target directory.
+     * @param {string} fileName 
+     */
+    async optimizeAndCopyFile(fileName) {
+        const inputPath = path.join(this.sourceDirectory, fileName);
+        const outputPath = path.join(this.targetDirectory, `${path.parse(fileName).name}.webp`);
 
-    const sourceHtmlFile = `${srcDir}/${page.name}.html`;
-    const targetHtmlFile = `${buildDir}/${page.name}.html`;
-    if(fs.existsSync(targetHtmlFile)) {
-        const sourceFileLastModified = fs.statSync(sourceHtmlFile).mtimeMs;
-        const targetFileLastModified = fs.statSync(targetHtmlFile).mtimeMs;
-        if(targetFileLastModified > sourceFileLastModified && targetFileLastModified > templateFileLastModified) {
-            console.log(`Skipping ${page.name}`);
-            return;
+        try {
+            console.log(`-> Copying optimized version of ${inputPath} to ${outputPath}`);
+            await sharp(inputPath)
+                .toFormat('webp', { quality: 80 })
+                .toFile(outputPath);
+        } catch (error) {
+            console.error(`-> Failed to optimize and copy ${inputPath} to ${outputPath}`, error);
         }
     }
 
-    console.log(`Building ${page.name}`);
+    /**
+     * Optimize all images in the source directory and copy them to the target directory.
+     */
+    async optimizeAndCopyFiles() {
+        const fileNames = await fs.readdir(this.sourceDirectory);
 
-    const rawHtml = fs.readFileSync(`${srcDir}/${page.name}.html`);
-    const renderOptions = {
-        ...page,
-        htmlContent: rawHtml,
-        scripts: [],
-        lastUpdated: buildDateTime
-    };
-
-    const hasScriptFile = fs.existsSync(`${staticDir}/${page.name}.js`)
-    if(hasScriptFile) {
-        renderOptions.scripts.push(`${page.name}.js`);
+        for (const fileName of fileNames) {
+            await this.optimizeAndCopyFile(fileName);
+        }
     }
-    const renderedHtml = ejs.render(templateHtml, renderOptions);
+}
 
-    fs.writeFileSync(`${buildDir}/${page.name}.html`, renderedHtml);
-});
+class PageProcessor {
+    /**
+     * @type {string}
+     */
+    templateHtml;
+    /**
+     * @type {number}
+     */
+    templateFileLastModified;
+    /**
+     * @type {string}
+     */
+    htmlSourceDirectory;
+    /**
+     * @type {string}
+     */
+    htmlTargetDirectory;
+    /**
+     * @type {string}
+     */
+    scriptSourceDirectory;
 
-/**
- * @type {string[]}
- */
-const staticFiles = fs.readdirSync(staticDir);
-
-staticFiles.forEach(staticFile => {
-    const sourcePath = `${staticDir}/${staticFile}`;
-    const sourceStats = fs.statSync(sourcePath);
-    const targetPath = `${buildDir}/${staticFile}`
-
-    console.log(`Copying ${sourcePath} to ${targetPath}`);
-    
-    if(sourceStats.isDirectory()) {
-        fs.cpSync(sourcePath, targetPath, {
-            recursive: true
-        });
-    } else {
-        fs.copyFileSync(`${sourcePath}`, `${targetPath}`);
+    /**
+     * @param {string} templateHtml The template HTML to use when rendering a page.
+     * @param {number} templateFileLastModified When the template file was last modified. Used to determine whether to actually render a page.
+     * @param {string} htmlSourceDirectory The directory containing the page files.
+     * @param {string} htmlTargetDirectory The directory to put the rendered pages into.
+     * @param {string} scriptSourceDirectory The directory to check for script files belonging to page files.
+     */
+    constructor(templateHtml, templateFileLastModified, htmlSourceDirectory, htmlTargetDirectory, scriptSourceDirectory) {
+        this.templateHtml = templateHtml;
+        this.templateFileLastModified = templateFileLastModified;
+        this.htmlSourceDirectory = htmlSourceDirectory;
+        this.htmlTargetDirectory = htmlTargetDirectory;
+        this.scriptSourceDirectory = scriptSourceDirectory;
     }
-});
 
-const elapsed = new Date().getTime() - now;
-console.log(`Build complete in ${elapsed / 1000} s`);
+    /**
+     * Build a specific page if the template is newer than the template file, or if the source page file is newer than the target page file.
+     * @param {Page} page 
+     */
+    async renderAndCopyFile(page) {
+        // Should we build the page?
+        // We should build it if the template is newer than the page.
+
+        const sourceHtmlFilePath = path.join(this.htmlSourceDirectory, `${page.name}.html`);
+        const targetHtmlFilePath = path.join(this.htmlTargetDirectory, `${page.name}.html`);
+        const targetHtmlFileExists = existsSync(targetHtmlFilePath);
+
+        if (targetHtmlFileExists) {
+            const sourceFileLastModified = await fs.stat(sourceHtmlFilePath).mtimeMs;
+            const targetFileLastModified = await fs.stat(targetHtmlFilePath).mtimeMs;
+
+            if (targetFileLastModified > sourceFileLastModified && targetFileLastModified > this.templateFileLastModified) {
+                console.log(`Skipping ${page.name}`);
+                return;
+            }
+        }
+
+        console.log(`Building ${page.name}`);
+
+        const rawHtml = await fs.readFile(sourceHtmlFilePath);
+        const renderOptions = {
+            ...page,
+            htmlContent: rawHtml,
+            scripts: [],
+            lastUpdated: formatInTimeZone(new Date(), 'Europe/Oslo', 'yyyy-MM-dd HH:mm:ss zzz')
+        };
+
+        const scriptFilePath = path.join(this.scriptSourceDirectory, `${page.name}.js`);
+        const hasScriptFile = existsSync(scriptFilePath);
+        if (hasScriptFile) {
+            renderOptions.scripts.push(`${page.name}.js`);
+        }
+        const renderedHtml = ejs.render(this.templateHtml, renderOptions);
+
+        await fs.writeFile(targetHtmlFilePath, renderedHtml);
+    }
+
+    /**
+    * Build the specific pages.
+    * @param {Page[]} pages 
+    */
+    async renderAndCopyFiles(pages) {
+        for (const page of pages) {
+            await this.renderAndCopyFile(page);
+        }
+    }
+}
+
+class StaticFileProcessor {
+    /**
+     * @type {string}
+     */
+    sourceDirectory;
+    /**
+     * @type {string}
+     */
+    targetDirectory;
+    /**
+     * @type {ImageProcessor}
+     */
+    imageProcessor;
+
+    /**
+     * @param {string} sourceDirectory 
+     * @param {string} targetDirectory 
+     */
+    constructor(sourceDirectory, targetDirectory) {
+        this.sourceDirectory = sourceDirectory;
+        this.targetDirectory = targetDirectory;
+    }
+
+    /**
+     * Copy the file to the target directory.
+     * @param {string} fileName 
+     */
+    async copyFile(fileName) {
+        const sourceFilePath = path.join(this.sourceDirectory, fileName);
+        const targetFilePath = path.join(this.targetDirectory, fileName);
+
+        console.log(`Copying ${sourceFilePath} to ${targetFilePath}`);
+
+        const sourceFileStats = await fs.stat(sourceFilePath);
+        if (sourceFileStats.isDirectory()) {
+            if (fileName === 'images') {
+                const imageProcessor = new ImageProcessor(sourceFilePath, targetFilePath);
+                await imageProcessor.optimizeAndCopyFiles();
+            } else {
+                await fs.cp(sourceFilePath, targetFilePath, {
+                    recursive: true
+                });
+            }
+        } else {
+            await fs.copyFile(sourceFilePath, targetFilePath);
+        }
+    }
+
+    /**
+     * Copy all files in the source directory to the target directory.
+     */
+    async copyFiles() {
+        /**
+         * @type {string[]}
+         */
+        const fileNames = await fs.readdir(this.sourceDirectory);
+
+        for (const fileName of fileNames) {
+            await this.copyFile(fileName);
+        }
+    }
+}
+
+async function buildEverything() {
+    const now = new Date();
+    const buildDir = 'build';
+    const srcDir = 'src';
+    const staticDir = 'static';
+
+    /**
+     * @type {Page[]}
+     */
+    const pages = [{
+        title: 'Martin Severin Steffensen',
+        description: 'My personal website.',
+        name: 'index'
+    }, {
+        title: 'EVE Online: Ninja Hacking Guide',
+        description: 'A comprehensive guide to ninja hacking data and relic sites in C5 wormholes using a Myrmidon. Includes fit, tactics, and site-specific strategies.',
+        name: 'eve-online-ninja-hacking-guide'
+    }, {
+        title: 'Gallery',
+        description: 'This used to be my Instagram feed.',
+        name: 'gallery'
+    }];
+    const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');
+    const templateFileLastModified = await fs.stat(`${srcDir}/layout.html`).mtimeMs;
+
+    const pageProcessor = new PageProcessor(templateHtml, templateFileLastModified, srcDir, buildDir, staticDir);
+    await pageProcessor.renderAndCopyFiles(pages);
+
+    const staticFileProcessor = new StaticFileProcessor(staticDir, buildDir);
+    await staticFileProcessor.copyFiles();
+
+    const elapsed = new Date().getTime() - now;
+    console.log(`Build complete in ${elapsed / 1000} s`);
+}
+
+buildEverything();
