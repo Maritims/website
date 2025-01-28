@@ -1,53 +1,151 @@
-button {
-    &#scroll-to-top-button {
-        background-color: black;
-        border: none;
-        bottom: 20px;
-        color: white;
-        cursor: pointer;
-        font-size: 18px;
-        line-height: 48px;
-        position: fixed;
-        right: 20px;
-        width: 48px;
-        z-index: 100;
-        opacity: 0;
-        transform: translateY(100px);
-        transition: all 0.5s ease;
+div#the-page-container {
+    margin: 0 auto;
+    width: 100%;
 
-        &.show {
-            opacity: 1;
-            transform: translateY(0);
+    @media (min-width: 1440px) {
+        max-width: 1200px;
+    }
+}
+
+button#scroll-to-top-button {
+    background-color: black;
+    border: none;
+    bottom: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 48px;
+    position: fixed;
+    right: 20px;
+    width: 48px;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 0.5s ease;
+
+    &.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+nav#the-main-navigation {
+    padding: 0 0 5px 0;
+}
+
+@media print {
+
+    nav#the-main-navigation,
+    footer#the-main-footer {
+        display: none;
+    }
+}
+
+ul.horizontal-menu {
+    margin: 0;
+    padding: 0;
+
+    &>li {
+        display: inline-block;
+
+        &:not(:last-child)::after {
+            content: "/";
+            padding: 0 5px 0 5px;
         }
     }
 }
 
-nav {
-    &#the-main-navigation {
-        border-bottom: 1px solid black;
-        padding: 0 0 5px 0;
-    }
-}
+section#the-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 16px;
 
-ul {
-    &.horizontal-menu {
-        margin: 0;
-        padding: 0;
+    > article {
+        box-sizing: border-box;
+        
+        > figure {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
 
-        & > li {
-            display: inline-block;
+            &:hover {
+                cursor: pointer;
+            }
 
-            &:not(:last-child)::after {
-                content: "/";
-                padding: 0 5px 0 5px;
+            > .image-container {
+                aspect-ratio: 4 / 3;
+                width: 100%;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                > img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
             }
         }
+
+        @media (min-width:768px) {
+            flex: 0 1 calc(33.333% - 16px);
+        }
+    }
+
+    > dialog {
+        border: 1px black solid;
+        gap: 16px;  
+        max-height: 90vh;
+
+        &::backdrop {
+            background-color: black;
+            opacity: 0.5;
+        }
+
+        > .dialog-content {
+            display: flex;
+            flex-direction: column;;
+            gap: 16px;
+
+            > .dialog-header {
+                display: flex;
+                justify-content: end;
+            }
+
+            > .dialog-body {
+                > figure {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+                    margin: 0;
+        
+                    > img {
+                        max-width: calc(90vw - 32px);
+                        max-height: calc(90vh - 80px);
+                        width: auto;
+                        height: auto;
+                        object-fit: contain;
+                    }
+
+                    > figcaption {
+                        align-self: flex-start;
+                        margin-top: 16px;
+                    }
+                }
+            }
+        }
+
+        @media (max-width:768px) {
+            margin-top: 16px;
+            width: calc(90vw - 32px);
+        }
     }
 }
 
-footer {
-    &#the-main-footer {
-        border-top: 1px solid black;
-        padding: 5px 0 0 0;
-    }
+footer#the-main-footer {
+    padding: 5px 0 0 0;
 }

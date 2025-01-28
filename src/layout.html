@@ -7,32 +7,40 @@
         <link rel="stylesheet" type="text/css" href="stylesheet.css">
     </head>
     <body>
-        <header>
-            <nav id="the-main-navigation">
+        <div id="the-page-container">
+            <header>
+                <nav id="the-main-navigation">
+                    <ul class="horizontal-menu">
+                        <li>
+                            <a href="index.html">Home</a>
+                        </li>
+                        <li>
+                            <a href="eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
+                        </li>
+                        <li>
+                            <a href="gallery.html">Gallery</a>
+                        </li>
+                    </ul>
+                </nav>
+                <h1><%= title %></h1>
+            </header>
+            <main id="the-main-content">
+                <%- htmlContent %>
+            </main>
+            <footer id="the-main-footer">
+                <button id="scroll-to-top-button">☝️</button>
                 <ul class="horizontal-menu">
+                    <li>Last updated: <%= lastUpdated %></li>
                     <li>
-                        <a href="index.html">Home</a>
-                    </li>
-                    <li>
-                        <a href="eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
+                        Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
                     </li>
                 </ul>
-            </nav>
-            <h1><%= title %></h1>
-        </header>
-        <main>
-            <%- htmlContent %>
-        </main>
-        <footer id="the-main-footer">
-            <button id="scroll-to-top-button">☝️</button>
-            <ul class="horizontal-menu">
-                <li>Last updated: <%= lastUpdated %></li>
-                <li>
-                    Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
-                </li>
-            </ul>
-        </footer>
+            </footer>
+        </div>
 
         <script src="main.js"></script>
+        <% scripts.forEach(script => { %>
+            <script src="<%= script %>"></script>
+        <% }) %>
     </body>
 </html>
