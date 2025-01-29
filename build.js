@@ -36,16 +36,27 @@ class ImageProcessor {
      * @param {string} fileName 
      */
     async optimizeAndCopyFile(fileName) {
-        const inputPath = path.join(this.sourceDirectory, fileName);
-        const outputPath = path.join(this.targetDirectory, `${path.parse(fileName).name}.webp`);
+        const sourceFilePath = path.join(this.sourceDirectory, fileName);
+        const targetFilePath = path.join(this.targetDirectory, `${path.parse(fileName).name}.webp`);
+        const targetFileExists = existsSync(targetFilePath);
+
+        if(targetFileExists) {
+            const sourceFileLastModified = (await fs.stat(sourceFilePath)).mtimeMs;
+            const targetFileLastModified = (await fs.stat(targetFilePath)).mtimeMs;
+
+            if(targetFileLastModified > sourceFileLastModified) {
+                console.log(`Skipping ${sourceFilePath}`);
+                return;
+            }
+        }
 
         try {
-            console.log(`-> Copying optimized version of ${inputPath} to ${outputPath}`);
-            await sharp(inputPath)
+            console.log(`Copying optimized version of ${sourceFilePath} to ${targetFilePath}`);
+            await sharp(sourceFilePath)
                 .toFormat('webp', { quality: 80 })
-                .toFile(outputPath);
+                .toFile(targetFilePath);
         } catch (error) {
-            console.error(`-> Failed to optimize and copy ${inputPath} to ${outputPath}`, error);
+            console.error(`Failed to optimize and copy ${sourceFilePath} to ${targetFilePath}`, error);
         }
     }
 
@@ -91,6 +102,12 @@ class PageProcessor {
      * @param {string} scriptSourceDirectory The directory to check for script files belonging to page files.
      */
     constructor(templateHtml, templateFileLastModified, htmlSourceDirectory, htmlTargetDirectory, scriptSourceDirectory) {
+        if (!templateHtml) throw Error('templateHtml is required');
+        if (!templateFileLastModified) throw Error('templateFileLastModified is required');
+        if (!htmlSourceDirectory) throw Error('htmlSourceDirectory is required');
+        if (!htmlTargetDirectory) throw Error('htmlTargetDirectory is required');
+        if (!scriptSourceDirectory) throw Error('scriptSourceDirectory is required');
+
         this.templateHtml = templateHtml;
         this.templateFileLastModified = templateFileLastModified;
         this.htmlSourceDirectory = htmlSourceDirectory;
@@ -106,21 +123,22 @@ class PageProcessor {
         // Should we build the page?
         // We should build it if the template is newer than the page.
 
+        let isBuilding = true;
         const sourceHtmlFilePath = path.join(this.htmlSourceDirectory, `${page.name}.html`);
         const targetHtmlFilePath = path.join(this.htmlTargetDirectory, `${page.name}.html`);
         const targetHtmlFileExists = existsSync(targetHtmlFilePath);
 
         if (targetHtmlFileExists) {
-            const sourceFileLastModified = await fs.stat(sourceHtmlFilePath).mtimeMs;
-            const targetFileLastModified = await fs.stat(targetHtmlFilePath).mtimeMs;
+            const sourceFileLastModified = await fs.stat(sourceHtmlFilePath);
+            const targetFileLastModified = await fs.stat(targetHtmlFilePath);
 
-            if (targetFileLastModified > sourceFileLastModified && targetFileLastModified > this.templateFileLastModified) {
-                console.log(`Skipping ${page.name}`);
+            if (targetFileLastModified.mtimeMs >= sourceFileLastModified.mtimeMs && targetFileLastModified.mtimeMs >= this.templateFileLastModified) {
+                console.log(`Skipping ${sourceHtmlFilePath}`);
                 return;
             }
         }
 
-        console.log(`Building ${page.name}`);
+        console.log(`Building ${sourceHtmlFilePath}`);
 
         const rawHtml = await fs.readFile(sourceHtmlFilePath);
         const renderOptions = {
@@ -138,6 +156,7 @@ class PageProcessor {
         const renderedHtml = ejs.render(this.templateHtml, renderOptions);
 
         await fs.writeFile(targetHtmlFilePath, renderedHtml);
+
     }
 
     /**
@@ -181,10 +200,8 @@ class StaticFileProcessor {
     async copyFile(fileName) {
         const sourceFilePath = path.join(this.sourceDirectory, fileName);
         const targetFilePath = path.join(this.targetDirectory, fileName);
-
-        console.log(`Copying ${sourceFilePath} to ${targetFilePath}`);
-
         const sourceFileStats = await fs.stat(sourceFilePath);
+
         if (sourceFileStats.isDirectory()) {
             if (fileName === 'images') {
                 const imageProcessor = new ImageProcessor(sourceFilePath, targetFilePath);
@@ -195,6 +212,19 @@ class StaticFileProcessor {
                 });
             }
         } else {
+            const targetFileExists = existsSync(targetFilePath);
+
+            if(targetFileExists) {
+                const sourceFileLastModified = (await fs.stat(sourceFilePath)).mtimeMs;
+                const targetFileLastModified = (await fs.stat(targetFilePath)).mtimeMs;
+
+                if (targetFileLastModified >= sourceFileLastModified) {
+                    console.log(`Skipping ${sourceFilePath}`);
+                    return;
+                }
+            }
+
+            console.log(`Copying ${sourceFilePath} to ${targetFilePath}`);
             await fs.copyFile(sourceFilePath, targetFilePath);
         }
     }
@@ -237,7 +267,7 @@ async function buildEverything() {
         name: 'gallery'
     }];
     const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');
-    const templateFileLastModified = await fs.stat(`${srcDir}/layout.html`).mtimeMs;
+    const templateFileLastModified = (await fs.stat(`${srcDir}/layout.html`)).mtimeMs;
 
     const pageProcessor = new PageProcessor(templateHtml, templateFileLastModified, srcDir, buildDir, staticDir);
     await pageProcessor.renderAndCopyFiles(pages);
