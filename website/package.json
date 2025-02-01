@@ -11,7 +11,7 @@
     "dev": "nodemon build.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Martin Severin Steffensen",
   "license": "ISC",
   "devDependencies": {
     "date-fns": "^4.1.0",
