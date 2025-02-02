@@ -45,6 +45,37 @@ class ScrollToTopButton {
     }
 }
 
+class HitCounter extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    async connectedCallback() {
+        const shadow = this.attachShadow({
+            mode: "open"
+        });
+
+        const span = document.createElement('span');
+        span.setAttribute("class", "hit-counter");
+
+        let response;
+        if(document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"))) {
+            response = await fetch('http://localhost:8080/hit');
+        } else {
+            response = await fetch("http://localhost:8080/hit", {
+                method: "POST"
+            });
+            document.cookie = "hitHasBeenCounted=true; max-age=3600; path=/";
+        }
+        const json = await response.json();
+        span.textContent = `${this.getAttribute("label")}: ${json.hitCount} (site counters, a thing of the past!)`;
+
+        shadow.appendChild(span);
+    }
+}
+
+customElements.define('clueless-hit-counter', HitCounter);
+
 (function () {
     const scrollToTopButton = new ScrollToTopButton('scroll-to-top-button', document.documentElement, 0.1);
     scrollToTopButton.setupEvents();

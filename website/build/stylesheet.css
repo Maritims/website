@@ -61,8 +61,12 @@ ul.horizontal-menu {
 
 section#the-gallery {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 16px;
+    grid-template-columns: 1fr;
+    grid-gap: 1px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }
 
 footer#the-main-footer {

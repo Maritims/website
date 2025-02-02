@@ -64,6 +64,9 @@ class ImageProcessor {
      * Optimize all images in the source directory and copy them to the target directory.
      */
     async optimizeAndCopyFiles() {
+        if(!existsSync(this.targetDirectory)) {
+            await fs.mkdir(this.targetDirectory);
+        }
         const fileNames = await fs.readdir(this.sourceDirectory);
 
         for (const fileName of fileNames) {
@@ -123,7 +126,6 @@ class PageProcessor {
         // Should we build the page?
         // We should build it if the template is newer than the page.
 
-        let isBuilding = true;
         const sourceHtmlFilePath = path.join(this.htmlSourceDirectory, `${page.name}.html`);
         const targetHtmlFilePath = path.join(this.htmlTargetDirectory, `${page.name}.html`);
         const targetHtmlFileExists = existsSync(targetHtmlFilePath);
