@@ -227,7 +227,14 @@ class StaticFileProcessor {
             }
 
             console.log(`Copying ${sourceFilePath} to ${targetFilePath}`);
-            await fs.copyFile(sourceFilePath, targetFilePath);
+
+            if(fileName.endsWith(".js")) {
+                let scriptContent = await fs.readFile(sourceFilePath, "utf-8");
+                scriptContent = scriptContent.replace(/"__MICROSERVICE_URL__"/g, `"${process.env.MICROSERVICE_URL || "http://localhost:8080"}"`);
+                await fs.writeFile(targetFilePath, scriptContent);
+            } else {
+                await fs.copyFile(sourceFilePath, targetFilePath);
+            }
         }
     }
 

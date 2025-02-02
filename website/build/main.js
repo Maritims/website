@@ -51,6 +51,8 @@ class HitCounter extends HTMLElement {
     }
 
     async connectedCallback() {
+        const microserviceUrl = "http://localhost:8080";
+
         const shadow = this.attachShadow({
             mode: "open"
         });
@@ -60,9 +62,9 @@ class HitCounter extends HTMLElement {
 
         let response;
         if(document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"))) {
-            response = await fetch('http://localhost:8080/hit');
+            response = await fetch(`${microserviceUrl}/hit`);
         } else {
-            response = await fetch("http://localhost:8080/hit", {
+            response = await fetch(`${microserviceUrl}/hit`, {
                 method: "POST"
             });
             document.cookie = "hitHasBeenCounted=true; max-age=3600; path=/";
