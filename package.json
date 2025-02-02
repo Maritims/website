@@ -1,0 +1,15 @@
+{
+    "name": "website",
+    "private": "true",
+    "workspaces": ["website", "microservice", "proxy"],
+    "scripts": {
+        "dev:microservice": "npm --prefix microservice run dev",
+        "dev:website": "npm --prefix website run dev",
+        "dev:proxy": "npm --prefix proxy run dev",
+        "dev:all": "concurrently \"npm run dev:microservice\" \"npm run dev:website\" \"npm run dev:proxy\"",
+        "install:all": "npm install --workspaces"
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.2"
+    }
+}

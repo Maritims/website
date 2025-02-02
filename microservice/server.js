@@ -5,7 +5,7 @@ import hitCouter from './routes/hitCounter.js';
 
 const app = express();
 const port = process.env.PORT || 8080;
-const corsOrigin = process.env.CORS_ORIGIN || 'http://127.0.0.1:3000';
+const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
 
 app.use(express.json());
 app.use(express.urlencoded({
