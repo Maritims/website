@@ -268,6 +268,10 @@ async function buildEverything() {
         description: 'This used to be my Instagram feed.',
         name: 'gallery'
     }, {
+        title: 'Projects',
+        description: 'Some of my projects.',
+        name: 'projects'
+    }, {
         title: 'Links',
         description: 'Links to other areas of the Internet I enjoy.',
         name: 'links'

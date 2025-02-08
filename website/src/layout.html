@@ -21,6 +21,9 @@
                             <a href="gallery.html">Gallery</a>
                         </li>
                         <li>
+                            <a href="projects.html">Projects</a>
+                        </li>
+                        <li>
                             <a href="links.html">Links</a>
                         </li>
                     </ul>
@@ -38,21 +41,12 @@
                         Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
                     </li>
                 </ul>
-                <a href="https://discord.gg/norsk-programmering" class="badge" target="_blank" aria-label="A badge representing the Discord community Norsk Programmering">
-                    <div class="left">
-                        &lt; / &gt;
-                    </div>
-                    <div class="middle">
-
-                    </div>
-                    <div class="right">
-                        norsk programmering
-                    </div>
-                </a>
+                <norsk-programmering-badge></norsk-programmering-badge>
             </footer>
         </div>
 
         <script src="main.js"></script>
+        <script src="norsk-programmering-badge.js"></script>
         <% scripts.forEach(script => { %>
             <script src="<%= script %>"></script>
         <% }) %>
