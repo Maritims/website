@@ -2,6 +2,16 @@
     font-family: system-ui, sans-serif;
 }
 
+@font-face {
+    font-family: 'Roboto';
+    src: url('/fonts/Roboto-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Silkscreen';
+    src: url('fonts/slkscr.ttf');
+}
+
 div#the-page-container {
     margin: 0 auto;
     width: 100%;
@@ -71,4 +81,48 @@ section#the-gallery {
 
 footer#the-main-footer {
     padding: 5px 0 0 0;
+    ul.horizontal-menu {
+        margin-bottom: 5px;
+    }
+}
+
+.badge {
+    display: flex;
+    width: 210px;
+    height: 30px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    font-size: 0.7rem;
+    text-decoration: none;
+
+    &:active {
+        color: initial;
+    }
+
+    .left, .right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 1px;
+        height: calc(100% - 2px);
+        font-family: 'Silkscreen';
+    }
+    
+    .left {
+        flex: 1;
+        background-color: #01a8f4;
+        padding: 0 1px;
+    }
+
+    .middle {
+        width: 1px;
+        background-color: black;
+    }
+
+    .right {
+        flex: 5;
+        background-color: #2f3138;
+        color: #01a8f4;
+        text-transform: uppercase;
+    }
 }
