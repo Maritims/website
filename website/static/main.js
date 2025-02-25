@@ -55,9 +55,6 @@ class HitCounter extends HTMLElement {
             mode: "open"
         });
 
-        const span = document.createElement('span');
-        span.setAttribute("class", "hit-counter");
-
         let response;
         if(document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"))) {
             response = await fetch(`/microservice/hit`);
@@ -67,10 +64,46 @@ class HitCounter extends HTMLElement {
             });
             document.cookie = "hitHasBeenCounted=true; max-age=3600; path=/";
         }
-        const json = await response.json();
-        span.textContent = `${this.getAttribute("label")}: ${json.hitCount} (site counters, a thing of the past!)`;
 
-        shadow.appendChild(span);
+        const div = document.createElement('div');
+        div.setAttribute("class", "badge");
+
+        const left = document.createElement("div");
+        left.setAttribute("class", "inner");
+        left.textContent = ``;
+        div.appendChild(left);
+
+        const json = await response.json();
+        left.textContent = `You are visitor #${json.hitCount}`;
+
+        const style = document.createElement("style");
+        style.textContent = `
+        .badge {
+            display: flex;
+            width: 210px;
+            height: 30px;
+            border: 1px solid black;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+            text-decoration: none;
+            font-family: 'Digital-7';
+            background-color: black;
+            color: #00FF00;
+
+            .inner {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 1px;
+                height: calc(100% - 2px);
+                flex: 1;
+                padding: 0 1px;
+            }
+        }
+        `;
+
+        shadow.appendChild(style);
+        shadow.appendChild(div);
     }
 }
 

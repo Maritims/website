@@ -12,6 +12,11 @@
     src: url('fonts/slkscr.ttf');
 }
 
+@font-face {
+    font-family: 'Digital-7';
+    src: url('fonts/digital-7.ttf');
+}
+
 div#the-page-container {
     margin: 0 auto;
     width: 100%;
