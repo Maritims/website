@@ -1,7 +1,10 @@
 import express from 'express';
 import postgres from 'postgres';
 
-const connectionString = process.env.CONNECTION_STRING;
+const connectionString = process.env.CONNECTION_STRING || (function () {
+    console.error("Environment variable CONNECTION_STRING is required");
+    process.exit(1);
+})();
 const sql = postgres(connectionString);
 
 (async function () {

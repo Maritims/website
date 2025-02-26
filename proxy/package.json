@@ -4,6 +4,7 @@
     "version": "1.0.0",
     "description": "A proxy for local development",
     "main": "proxy.js",
+    "type": "module",
     "scripts": {
         "dev": "nodemon proxy.js"
     },
