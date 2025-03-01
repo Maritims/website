@@ -1,35 +1,54 @@
-import createError from 'http-errors';
 import express from 'express';
 import cors from 'cors';
-import hitCouter from './routes/hitCounter.js';
+import { createConnection, run, findFirst } from './lib/db.js';
+
+/**
+ * @type {sqlite3.Database|undefined}
+ */
+let dbConnection;
 
 const app = express();
-const port = process.env.PORT || 8080;
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const { PORT = 8080, CORS_ORIGIN = 'http://localhost:3000' } = process.env;
 
-app.use(express.json());
-app.use(express.urlencoded({
-    extended: false
-}));
-app.use(cors({
-    origin: corsOrigin,
-    optionsSuccessStatus: 200
-}));
+app.use(express.json())
+    .use(cors({ origin: CORS_ORIGIN, optionsSuccessStatus: 200 }))
+    .use("/hit", express.Router()
+        .post("/", async (req, res) => {
+            await run(dbConnection, `UPDATE hit_count SET count = count + 1, lastUpdated = ?`, [new Date().toISOString()]);
+            
+            const result = await findFirst(dbConnection, "hit_count");
+            res.json({ hitCount: result.count });
+        })
+        .get("/", async (req, res) => {
+            const result = await findFirst(dbConnection, "hit_count");
+            res.json({ hitCount: result.count });
+        }))
+    .listen(PORT, async () => {
+        console.log(`Listening on ${PORT}`);
 
-app.use("/hit", hitCouter);
+        dbConnection = await createConnection('hitCounter.db');
+        console.log(`Connected to database`);
 
-app.use((req, res, next) => {
-    next(createError(404));
-});
+        await run(dbConnection,
+            `CREATE TABLE IF NOT EXISTS hit_count
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                count INTEGER NOT NULL,
+                created TEXT NOT NULL,
+                lastUpdated TEXT NOT NULL
+            )`
+        );
 
-app.use((err, req, res, next) => {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+        const count = await findFirst(dbConnection, 'hit_count');
+        if (count === 0) {
+            const now = new Date();
+            await run(
+                dbConnection,
+                `INSERT INTO hit_count (count, created, lastUpdated) VALUES (?, ?, ?)`,
+                [0, now.toISOString(), now.toISOString()]
+            );
+            console.log("Created initial row");
+        }
 
-    res.status(err.status || 500);
-    res.render('error');
-});
-
-app.listen(port, () => {
-    console.log(`Listening on ${port}`);
-})
+        dbConnection = dbConnection;
+    });

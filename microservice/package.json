@@ -12,6 +12,8 @@
   "author": "Martin Severin Steffensen",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "aws-sdk": "^2.1692.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "http-errors": "^2.0.0",
