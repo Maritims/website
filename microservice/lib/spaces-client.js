@@ -10,14 +10,13 @@ if(!SPACE_NAME || !SPACE_REGION || !SPACE_ACCESS_KEY_ID || !SPACE_SECRET_ACCESS_
 }
 
 const endpoint = `https://${SPACE_REGION}.digitaloceanspaces.com`;
-
-
 const s3 = new S3Client({
-    SPACE_REGION,
-    endpoint,
+    forcePathStyle: false,
+    region: SPACE_REGION,
+    endpoint: endpoint,
     credentials: {
-        SPACE_ACCESS_KEY_ID,
-        SPACE_SECRET_ACCESS_KEY
+        accessKeyId: SPACE_ACCESS_KEY_ID,
+        secretAccessKey: SPACE_SECRET_ACCESS_KEY
     }
 });
 
