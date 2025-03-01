@@ -32,12 +32,24 @@ class ImageProcessor {
     }
 
     /**
+     * 
+     * @param {string} fileName 
+     */
+    getTargetFileName(fileName) {
+        if(fileName.endsWith(".svg")) {
+            return fileName;
+        } else {
+            return `${path.parse(fileName).name}.webp`;
+        }
+    }
+
+    /**
      * Optimize the image in the source directory and copy it to the target directory.
      * @param {string} fileName 
      */
     async optimizeAndCopyFile(fileName) {
         const sourceFilePath = path.join(this.sourceDirectory, fileName);
-        const targetFilePath = path.join(this.targetDirectory, `${path.parse(fileName).name}.webp`);
+        const targetFilePath = path.join(this.targetDirectory, this.getTargetFileName(fileName));
         const targetFileExists = existsSync(targetFilePath);
 
         if(targetFileExists) {
