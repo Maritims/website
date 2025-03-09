@@ -14,24 +14,6 @@ import sharp from 'sharp';
 
 class ImageProcessor {
     /**
-     * @type {string}
-     */
-    sourceDirectory;
-    /**
-     * @type {string}
-     */
-    targetDirectory;
-
-    /**
-     * @param {string} sourceDirectory 
-     * @param {string} targetDirectory 
-     */
-    constructor(sourceDirectory, targetDirectory) {
-        this.sourceDirectory = sourceDirectory;
-        this.targetDirectory = targetDirectory;
-    }
-
-    /**
      * 
      * @param {string} fileName 
      */
@@ -45,11 +27,12 @@ class ImageProcessor {
 
     /**
      * Optimize the image in the source directory and copy it to the target directory.
+     * @param {string} targetDirectory
      * @param {string} fileName 
      */
-    async optimizeAndCopyFile(fileName) {
-        const sourceFilePath = path.join(this.sourceDirectory, fileName);
-        const targetFilePath = path.join(this.targetDirectory, this.getTargetFileName(fileName));
+    async optimizeAndCopyFile(sourceDirectory, targetDirectory, fileName) {
+        const sourceFilePath = path.join(sourceDirectory, fileName);
+        const targetFilePath = path.join(targetDirectory, this.getTargetFileName(fileName));
         const targetFileExists = existsSync(targetFilePath);
 
         if(targetFileExists) {
@@ -75,14 +58,21 @@ class ImageProcessor {
     /**
      * Optimize all images in the source directory and copy them to the target directory.
      */
-    async optimizeAndCopyFiles() {
-        if(!existsSync(this.targetDirectory)) {
-            await fs.mkdir(this.targetDirectory);
+    async optimizeAndCopyFiles(sourceDirectory, targetDirectory) {
+        if(!existsSync(targetDirectory)) {
+            await fs.mkdir(targetDirectory);
         }
-        const fileNames = await fs.readdir(this.sourceDirectory);
+        const fileNames = await fs.readdir(sourceDirectory);
 
         for (const fileName of fileNames) {
-            await this.optimizeAndCopyFile(fileName);
+            const stats = await fs.stat(path.join(sourceDirectory, fileName));
+            if(stats.isDirectory()) {
+                sourceDirectory = path.join(sourceDirectory, fileName);
+                targetDirectory = path.join(targetDirectory, fileName);
+                await this.optimizeAndCopyFiles(sourceDirectory, targetDirectory);
+            } else {
+                await this.optimizeAndCopyFile(sourceDirectory, targetDirectory, fileName);
+            }
         }
     }
 }
@@ -218,8 +208,8 @@ class StaticFileProcessor {
 
         if (sourceFileStats.isDirectory()) {
             if (fileName === 'images') {
-                const imageProcessor = new ImageProcessor(sourceFilePath, targetFilePath);
-                await imageProcessor.optimizeAndCopyFiles();
+                const imageProcessor = new ImageProcessor();
+                await imageProcessor.optimizeAndCopyFiles(sourceFilePath, targetFilePath);
             } else {
                 await fs.cp(sourceFilePath, targetFilePath, {
                     recursive: true

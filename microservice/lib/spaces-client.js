@@ -5,22 +5,31 @@ import util from 'util';
 import stream from 'stream';
 
 const { SPACE_NAME, SPACE_REGION, SPACE_ACCESS_KEY_ID, SPACE_SECRET_ACCESS_KEY } = process.env;
-if(!SPACE_NAME || !SPACE_REGION || !SPACE_ACCESS_KEY_ID || !SPACE_SECRET_ACCESS_KEY) {
-    throw new Error("Missing one or more environment variable. S3 client creation would fail.");
+const endpoint = `https://${SPACE_REGION}.digitaloceanspaces.com`;
+
+/**
+ * @type {S3Client|undefined}
+ */
+let s3;
+if(SPACE_REGION && SPACE_ACCESS_KEY_ID && SPACE_SECRET_ACCESS_KEY) {
+    s3 = new S3Client({
+        forcePathStyle: false,
+        region: SPACE_REGION,
+        endpoint: endpoint,
+        credentials: {
+            accessKeyId: SPACE_ACCESS_KEY_ID,
+            secretAccessKey: SPACE_SECRET_ACCESS_KEY
+        }
+    });
+} else {
+    console.error(`Unable to create S3Client. One or more environment variables is missing.`);
 }
 
-const endpoint = `https://${SPACE_REGION}.digitaloceanspaces.com`;
-const s3 = new S3Client({
-    forcePathStyle: false,
-    region: SPACE_REGION,
-    endpoint: endpoint,
-    credentials: {
-        accessKeyId: SPACE_ACCESS_KEY_ID,
-        secretAccessKey: SPACE_SECRET_ACCESS_KEY
-    }
-});
-
 async function fileExists(filename) {
+    if(!s3) {
+        throw new Error("S3 client is not initialized.");
+    }
+
     const command = new HeadObjectCommand({
         Bucket: SPACE_NAME,
         Key: filename
@@ -40,8 +49,7 @@ async function fileExists(filename) {
 
 async function uploadFile(filename) {
     if(!s3) {
-        console.error(`Unable to upload ${filename}: S3 client is undefined`);
-        return;
+        throw new Error("S3 client is not initialized.");
     }
 
     const fileData = await readFile(filename);
@@ -58,8 +66,7 @@ async function uploadFile(filename) {
 
 async function downloadFile(filename) {
     if(!s3) {
-        console.error(`Unable to download ${filename}: S3 client is undefined`);
-        return;
+        throw new Error("S3 client is not initialized.");
     }
 
     try {

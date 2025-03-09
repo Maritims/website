@@ -32,7 +32,7 @@ class ScrollToTopButton {
 
     onScroll() {
         const scrollTotal = this._rootElement.scrollHeight - this._rootElement.clientHeight;
-        if(this._rootElement.scrollTop / scrollTotal > this._scrollThreshold) {
+        if (this._rootElement.scrollTop / scrollTotal > this._scrollThreshold) {
             this._buttonElement.classList.add('show');
         } else {
             this._buttonElement.classList.remove('show');
@@ -55,14 +55,14 @@ class HitCounter extends HTMLElement {
             mode: "open"
         });
 
-        let response;
-        if(document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"))) {
-            response = await fetch(`/microservice/hit`);
-        } else {
-            response = await fetch(`/microservice/hit`, {
-                method: "POST"
-            });
+        const hitHasBeenCounted = document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"));
+        const response = await fetch(`/microservice/hit`, { method: hitHasBeenCounted ? "GET" : "POST" });
+        const json = await response.json();
+
+        if(response.ok) {
             document.cookie = "hitHasBeenCounted=true; max-age=3600; path=/";
+        } else {
+            console.error(`The hit counter microservice returned an error: ${json.error}`);
         }
 
         const div = document.createElement('div');
@@ -70,11 +70,9 @@ class HitCounter extends HTMLElement {
 
         const left = document.createElement("div");
         left.setAttribute("class", "inner");
-        left.textContent = ``;
+        left.textContent = `You are visitor #${response.ok ? json.hitCount : 'ERROR'}`;
         div.appendChild(left);
-
-        const json = await response.json();
-        left.textContent = `You are visitor #${json.hitCount}`;
+        
 
         const style = document.createElement("style");
         style.textContent = `

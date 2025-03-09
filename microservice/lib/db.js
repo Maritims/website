@@ -21,10 +21,17 @@ let lastWrite;
  */
 function createConnection(filename) {
     return new Promise(async (resolve, reject) => {
-        const dbFileExists = await fileExists(filename);
-        if (dbFileExists) {
-            await downloadFile(filename);
-            console.log(`Downloaded ${filename}`);
+        let dbFileExists = false;
+
+        try {
+            dbFileExists = await fileExists(filename);
+            if (dbFileExists) {
+                await downloadFile(filename);
+                console.log(`Downloaded ${filename}`);
+            }
+        } catch (error) {
+            reject(`Unable to verify existence of, and download ${filename}. Connection to database cannot be established: ${error}`);
+            return;
         }
 
         const db = new sqlite3.Database(filename, async (error) => {
@@ -50,21 +57,18 @@ function createConnection(filename) {
  */
 function run(dbConnection, query, params = []) {
     return new Promise(async (resolve, reject) => {
+        if (!dbConnection) {
+            reject("Unable to execute query: No database connection");
+            return;
+        }
+
         dbConnection.run(query, params, async function (error) {
             if (error) {
                 reject(error);
                 return;
             }
 
-            writes++;
-
-            if (writes > 0 && (!lastWrite || (new Date() - lastWrite) > 1000 * 60 * 5)) {
-                console.log(`Uploading database file - writes: ${writes}, lastWrite: ${lastWrite?.toISOString() || ''}`);
-                await uploadFile(dbConnection.filename);
-                lastWrite = new Date();
-                writes = 0;
-            }
-
+            await uploadFile(dbConnection.filename);
             resolve(this);
         });
     });
@@ -78,6 +82,11 @@ function run(dbConnection, query, params = []) {
  */
 function findFirst(dbConnection, table) {
     return new Promise((resolve, reject) => {
+        if (!dbConnection) {
+            reject("Not connected to database.");
+            return;
+        }
+
         dbConnection.get(
             `SELECT * FROM ${table} LIMIT 1`,
             (error, row) => {
@@ -91,8 +100,29 @@ function findFirst(dbConnection, table) {
     });
 }
 
+function findLast(dbConnection, table) {
+    return new Promise((resolve, reject) => {
+        if (!dbConnection) {
+            reject(`Unable to query table ${table}: Not connected to database.`);
+            return;
+        }
+    
+        dbConnection.get(
+            `SELECT * FROM ${table}`,
+            (error, row) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(row);
+                }
+            }
+        )
+    });
+}
+
 export {
     createConnection,
     run,
-    findFirst
+    findFirst,
+    findLast
 }
