@@ -45,68 +45,6 @@ class ScrollToTopButton {
     }
 }
 
-class HitCounter extends HTMLElement {
-    constructor() {
-        super();
-    }
-
-    async connectedCallback() {
-        const shadow = this.attachShadow({
-            mode: "open"
-        });
-
-        const hitHasBeenCounted = document.cookie.split("; ").find((row) => row.startsWith("hitHasBeenCounted=true"));
-        const response = await fetch(`/microservice/hit`, { method: hitHasBeenCounted ? "GET" : "POST" });
-        const json = await response.json();
-
-        if(response.ok) {
-            document.cookie = "hitHasBeenCounted=true; max-age=3600; path=/";
-        } else {
-            console.error(`The hit counter microservice returned an error: ${json.error}`);
-        }
-
-        const div = document.createElement('div');
-        div.setAttribute("class", "badge");
-
-        const left = document.createElement("div");
-        left.setAttribute("class", "inner");
-        left.textContent = `You are visitor #${response.ok ? json.hitCount : 'ERROR'}`;
-        div.appendChild(left);
-        
-
-        const style = document.createElement("style");
-        style.textContent = `
-        .badge {
-            display: flex;
-            width: 210px;
-            height: 30px;
-            border: 1px solid black;
-            box-sizing: border-box;
-            font-size: 1.1rem;
-            text-decoration: none;
-            font-family: 'Digital-7';
-            background-color: black;
-            color: #00FF00;
-
-            .inner {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 1px;
-                height: calc(100% - 2px);
-                flex: 1;
-                padding: 0 1px;
-            }
-        }
-        `;
-
-        shadow.appendChild(style);
-        shadow.appendChild(div);
-    }
-}
-
-customElements.define('clueless-hit-counter', HitCounter);
-
 (function () {
     const scrollToTopButton = new ScrollToTopButton('scroll-to-top-button', document.documentElement, 0.1);
     scrollToTopButton.setupEvents();

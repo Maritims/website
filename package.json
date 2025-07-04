@@ -2,16 +2,11 @@
     "name": "website",
     "private": "true",
     "scripts": {
-        "dev:microservice": "cd microservice && npm run dev",
-        "dev:website": "cd website && npm run dev",
-        "dev:proxy": "cd proxy && npm run dev",
-        "dev:all": "concurrently \"npm run dev:microservice\" \"npm run dev:website\" \"npm run dev:proxy\"",
-        "install:microservice": "cd microservice && npm i",
-        "install:website": "cd website && npm i",
-        "install:proxy": "cd proxy && npm i",
-        "install:all": "npm run install:microservice && npm run install:website && npm run install:proxy"
+        "dev": "cd website && npm run dev",
+        "install": "cd website && npm i"
     },
     "devDependencies": {
-        "concurrently": "^9.1.2"
+        "concurrently": "^9.1.2",
+        "express": "^5.1.0"
     }
 }

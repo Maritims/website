@@ -277,10 +277,6 @@ async function buildEverything() {
         title: 'Links',
         description: 'Links to other areas of the Internet I enjoy.',
         name: 'links'
-    }, {
-        title: 'Balatro',
-        description: 'Balatro',
-        name: 'balatro'
     }];
     const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');
     const templateFileLastModified = (await fs.stat(`${srcDir}/layout.html`)).mtimeMs;
