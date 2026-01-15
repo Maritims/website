@@ -3,7 +3,6 @@
 # Exit on error
 set -e
 
-# Configuration from environment or defaults
 if [ -z "$DEPLOY_USER" ]; then
     echo "Error: DEPLOY_USER environment variable is not set"
     exit 1
