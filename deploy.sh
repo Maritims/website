@@ -4,8 +4,17 @@
 set -e
 
 # Configuration from environment or defaults
-DEPLOY_USER="${DEPLOY_USER:-martin}"
-DEPLOY_HOST="${DEPLOY_HOST:-clueless.no}"
+if [ -z "$DEPLOY_USER" ]; then
+    echo "Error: DEPLOY_USER environment variable is not set"
+    exit 1
+fi
+
+if [ -z "$DEPLOY_HOST" ]; then
+    echo "Error: DEPLOY_HOST environment variable is not set"
+    exit 1
+fi
+
+
 IMAGE_NAME="clueless-website"
 TAG="latest"
 TAR_NAME="clueless-website.tar"
