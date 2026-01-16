@@ -4,5 +4,8 @@
         "src/",
         "static/"
     ],
-    "ext": "css,html,js"
+    "ext": "css,html,js",
+    "events": {
+        "restart": "node build.js"
+    }
 }

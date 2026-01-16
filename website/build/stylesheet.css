@@ -91,3 +91,9 @@ footer#the-main-footer {
         margin-bottom: 5px;
     }
 }
+
+article {
+    &.job, &.school, &.volunteer-work {
+        border-bottom: 1px solid black;
+    }
+}

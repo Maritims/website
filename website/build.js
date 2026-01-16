@@ -1,7 +1,7 @@
 import { formatInTimeZone } from 'date-fns-tz';
-import ejs, { render } from 'ejs';
+import ejs from 'ejs';
 import * as fs from 'node:fs/promises';
-import { existsSync, stat } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'path';
 import sharp from 'sharp';
 
@@ -27,8 +27,9 @@ class ImageProcessor {
 
     /**
      * Optimize the image in the source directory and copy it to the target directory.
+     * @param {string} sourceDirectory
      * @param {string} targetDirectory
-     * @param {string} fileName 
+     * @param {string} fileName
      */
     async optimizeAndCopyFile(sourceDirectory, targetDirectory, fileName) {
         const sourceFilePath = path.join(sourceDirectory, fileName);
@@ -183,10 +184,6 @@ class StaticFileProcessor {
      * @type {string}
      */
     targetDirectory;
-    /**
-     * @type {ImageProcessor}
-     */
-    imageProcessor;
 
     /**
      * @param {string} sourceDirectory 
@@ -270,6 +267,10 @@ async function buildEverything() {
         description: 'This used to be my Instagram feed.',
         name: 'gallery'
     }, {
+        title: 'CV',
+        description: 'My CV.',
+        name: 'cv'
+    }, {
         title: 'Projects',
         description: 'Some of my projects.',
         name: 'projects'
@@ -278,6 +279,7 @@ async function buildEverything() {
         description: 'Links to other areas of the Internet I enjoy.',
         name: 'links'
     }];
+
     const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');
     const templateFileLastModified = (await fs.stat(`${srcDir}/layout.html`)).mtimeMs;
 
@@ -291,4 +293,4 @@ async function buildEverything() {
     console.log(`Build complete in ${elapsed / 1000} s`);
 }
 
-buildEverything();
+buildEverything().then(() => {});
