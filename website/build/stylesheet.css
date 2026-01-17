@@ -1,7 +1,38 @@
-* {
-    font-family: system-ui, sans-serif;
+:root {
+    --main-font-family: system-ui, sans-serif;
+    --main-color: black;
+    --main-background-color: white;
+    --secondary-background-color: black;
+    --border-color: black;
+    --link-color: blue;
+    --link-color-visited: purple;
 }
 
+::backdrop {
+    background-color: var(--secondary-background-color);
+    opacity: 0.5;
+}
+
+/*noinspection CssNoGenericFontName*/
+* {
+
+}
+
+body {
+    font-family: var(--main-font-family);
+    color: var(--main-color);
+    background-color: var(--main-background-color);
+
+    a {
+        color: var(--link-color);
+
+        &:visited {
+            color: var(--link-color-visited);
+        }
+    }
+}
+
+/*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'Roboto';
     src: url('/fonts/Roboto-Regular.ttf');
@@ -94,6 +125,6 @@ footer#the-main-footer {
 
 article {
     &.job, &.school, &.volunteer-work {
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid var(--border-color);
     }
 }

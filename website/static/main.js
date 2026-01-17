@@ -13,7 +13,7 @@ class ScrollToTopButton {
     _scrollThreshold;
 
     /**
-     * @param {string} buttonElementId 
+     * @param {string} buttonElementId
      * @param {Element} rootElement
      * @param {number} scrollThreshold
      */
@@ -24,6 +24,7 @@ class ScrollToTopButton {
     }
 
     scrollToTop() {
+        // noinspection JSCheckFunctionSignatures
         this._rootElement.scrollTo({
             top: 0,
             behaviour: 'smooth'
