@@ -22,7 +22,7 @@ class ThemeEditor extends HTMLElement {
             "--main-background-color": "Main background color",
             "--secondary-background-color": "Secondary background color",
             "--link-color": "Link color",
-            "--link-visited-color": "Link color (visited)"
+            "--link-color-visited": "Link color (visited)"
         };
     }
 
