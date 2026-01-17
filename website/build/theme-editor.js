@@ -4,7 +4,7 @@
  * @property {string} "--main-background-color"
  * @property {string} "--secondary-background-color"
  * @property {string} "--link-color"
- * @property {string} "--link-visited-color"
+ * @property {string} "--link-color-visited"
  * @property {string} "--main-font-family"
  */
 
@@ -14,10 +14,6 @@ class ThemeEditor extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this._storageKey = 'theme-editor-settings';
 
-        /**
-         * @type {ThemeTranslations}
-         * @private
-         */
         this._translations = {
             "--main-color": "Main color",
             "--main-background-color": "Main background color",
@@ -27,13 +23,37 @@ class ThemeEditor extends HTMLElement {
             "--main-font-family": "Main font family"
         };
 
-        // Define available fonts
         this._fonts = [
             { label: 'System Sans', value: 'system-ui, sans-serif' },
             { label: 'Serif', value: 'Georgia, serif' },
-            { label: 'Monospace', value: 'monospace' },
-            { label: 'Cursive', value: 'cursive' }
+            { label: 'Monospace', value: 'monospace' }
         ];
+
+        // Define our Presets
+        this._presets = {
+            "default": {
+                label: "Standard",
+                values: {
+                    "--main-color": "#333333",
+                    "--main-background-color": "#ffffff",
+                    "--secondary-background-color": "#f0f0f0",
+                    "--link-color": "#0000ee",
+                    "--link-color-visited": "#551a8b",
+                    "--main-font-family": "system-ui, sans-serif"
+                }
+            },
+            "hacker": {
+                label: "Hacker",
+                values: {
+                    "--main-color": "#00ff00",
+                    "--main-background-color": "#000000",
+                    "--secondary-background-color": "#0a0a0a",
+                    "--link-color": "#ffffff",
+                    "--link-color-visited": "#cccccc",
+                    "--main-font-family": "monospace"
+                }
+            }
+        };
     }
 
     connectedCallback() {
@@ -41,33 +61,33 @@ class ThemeEditor extends HTMLElement {
         this.render();
     }
 
-    /**
-     * Loads settings from localStorage and applies them to the document
-     */
     loadSavedTheme() {
         const saved = localStorage.getItem(this._storageKey);
         if (saved) {
             try {
                 const settings = JSON.parse(saved);
-                Object.entries(settings).forEach(
-                    /**
-                     * @param {string} prop
-                     * @param {string} value
-                     */
-                    ([prop, value]) => {
+                Object.entries(settings).forEach(([prop, value]) => {
                     document.documentElement.style.setProperty(prop, value);
                 });
-            } catch (e) {
-                console.error("Failed to parse saved theme", e);
-            }
+            } catch (e) { console.error(e); }
         }
     }
 
     /**
-     * Saves a single property to localStorage
-     * @param {string} property
-     * @param {string} value
+     * Applies a preset and saves the whole batch to storage
      */
+    applyPreset(presetKey) {
+        const preset = this._presets[presetKey];
+        if (!preset) return;
+
+        Object.entries(preset.values).forEach(([prop, value]) => {
+            document.documentElement.style.setProperty(prop, value);
+        });
+
+        localStorage.setItem(this._storageKey, JSON.stringify(preset.values));
+        this.render(); // Re-draw inputs to show new values
+    }
+
     saveVariable(property, value) {
         const saved = localStorage.getItem(this._storageKey);
         const settings = saved ? JSON.parse(saved) : {};
@@ -75,15 +95,12 @@ class ThemeEditor extends HTMLElement {
         localStorage.setItem(this._storageKey, JSON.stringify(settings));
     }
 
-    /**
-     * Reverts to browser CSS defaults and clears storage
-     */
     resetTheme() {
         localStorage.removeItem(this._storageKey);
         Object.keys(this._translations).forEach(prop => {
             document.documentElement.style.removeProperty(prop);
         });
-        this.render(); // Re-render to update input colors
+        this.render();
     }
 
     _getCurrentValue(property) {
@@ -99,72 +116,68 @@ class ThemeEditor extends HTMLElement {
     render() {
         const style = `
             :host { font-family: system-ui, sans-serif; }
-            #settings-dialog { border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 350px;}
-            #settings-dialog::backdrop { background: rgba(0,0,0,0.5); }
+            #settings-dialog { border: none; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 350px;}
+            #settings-dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
             
-            form {
-                display: grid;
-                grid-template-columns: 1fr 120px;
-                gap: 15px;
-                align-items: center;
-                margin-bottom: 20px;
+            .preset-section { 
+                display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; 
             }
-            label { font-size: 0.9rem; font-weight: 500; }
-            input[type="color"], select { 
-                cursor: pointer; 
-                border: 1px solid #ccc; 
-                border-radius: 4px; 
-                height: 32px; 
-                width: 100%;
-                box-sizing: border-box;
+            .preset-btn { 
+                flex: 1; padding: 6px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; cursor: pointer;
             }
-            .controls { display: flex; justify-content: flex-end; gap: 8px; }
-            button { cursor: pointer; padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; background: white; }
-            #open-dialog { background: var(--main-color, #000); color: white; border: none; }
+            .preset-btn:hover { background: #eee; }
+
+            form { display: grid; grid-template-columns: 1fr 100px; gap: 12px; align-items: center; margin-bottom: 20px; }
+            label { font-size: 0.85rem; color: #555; }
+            input[type="color"], select { height: 32px; width: 100%; cursor: pointer; }
+            
+            .controls { display: flex; justify-content: space-between; align-items: center; }
+            #reset-btn { color: #888; border: none; background: none; text-decoration: underline; font-size: 0.8rem; }
+            #close-dialog { background: #333; color: white; border: none; padding: 8px 20px; border-radius: 6px; }
         `;
+
+        const presetButtons = Object.entries(this._presets).map(([key, preset]) =>
+            `<button type="button" class="preset-btn" data-preset="${key}">${preset.label}</button>`
+        ).join('');
+
         const formElements = Object.entries(this._translations).map(([property, label]) => {
             const value = this._getCurrentValue(property);
-
-            // Check if it's a font-family property
             if (property.includes('font-family')) {
                 const options = this._fonts.map(f =>
                     `<option value="${f.value}" ${value.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`
                 ).join('');
-
-                return `
-                    <label for="${property}">${label}</label>
-                    <select name="${property}" id="${property}">${options}</select>
-                `;
+                return `<label>${label}</label><select name="${property}">${options}</select>`;
             }
-
-            // Default to color input
-            const hexValue = this._normalizeHex(value);
-            return `
-                <label for="${property}">${label}</label>
-                <input type="color" name="${property}" id="${property}" value="${hexValue}" />
-            `;
+            return `<label>${label}</label><input type="color" name="${property}" value="${this._normalizeHex(value)}" />`;
         }).join('');
 
         this.shadowRoot.innerHTML = `
             <style>${style}</style>
             <button type="button" id="open-dialog">Edit theme</button>
             <dialog id="settings-dialog">
-                <h3 style="margin-top:0">Edit theme</h3>
+                <h3 style="margin-top:0">Presets</h3>
+                <div class="preset-section">${presetButtons}</div>
+                
+                <h3 style="font-size: 1rem;">Edit theme</h3>
                 <form method="dialog">${formElements}</form>
+                
                 <div class="controls">
-                    <button type="button" id="reset-btn">Reset</button>
+                    <button type="button" id="reset-btn">Clear All</button>
                     <button type="button" id="close-dialog">Done</button>
                 </div>
             </dialog>
         `;
 
-        // Listen for both color 'input' and select 'change'
+        // Presets logic
+        this.shadowRoot.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.applyPreset(btn.dataset.preset));
+        });
+
+        // Manual inputs logic
         this.shadowRoot.querySelectorAll('input, select').forEach(el => {
-            const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
-            el.addEventListener(eventType, (e) => {
-                const { name, value } = e.target;
-                document.documentElement.style.setProperty(name, value);
-                this.saveVariable(name, value);
+            el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', (e) => {
+                document.documentElement.style.setProperty(e.target.name, e.target.value);
+                this.saveVariable(e.target.name, e.target.value);
             });
         });
 
