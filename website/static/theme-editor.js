@@ -5,6 +5,7 @@
  * @property {string} "--secondary-background-color"
  * @property {string} "--link-color"
  * @property {string} "--link-visited-color"
+ * @property {string} "--main-font-family"
  */
 
 class ThemeEditor extends HTMLElement {
@@ -22,8 +23,17 @@ class ThemeEditor extends HTMLElement {
             "--main-background-color": "Main background color",
             "--secondary-background-color": "Secondary background color",
             "--link-color": "Link color",
-            "--link-color-visited": "Link color (visited)"
+            "--link-color-visited": "Link color (visited)",
+            "--main-font-family": "Main font family"
         };
+
+        // Define available fonts
+        this._fonts = [
+            { label: 'System Sans', value: 'system-ui, sans-serif' },
+            { label: 'Serif', value: 'Georgia, serif' },
+            { label: 'Monospace', value: 'monospace' },
+            { label: 'Cursive', value: 'cursive' }
+        ];
     }
 
     connectedCallback() {
@@ -76,41 +86,62 @@ class ThemeEditor extends HTMLElement {
         this.render(); // Re-render to update input colors
     }
 
-    _getInitialValue(property) {
-        // 1. Check computed style (which includes our current inline overrides)
-        const value = getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+    _getCurrentValue(property) {
+        return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+    }
 
-        // 2. Normalize to Hex for the input element
+    _normalizeHex(colorValue) {
         const ctx = document.createElement('canvas').getContext('2d');
-        ctx.fillStyle = value || '#000000';
+        ctx.fillStyle = colorValue || '#000000';
         return ctx.fillStyle;
     }
+
     render() {
         const style = `
             :host { font-family: system-ui, sans-serif; }
-            #settings-dialog { border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+            #settings-dialog { border: none; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 350px;}
             #settings-dialog::backdrop { background: rgba(0,0,0,0.5); }
             
             form {
                 display: grid;
-                grid-template-columns: 1fr auto;
+                grid-template-columns: 1fr 120px;
                 gap: 15px;
                 align-items: center;
                 margin-bottom: 20px;
             }
-            .element-group { display: contents; }
             label { font-size: 0.9rem; font-weight: 500; }
-            input[type="color"] { cursor: pointer; border: 1px solid #ccc; border-radius: 4px; height: 30px; width: 50px; }
+            input[type="color"], select { 
+                cursor: pointer; 
+                border: 1px solid #ccc; 
+                border-radius: 4px; 
+                height: 32px; 
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .controls { display: flex; justify-content: flex-end; gap: 8px; }
             button { cursor: pointer; padding: 8px 16px; border-radius: 4px; border: 1px solid #ccc; background: white; }
             #open-dialog { background: var(--main-color, #000); color: white; border: none; }
         `;
-        const elementGroups = Object.entries(this._translations).map(([property, label]) => {
-            const hexValue = this._getInitialValue(property);
-            return `
-                <div class="element-group">
+        const formElements = Object.entries(this._translations).map(([property, label]) => {
+            const value = this._getCurrentValue(property);
+
+            // Check if it's a font-family property
+            if (property.includes('font-family')) {
+                const options = this._fonts.map(f =>
+                    `<option value="${f.value}" ${value.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`
+                ).join('');
+
+                return `
                     <label for="${property}">${label}</label>
-                    <input type="color" name="${property}" id="${property}" value="${hexValue}""/>
-                </div>
+                    <select name="${property}" id="${property}">${options}</select>
+                `;
+            }
+
+            // Default to color input
+            const hexValue = this._normalizeHex(value);
+            return `
+                <label for="${property}">${label}</label>
+                <input type="color" name="${property}" id="${property}" value="${hexValue}" />
             `;
         }).join('');
 
@@ -119,7 +150,7 @@ class ThemeEditor extends HTMLElement {
             <button type="button" id="open-dialog">Edit theme</button>
             <dialog id="settings-dialog">
                 <h3 style="margin-top:0">Edit theme</h3>
-                <form method="dialog">${elementGroups}</form>
+                <form method="dialog">${formElements}</form>
                 <div class="controls">
                     <button type="button" id="reset-btn">Reset</button>
                     <button type="button" id="close-dialog">Done</button>
@@ -127,16 +158,16 @@ class ThemeEditor extends HTMLElement {
             </dialog>
         `;
 
-        // Input listeners
-        this.shadowRoot.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', (e) => {
+        // Listen for both color 'input' and select 'change'
+        this.shadowRoot.querySelectorAll('input, select').forEach(el => {
+            const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
+            el.addEventListener(eventType, (e) => {
                 const { name, value } = e.target;
                 document.documentElement.style.setProperty(name, value);
                 this.saveVariable(name, value);
             });
         });
 
-        // Dialog controls
         const dialog = this.shadowRoot.querySelector('#settings-dialog');
         this.shadowRoot.querySelector('#open-dialog').addEventListener('click', () => dialog.showModal());
         this.shadowRoot.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
