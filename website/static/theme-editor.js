@@ -1,11 +1,5 @@
 /**
  * @typedef {Object} ThemeTranslations
- * @property {string} "--main-color"
- * @property {string} "--main-background-color"
- * @property {string} "--secondary-background-color"
- * @property {string} "--link-color"
- * @property {string} "--link-color-visited"
- * @property {string} "--main-font-family"
  */
 
 class ThemeEditor extends HTMLElement {
@@ -15,44 +9,28 @@ class ThemeEditor extends HTMLElement {
         this._storageKey = 'theme-editor-settings';
 
         this._translations = {
-            "--main-color": "Main color",
-            "--main-background-color": "Main background color",
-            "--secondary-background-color": "Secondary background color",
-            "--link-color": "Link color",
-            "--link-color-visited": "Link color (visited)",
-            "--main-font-family": "Main font family"
+            "--main-color": "Text Color",
+            "--main-background-color": "Background",
+            "--secondary-background-color": "Surface",
+            "--link-color": "Link Color",
+            "--link-color-visited": "Visited Link",
+            "--main-font-family": "Font Family",
+            "--border-radius": "Corner Radius",
+            "--border-width": "Border Thickness",
+            "--spacing-unit": "Spacing"
         };
 
         this._fonts = [
             { label: 'System Sans', value: 'system-ui, sans-serif' },
             { label: 'Serif', value: 'Georgia, serif' },
-            { label: 'Monospace', value: 'monospace' }
+            { label: 'Monospace', value: 'monospace' },
+            { label: '90s Amateur', value: '"Comic Sans MS", "Comic Sans", cursive' }
         ];
 
-        // Define our Presets
         this._presets = {
-            "default": {
-                label: "Standard",
-                values: {
-                    "--main-color": "#333333",
-                    "--main-background-color": "#ffffff",
-                    "--secondary-background-color": "#f0f0f0",
-                    "--link-color": "#0000ee",
-                    "--link-color-visited": "#551a8b",
-                    "--main-font-family": "system-ui, sans-serif"
-                }
-            },
-            "hacker": {
-                label: "Hacker",
-                values: {
-                    "--main-color": "#00ff00",
-                    "--main-background-color": "#000000",
-                    "--secondary-background-color": "#0a0a0a",
-                    "--link-color": "#ffffff",
-                    "--link-color-visited": "#cccccc",
-                    "--main-font-family": "monospace"
-                }
-            }
+            "default": { label: "Standard", values: { "--main-color": "#333333", "--main-background-color": "#ffffff", "--secondary-background-color": "#f0f0f0", "--link-color": "#0000ee", "--link-color-visited": "#551a8b", "--main-font-family": "system-ui, sans-serif", "--border-radius": "4px", "--border-width": "1px", "--spacing-unit": "8px", "--is-blinking": "none" } },
+            "hacker": { label: "Hacker", values: { "--main-color": "#00ff00", "--main-background-color": "#000000", "--secondary-background-color": "#0a0a0a", "--link-color": "#00ff00", "--link-color-visited": "#008800", "--main-font-family": "monospace", "--border-radius": "0px", "--border-width": "1px", "--spacing-unit": "6px", "--is-blinking": "none" } },
+            "geocities": { label: "GeoCities '96", values: { "--main-color": "#0000FF", "--main-background-color": "#C0C0C0", "--secondary-background-color": "#FFFF00", "--link-color": "#FF0000", "--link-color-visited": "#800000", "--main-font-family": '"Comic Sans MS", "Comic Sans", cursive', "--border-radius": "0px", "--border-width": "3px", "--spacing-unit": "12px", "--is-blinking": "inline" } },
         };
     }
 
@@ -66,126 +44,120 @@ class ThemeEditor extends HTMLElement {
         if (saved) {
             try {
                 const settings = JSON.parse(saved);
-                Object.entries(settings).forEach(([prop, value]) => {
-                    document.documentElement.style.setProperty(prop, value);
-                });
+                Object.entries(settings).forEach(([prop, val]) => document.documentElement.style.setProperty(prop, val));
             } catch (e) { console.error(e); }
         }
     }
 
-    /**
-     * Applies a preset and saves the whole batch to storage
-     */
-    applyPreset(presetKey) {
-        const preset = this._presets[presetKey];
-        if (!preset) return;
-
-        Object.entries(preset.values).forEach(([prop, value]) => {
-            document.documentElement.style.setProperty(prop, value);
-        });
-
-        localStorage.setItem(this._storageKey, JSON.stringify(preset.values));
-        this.render(); // Re-draw inputs to show new values
-    }
-
-    saveVariable(property, value) {
-        const saved = localStorage.getItem(this._storageKey);
-        const settings = saved ? JSON.parse(saved) : {};
-        settings[property] = value;
-        localStorage.setItem(this._storageKey, JSON.stringify(settings));
-    }
-
-    resetTheme() {
-        localStorage.removeItem(this._storageKey);
-        Object.keys(this._translations).forEach(prop => {
-            document.documentElement.style.removeProperty(prop);
-        });
+    applyPreset(key) {
+        if (key === 'random') {
+            const randomHex = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            const newTheme = Object.keys(this._translations).reduce((acc, prop) => {
+                if (prop.includes('font')) acc[prop] = this._fonts[Math.floor(Math.random() * this._fonts.length)].value;
+                else if (prop.includes('radius') || prop.includes('width') || prop.includes('spacing')) acc[prop] = Math.floor(Math.random() * 20) + "px";
+                else acc[prop] = randomHex();
+                return acc;
+            }, {});
+            Object.entries(newTheme).forEach(([p, v]) => document.documentElement.style.setProperty(p, v));
+            localStorage.setItem(this._storageKey, JSON.stringify(newTheme));
+        } else {
+            const preset = this._presets[key];
+            if (!preset) return;
+            document.documentElement.removeAttribute('style');
+            Object.entries(preset.values).forEach(([p, v]) => document.documentElement.style.setProperty(p, v));
+            localStorage.setItem(this._storageKey, JSON.stringify(preset.values));
+        }
         this.render();
-    }
-
-    _getCurrentValue(property) {
-        return getComputedStyle(document.documentElement).getPropertyValue(property).trim();
-    }
-
-    _normalizeHex(colorValue) {
-        const ctx = document.createElement('canvas').getContext('2d');
-        ctx.fillStyle = colorValue || '#000000';
-        return ctx.fillStyle;
     }
 
     render() {
         const style = `
-            :host { font-family: system-ui, sans-serif; }
-            #settings-dialog { border: none; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 350px;}
-            #settings-dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
-            
-            .preset-section { 
-                display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; 
+            form { 
+                display: grid; 
+                grid-template-columns: auto 1fr; 
+                gap: 10px; 
+                align-items: center; 
+                margin: 15px 0;
             }
-            .preset-btn { 
-                flex: 1; padding: 6px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; cursor: pointer;
+            .controls { 
+                display: flex; 
+                justify-content: flex-end; 
+                gap: 10px; 
+                margin-top: 20px; 
             }
-            .preset-btn:hover { background: #eee; }
-
-            form { display: grid; grid-template-columns: 1fr 100px; gap: 12px; align-items: center; margin-bottom: 20px; }
-            label { font-size: 0.85rem; color: #555; }
-            input[type="color"], select { height: 32px; width: 100%; cursor: pointer; }
-            
-            .controls { display: flex; justify-content: space-between; align-items: center; }
-            #reset-btn { color: #888; border: none; background: none; text-decoration: underline; font-size: 0.8rem; }
-            #close-dialog { background: #333; color: white; border: none; padding: 8px 20px; border-radius: 6px; }
+            hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
         `;
 
-        const presetButtons = Object.entries(this._presets).map(([key, preset]) =>
-            `<button type="button" class="preset-btn" data-preset="${key}">${preset.label}</button>`
-        ).join('');
+        const presetOptions = Object.entries(this._presets).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('');
 
-        const formElements = Object.entries(this._translations).map(([property, label]) => {
-            const value = this._getCurrentValue(property);
-            if (property.includes('font-family')) {
-                const options = this._fonts.map(f =>
-                    `<option value="${f.value}" ${value.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`
-                ).join('');
-                return `<label>${label}</label><select name="${property}">${options}</select>`;
+        const formFields = Object.entries(this._translations).map(([prop, label]) => {
+            const val = getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+
+            if (prop.includes('font')) {
+                const opts = this._fonts.map(f => `<option value="${f.value}" ${val.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`).join('');
+                return `<label>${label}</label><select name="${prop}">${opts}</select>`;
             }
-            return `<label>${label}</label><input type="color" name="${property}" value="${this._normalizeHex(value)}" />`;
+
+            if (prop.includes('radius') || prop.includes('width') || prop.includes('spacing')) {
+                const num = parseInt(val) || 0;
+                return `<label>${label}</label><input type="range" name="${prop}" min="0" max="30" value="${num}" />`;
+            }
+
+            const ctx = document.createElement('canvas').getContext('2d');
+            ctx.fillStyle = val || '#000000';
+            return `<label>${label}</label><input type="color" name="${prop}" value="${ctx.fillStyle}" />`;
         }).join('');
 
         this.shadowRoot.innerHTML = `
             <style>${style}</style>
-            <button type="button" id="open-dialog">Edit theme</button>
-            <dialog id="settings-dialog">
-                <h3 style="margin-top:0">Presets</h3>
-                <div class="preset-section">${presetButtons}</div>
+            <button type="button" id="open">Theme Settings</button>
+            <dialog id="modal">
+                <header>
+                    <strong>Appearance</strong>
+                </header>
                 
-                <h3 style="font-size: 1rem;">Edit theme</h3>
-                <form method="dialog">${formElements}</form>
-                
+                <p>
+                    <label>Preset: </label>
+                    <select id="pre-sel">
+                        <option value="" disabled selected>Select...</option>
+                        ${presetOptions}
+                        <option value="random">Randomize</option>
+                    </select>
+                </p>
+
+                <hr>
+
+                <form method="dialog">
+                    ${formFields}
+                </form>
+
                 <div class="controls">
-                    <button type="button" id="reset-btn">Clear All</button>
-                    <button type="button" id="close-dialog">Done</button>
+                    <button type="button" id="reset">Reset</button>
+                    <button type="button" id="close">Done</button>
                 </div>
             </dialog>
         `;
 
-        // Presets logic
-        this.shadowRoot.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.applyPreset(btn.dataset.preset));
-        });
-
-        // Manual inputs logic
-        this.shadowRoot.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', (e) => {
-                document.documentElement.style.setProperty(e.target.name, e.target.value);
-                this.saveVariable(e.target.name, e.target.value);
+        this.shadowRoot.querySelector('#pre-sel').onchange = e => this.applyPreset(e.target.value);
+        this.shadowRoot.querySelectorAll('input, select:not(#pre-sel)').forEach(el => {
+            el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', e => {
+                let val = e.target.value;
+                if (e.target.type === 'range') val += 'px';
+                document.documentElement.style.setProperty(e.target.name, val);
+                const saved = JSON.parse(localStorage.getItem(this._storageKey) || '{}');
+                saved[e.target.name] = val;
+                localStorage.setItem(this._storageKey, JSON.stringify(saved));
             });
         });
 
-        const dialog = this.shadowRoot.querySelector('#settings-dialog');
-        this.shadowRoot.querySelector('#open-dialog').addEventListener('click', () => dialog.showModal());
-        this.shadowRoot.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
-        this.shadowRoot.querySelector('#reset-btn').addEventListener('click', () => this.resetTheme());
+        const d = this.shadowRoot.querySelector('#modal');
+        this.shadowRoot.querySelector('#open').onclick = () => d.showModal();
+        this.shadowRoot.querySelector('#close').onclick = () => d.close();
+        this.shadowRoot.querySelector('#reset').onclick = () => {
+            localStorage.removeItem(this._storageKey);
+            document.documentElement.removeAttribute('style');
+            this.render();
+        };
     }
 }
-
 customElements.define('theme-editor', ThemeEditor);
