@@ -5,7 +5,7 @@
 class ThemeEditor extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.attachShadow({mode: 'open'});
         this._storageKey = 'theme-editor-settings';
 
         this._translations = {
@@ -21,16 +21,55 @@ class ThemeEditor extends HTMLElement {
         };
 
         this._fonts = [
-            { label: 'System Sans', value: 'system-ui, sans-serif' },
-            { label: 'Serif', value: 'Georgia, serif' },
-            { label: 'Monospace', value: 'monospace' },
-            { label: '90s Amateur', value: '"Comic Sans MS", "Comic Sans", cursive' }
+            {label: 'System Sans', value: 'system-ui, sans-serif'},
+            {label: 'Serif', value: 'Georgia, serif'},
+            {label: 'Monospace', value: 'monospace'},
+            {label: '90s Amateur', value: '"Comic Sans MS", "Comic Sans", cursive'}
         ];
 
         this._presets = {
-            "default": { label: "Standard", values: { "--main-color": "#333333", "--main-background-color": "#ffffff", "--secondary-background-color": "#f0f0f0", "--link-color": "#0000ee", "--link-color-visited": "#551a8b", "--main-font-family": "system-ui, sans-serif", "--border-radius": "4px", "--border-width": "1px", "--spacing-unit": "8px", "--is-blinking": "none" } },
-            "hacker": { label: "Hacker", values: { "--main-color": "#00ff00", "--main-background-color": "#000000", "--secondary-background-color": "#0a0a0a", "--link-color": "#00ff00", "--link-color-visited": "#008800", "--main-font-family": "monospace", "--border-radius": "0px", "--border-width": "1px", "--spacing-unit": "6px", "--is-blinking": "none" } },
-            "geocities": { label: "GeoCities '96", values: { "--main-color": "#0000FF", "--main-background-color": "#C0C0C0", "--secondary-background-color": "#FFFF00", "--link-color": "#FF0000", "--link-color-visited": "#800000", "--main-font-family": '"Comic Sans MS", "Comic Sans", cursive', "--border-radius": "0px", "--border-width": "3px", "--spacing-unit": "12px", "--is-blinking": "inline" } },
+            "default": {label: "Standard",
+                values: {
+                    "--main-color": "#333333",
+                    "--main-background-color": "#ffffff",
+                    "--secondary-background-color": "#f0f0f0",
+                    "--link-color": "#0000ee",
+                    "--link-color-visited": "#551a8b",
+                    "--main-font-family": "system-ui, sans-serif",
+                    "--border-radius": "4px",
+                    "--border-width": "1px",
+                    "--spacing-unit": "8px",
+                    "--is-blinking": "none"
+                }
+            },
+            "hacker": {label: "Hacker",
+                values: {
+                    "--main-color": "#00ff00",
+                    "--main-background-color": "#000000",
+                    "--secondary-background-color": "#0a0a0a",
+                    "--link-color": "#00ff00",
+                    "--link-color-visited": "#008800",
+                    "--main-font-family": "monospace",
+                    "--border-radius": "0px",
+                    "--border-width": "1px",
+                    "--spacing-unit": "6px",
+                    "--is-blinking": "none"
+                }
+            },
+            "geocities": {label: "GeoCities '96",
+                values: {
+                    "--main-color": "#0000FF",
+                    "--main-background-color": "#C0C0C0",
+                    "--secondary-background-color": "#FFFF00",
+                    "--link-color": "#FF0000",
+                    "--link-color-visited": "#800000",
+                    "--main-font-family": '"Comic Sans MS", "Comic Sans", cursive',
+                    "--border-radius": "0px",
+                    "--border-width": "3px",
+                    "--spacing-unit": "12px",
+                    "--is-blinking": "inline"
+                }
+            },
         };
     }
 
@@ -45,13 +84,15 @@ class ThemeEditor extends HTMLElement {
             try {
                 const settings = JSON.parse(saved);
                 Object.entries(settings).forEach(([prop, val]) => document.documentElement.style.setProperty(prop, val));
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 
     applyPreset(key) {
         if (key === 'random') {
-            const randomHex = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            const randomHex = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
             const newTheme = Object.keys(this._translations).reduce((acc, prop) => {
                 if (prop.includes('font')) acc[prop] = this._fonts[Math.floor(Math.random() * this._fonts.length)].value;
                 else if (prop.includes('radius') || prop.includes('width') || prop.includes('spacing')) acc[prop] = Math.floor(Math.random() * 20) + "px";
@@ -86,6 +127,9 @@ class ThemeEditor extends HTMLElement {
                 margin-top: 20px; 
             }
             hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
+            #open {
+                height: 30px;
+            }
         `;
 
         const presetOptions = Object.entries(this._presets).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('');
@@ -110,10 +154,10 @@ class ThemeEditor extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>${style}</style>
-            <button type="button" id="open">Theme Settings</button>
+            <button type="button" id="open">Edit theme</button>
             <dialog id="modal">
                 <header>
-                    <strong>Appearance</strong>
+                    <strong>Edit theme</strong>
                 </header>
                 
                 <p>
@@ -160,4 +204,5 @@ class ThemeEditor extends HTMLElement {
         };
     }
 }
+
 customElements.define('theme-editor', ThemeEditor);
