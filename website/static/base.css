@@ -84,15 +84,11 @@ button#scroll-to-top-button {
 }
 
 nav.main-navigation {
-    padding: 0 0 5px 0;
-
     ul {
+        display: flex;
+        list-style: none;
         margin: 0;
         padding: 0;
-
-        & > li {
-            display: inline-block;
-        }
     }
 }
 
@@ -118,13 +114,10 @@ footer {
     padding: 5px 0 0 0;
 
     ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
         padding: 0;
-        margin-bottom: 5px;
-        list-style-type: none;
-
-        li {
-            display: inline-block;
-        }
     }
 
     .badges {
