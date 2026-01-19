@@ -1,4 +1,5 @@
 @layer base, theme;
 
 @import url(base.css) layer(base);
+@import url(default.css) layer(theme);
 @import url(lcars.css) layer(theme);

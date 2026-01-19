@@ -21,6 +21,8 @@
 
 :root {
     --font-family: system-ui, sans-serif, serif;
+    --font-size: 16px;
+    --font-color: black;
 
     --first-foreground-color: black;
     --first-background-color: white;
@@ -28,6 +30,13 @@
 
     --link-color: #0000EE;
     --link-color-visited: #551A8B;
+    --link-color-hover: var(--link-color);
+}
+
+html {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    color: var(--font-color);
 }
 
 ::backdrop {
@@ -43,7 +52,7 @@ a {
     }
 
     &:hover {
-        color: hsl(from var(--link-color) h s 115%);
+        color: var(--link-color-hover);
     }
 
     &:active {
@@ -91,11 +100,6 @@ nav.main-navigation {
 
         & > li {
             display: inline-block;
-
-            /*&:not(:last-child)::after {
-                content: "/";
-                padding: 0 5px 0 5px;
-            }*/
         }
     }
 }
@@ -129,6 +133,16 @@ footer {
         li {
             display: inline-block;
         }
+    }
+
+    .badges {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        gap: .25rem;
+        align-items: center;
+        margin-block-start: 1em;
+        font-size: 0;
     }
 }
 

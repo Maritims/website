@@ -1,0 +1,12 @@
+html.default {
+    nav.main-navigation {
+        ul {
+            li {
+                &:not(:last-child)::after {
+                    content: '/';
+                    padding: 0 5px 0 5px;
+                }
+            }
+        }
+    }
+}

@@ -38,10 +38,8 @@ html.lcars {
     --bg-color: black;
     --link-color: #C16FFF;
     --link-color-visited: var(--link-color);
+    --link-color-hover: hsl(from var(--link-color) h s 115%);
 
-    font-family: var(--font-family);
-    font-size: 22px;
-    color: var(--font-color);
     background-color: var(--bg-color);
 
     body {

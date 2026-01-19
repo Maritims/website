@@ -10,6 +10,9 @@ class ThemeSwitcher extends HTMLElement {
      * @private
      */
     _themes = [{
+       label: "Default",
+       value: 'default'
+    }, {
         label: "LCARS",
         value: 'lcars'
     }];
@@ -51,41 +54,15 @@ class ThemeSwitcher extends HTMLElement {
     render() {
         const style = ``;
 
-        const formFields = this._themes
-            .map(({label, value}) => `<label><input type="radio" name="theme" value="${value}" ${value === this.getAttribute('theme') ? 'checked' : ''} /> ${label}</label>`)
-            .join('');
-
         this.innerHTML = `
             <style>${style}</style>
-            <button type="button" id="open">Edit theme</button>
-            <dialog id="modal">
-                <header>
-                    <strong>Edit theme</strong>
-                </header>
-                <form method="dialog">
-                    ${formFields}
-                </form>
-                <div class="controls">
-                    <button type="button" id="reset">Reset</button>
-                    <button type="button" id="close">Done</button>
-                </div>
-            </dialog>
+            <select>${this._themes.map(({label, value}) => `<option value="${value}" ${document.documentElement.classList.contains(value) ? 'selected' : ''}>${label}</option>`).join('')}</select>
         `;
 
-        this.querySelectorAll('input[type=radio]').forEach(element => {
-            element.addEventListener('change', event => {
-                this._themes.forEach(theme => this.documentElement.body.classList.remove(theme.value));
-                this.documentElement.body.classList.add(event.target.value);
-            });
-        })
-
-        const dialog = this.querySelector('#modal');
-        this.querySelector('#open').onclick = () => dialog.showModal();
-        this.querySelector('#close').onclick = () => dialog.close();
-        this.querySelector('#reset').onclick = () => {
-            this._themes.forEach(theme => this.documentElement.body.classList.remove(theme.value));
-            this.render();
-        };
+        this.querySelector('select').addEventListener('change', event => {
+            this._themes.forEach(theme => document.documentElement.classList.remove(theme.value));
+            document.documentElement.classList.add(event.target.value);
+        });
     }
 }
 
