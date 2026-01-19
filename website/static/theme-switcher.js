@@ -22,6 +22,19 @@ class ThemeSwitcher extends HTMLElement {
 
     constructor() {
         super();
+        this.loadSavedTheme();
+    }
+
+    loadSavedTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if(savedTheme) {
+            this._themes.forEach(theme => document.documentElement.classList.remove(theme.value));
+            document.documentElement.classList.add(savedTheme);
+        }
+    }
+
+    saveTheme(theme) {
+        localStorage.setItem('theme', theme);
     }
 
     // noinspection JSUnusedGlobalSymbols
@@ -34,6 +47,7 @@ class ThemeSwitcher extends HTMLElement {
         this.querySelector('select').addEventListener('change', event => {
             this._themes.forEach(theme => document.documentElement.classList.remove(theme.value));
             document.documentElement.classList.add(event.target.value);
+            this.saveTheme(event.target.value);
         });
     }
 }
