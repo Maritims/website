@@ -40,8 +40,6 @@ html.lcars {
     --link-color-visited: var(--link-color);
     --link-color-hover: hsl(from var(--link-color) h s 115%);
 
-    background-color: var(--bg-color);
-
     body {
         h1 {
             color: var(--african-violet);

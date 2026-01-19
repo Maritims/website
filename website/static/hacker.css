@@ -1,0 +1,19 @@
+html.hacker {
+    --font-family: monospace;
+    --font-color: #00ff00;
+    --bg-color: #000000;
+    --link-color: #00ff00;
+    --link-color-visited: #008800;
+    --link-color-hover: hsl(from var(--link-color) h s calc(l + 10));
+
+    nav.main-navigation {
+        ul {
+            li {
+                &:not(:last-child)::after {
+                    content: '/';
+                    padding: 0 5px 0 5px;
+                }
+            }
+        }
+    }
+}

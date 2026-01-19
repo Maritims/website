@@ -24,10 +24,6 @@
     --font-size: 16px;
     --font-color: black;
 
-    --first-foreground-color: black;
-    --first-background-color: white;
-    --second-background-color: black;
-
     --link-color: #0000EE;
     --link-color-visited: #551A8B;
     --link-color-hover: var(--link-color);
@@ -37,11 +33,7 @@ html {
     font-family: var(--font-family);
     font-size: var(--font-size);
     color: var(--font-color);
-}
-
-::backdrop {
-    background-color: var(--second-background-color, revert);
-    opacity: 0.5;
+    background-color: var(--bg-color);
 }
 
 a {
