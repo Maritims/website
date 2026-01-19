@@ -1,0 +1,217 @@
+@font-face {
+    font-family: 'Antonio';
+    src: url('/fonts/Antonio-VariableFont_wght.ttf');
+}
+
+:root {
+    /* Classic theme colors */
+    --african-violet: #CC99FF;
+    --almond: #FFAA90;
+    --almond-creme: #FFBBAA;
+    --blue: #5566FF;
+    --bluey: #8899FF;
+    --butterscotch: #FF9966;
+    --gold: #FFAA00;
+    --golden-orange: #FF9900;
+    --gray: #666688;
+    --green: #999933;
+    --ice: #99CCFF;
+    --lilac: #CC55FF;
+    --lima-bean: #CCCC66;
+    --magenta: #CC5599;
+    --mars: #FF2200;
+    --moonlit-violet: #9966FF;
+    --orange: #FF8800;
+    --peach: #FF8866;
+    --red: #CC4444;
+    --sky: #AAAAFF;
+    --space-white: #F5F6FA;
+    --sunflower: #FFCC99;
+    --tomato: #FF5555;
+    --violet-creme: #DDBBFF;
+}
+
+html.lcars {
+    --font-family: "Antonio", "Arial Narrow", "Avenir Next Condensed", sans-serif;
+    --font-size: 22px;
+    --font-color: rgb(204, 153, 255);
+    --bg-color: black;
+    --link-color: #C16FFF;
+    --link-color-visited: var(--link-color);
+
+    font-family: var(--font-family);
+    font-size: 22px;
+    color: var(--font-color);
+    background-color: var(--bg-color);
+
+    body {
+        h1 {
+            color: var(--african-violet);
+            text-transform: uppercase;
+            text-align: right;
+        }
+
+        :where(h2, h3, h4) {
+            --bar-gap: .5rem;
+            --tip-size: 1.5rem;
+
+            &:is(h2) {
+                --color: var(--golden-orange);
+                --tip-color: var(--moonlit-violet);
+                --bar-color: var(--african-violet);
+            }
+
+            &:is(h3) {
+                --color: var(--sky);
+                --tip-color: var(--blue);
+                --bar-color: var(--sky);
+            }
+
+            &:is(h4) {
+                --color: var(--sunflower);
+                --tip-color: var(--lilac);
+                --bar-color: var(--sunflower);
+            }
+
+            display: grid;
+            grid-template-columns: 2rem max-content 1fr;
+            gap: 1em;
+            text-transform: uppercase;
+            color: var(--color);
+
+            &::before, &::after {
+                content: '';
+                display: block;
+                background-color: var(--tip-color);
+            }
+
+            &::before {
+                border-top-left-radius: 100vmax;
+                border-bottom-left-radius: 100vmax;
+            }
+
+            &::after {
+                border-top-right-radius: 100vmax;
+                border-bottom-right-radius: 100vmax;
+                background-image: linear-gradient(
+                        to right,
+                        var(--bar-color) 0%,
+                        var(--bar-color) calc(100% - (var(--tip-size) + var(--bar-gap))),
+                        black calc(100% - (var(--tip-size) + var(--bar-gap) + 1px)),
+                        black calc(100% - var(--tip-size)),
+                        var(--tip-color) calc(100% - var(--tip-size)),
+                        var(--tip-color) 100%
+                );
+            }
+        }
+
+        :not(nav.main-navigation, footer) > ul {
+            list-style-type: none;
+
+            li {
+                &::before {
+                    display: inline-block;
+                    margin-inline-end: .5rem;
+                    content: '';
+                    width: 34px;
+                    height: 18px;
+                    border-radius: 50%;
+                    background-color: var(--font-color);
+                }
+            }
+        }
+
+        nav.main-navigation {
+            ul {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+                list-style: none;
+                padding: 0;
+                gap: .5em;
+
+                li {
+                    &:nth-child(12n + 1) {
+                        --link-background-color: var(--gold);
+                    }
+
+                    &:nth-child(12n + 2) {
+                        --link-background-color: var(--green);
+                    }
+
+                    &:nth-child(12n + 3) {
+                        --link-background-color: var(--african-violet);
+                    }
+
+                    &:nth-child(12n + 4) {
+                        --link-background-color: var(--lilac);
+                    }
+
+                    &:nth-child(12n + 5) {
+                        --link-background-color: var(--red);
+                    }
+
+                    &:nth-child(12n + 6) {
+                        --link-background-color: var(--peach);
+                    }
+
+                    &:nth-child(12n + 7) {
+                        --link-background-color: var(--sky);
+                    }
+
+                    &:nth-child(12n + 8) {
+                        --link-background-color: var(--bluey);
+                    }
+
+                    &:nth-child(12n + 9) {
+                        --link-background-color: var(--butterscotch);
+                    }
+
+                    &:nth-child(12n + 10) {
+                        --link-background-color: var(--lima-bean);
+                    }
+
+                    &:nth-child(12n + 11) {
+                        --link-background-color: var(--almond-creme);
+                    }
+
+                    &:nth-child(12n + 12) {
+                        --link-background-color: var(--orange);
+                    }
+
+
+                    a {
+                        display: inline-grid;
+                        align-items: end;
+                        justify-content: end;
+                        width: 100%;
+
+                        border-radius: 100vmax;
+                        background-color: var(--link-background-color);
+                        color: black;
+                        font-weight: bold;
+                        text-align: right;
+                        text-decoration: none;
+                        text-transform: uppercase;
+
+                        padding-block: 1rem .5rem;
+                        padding-inline: 1.25rem;
+
+                        &:hover {
+                            background-color: hsl(from var(--link-background-color) h s calc(l + 10));
+                        }
+                    }
+                }
+            }
+        }
+
+        section {
+            & > * + * {
+                margin-block-start: 1.5em;
+            }
+        }
+
+        footer {
+            color: var(--lima-bean);
+        }
+    }
+}

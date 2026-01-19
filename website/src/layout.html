@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="lcars">
     <head>
         <title><%= title %></title>
         <meta name="description" content="<%= description %>">
@@ -10,8 +10,8 @@
     <body>
         <div id="the-page-container">
             <header>
-                <nav id="the-main-navigation">
-                    <ul class="horizontal-menu">
+                <nav class="main-navigation">
+                    <ul>
                         <li>
                             <a href="index.html">Home</a>
                         </li>
@@ -37,21 +37,21 @@
             <main id="the-main-content">
                 <%- htmlContent %>
             </main>
-            <footer id="the-main-footer">
+            <footer>
                 <button id="scroll-to-top-button">☝️</button>
-                <ul class="horizontal-menu">
+                <ul>
                     <li>Last updated: <%= lastUpdated %></li>
                     <li>
                         Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
                     </li>
                 </ul>
                 <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                    <theme-editor></theme-editor>
                     <a href="https://pysj.party" target="_blank">
                         <img src="images/pysjparty-badge.webp" alt="pysjparty">
                     </a>
                     <norsk-programmering-badge></norsk-programmering-badge>
                     <frk-frontend-badge></frk-frontend-badge>
+                    <wiigen-badge></wiigen-badge>
                     <a href="https://signup.upcloud.com/?promo=32BW92">
                         <img src="images/upcloud.webp" alt="UpCloud Badge">
                     </a>
@@ -60,9 +60,9 @@
         </div>
 
         <script src="main.js"></script>
-        <script src="theme-editor.js"></script>
         <script src="norsk-programmering-badge.js"></script>
         <script src="frk-frontend-badge.js"></script>
+        <script src="wiigen-badge.js"></script>
         <% scripts.forEach(script => { %>
             <script src="<%= script %>"></script>
         <% }) %>

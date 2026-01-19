@@ -39,7 +39,7 @@ class FrkFrontendBadge extends HTMLElement {
               height: 30px;
               border: 1px solid black;
               box-sizing: border-box;
-              font-size: 0.7rem;
+              font-size: 11px;
               text-decoration: none;
   
               &:active {

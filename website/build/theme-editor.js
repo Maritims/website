@@ -3,81 +3,114 @@
  */
 
 class ThemeEditor extends HTMLElement {
+    /**
+     * @type {string[]} The CSS properties that can be edited.
+     * @private
+     */
+    _cssProperties = [
+        "--font-family",
+        "--first-foreground-color",
+        "--first-background-color",
+        "--second-background-color",
+        "--link-color",
+        "--link-color-visited",
+        "--link-color-hover",
+        "--link-color-active",
+        "--button-border-width",
+        "--button-border-style",
+        "--button-border-color",
+        "--button-border-radius",
+        "--button-background-color",
+        "--button-foreground-color",
+        "--button-hover-background-color",
+        "--button-padding"
+    ];
+
+    _fonts = [{
+        label: 'System Sans',
+        value: 'system-ui, sans-serif'
+    }, {
+        label: 'Serif',
+        value: 'Georgia, serif'
+    }, {
+        label: 'Monospace',
+        value: 'monospace'
+    }];
+
+    _presets = {
+        "default": {
+            label: "Standard",
+            values: {}
+        },
+        "hacker": {
+            label: "Hacker",
+            values: {
+                "--font-family": "monospace",
+                "--first-foreground-color": "#00ff00",
+                "--first-background-color": "#000000",
+                "--second-background-color": "#0a0a0a",
+                "--link-color": "#00ff00",
+                "--link-color-visited": "#008800",
+                "--link-color-hover": "#00aa00",
+                "--button-border-width": "1px",
+                "--button-border-style": "solid",
+                "--button-border-color": "#008800",
+                "--button-background-color": "#000000",
+                "--button-foreground-color": "#00FF00",
+                "--button-hover-background-color": "#008800",
+            }
+        },
+        "lcars": {
+            label: "LCARS",
+            values: {
+                "--font-family": "'Antonio', 'Arial Narrow', 'Avenir Next Condensed', system-ui, sans-serif",
+                "--first-foreground-color": "rgb(255, 153, 0)",
+                "--first-background-color": "#000000",
+                "--second-background-color": "#1a1a1a",
+                "--link-color": "#ff9966",
+                "--link-color-visited": "#cc9966",
+                "--link-color-hover": "#ffcc99",
+                "--button-border-width": "0px",
+                "--button-border-style": "none",
+                "--button-border-color": "transparent",
+                "--button-border-radius": "50px",
+                "--button-background-color": "rgb(255, 170, 144)",
+                "--button-foreground-color": "#000000",
+                "--button-hover-background-color": "rgb(255, 170, 144)",
+                "--button-padding": "10px 20px"
+            }
+        },
+    };
+    _storageKey = 'theme-editor-settings';
+    _translations = {
+        "--font-family": "Font Family",
+        "--first-foreground-color": "First foreground color",
+        "--first-background-color": "First background color",
+        "--second-background-color": "Second background color",
+        "--link-color": "Link color",
+        "--link-color-visited": "Link color (visited)",
+        "--link-color-hover": "Link color (hover)",
+        "--link-color-active": "Link color (active)",
+        "--button-border-color": "Button border color",
+        "--button-background-color": "Button background color",
+        "--button-foreground-color": "Button foreground color",
+        "--button-hover-background-color": "Button hover background color",
+    };
+
     constructor() {
         super();
-        this.attachShadow({mode: 'open'});
-        this._storageKey = 'theme-editor-settings';
-
-        this._translations = {
-            "--main-color": "Text Color",
-            "--main-background-color": "Background",
-            "--secondary-background-color": "Surface",
-            "--link-color": "Link Color",
-            "--link-color-visited": "Visited Link",
-            "--main-font-family": "Font Family",
-            "--border-radius": "Corner Radius",
-            "--border-width": "Border Thickness",
-            "--spacing-unit": "Spacing"
-        };
-
-        this._fonts = [
-            {label: 'System Sans', value: 'system-ui, sans-serif'},
-            {label: 'Serif', value: 'Georgia, serif'},
-            {label: 'Monospace', value: 'monospace'},
-            {label: '90s Amateur', value: '"Comic Sans MS", "Comic Sans", cursive'}
-        ];
-
-        this._presets = {
-            "default": {label: "Standard",
-                values: {
-                    "--main-color": "#333333",
-                    "--main-background-color": "#ffffff",
-                    "--secondary-background-color": "#f0f0f0",
-                    "--link-color": "#0000ee",
-                    "--link-color-visited": "#551a8b",
-                    "--main-font-family": "system-ui, sans-serif",
-                    "--border-radius": "4px",
-                    "--border-width": "1px",
-                    "--spacing-unit": "8px",
-                    "--is-blinking": "none"
-                }
-            },
-            "hacker": {label: "Hacker",
-                values: {
-                    "--main-color": "#00ff00",
-                    "--main-background-color": "#000000",
-                    "--secondary-background-color": "#0a0a0a",
-                    "--link-color": "#00ff00",
-                    "--link-color-visited": "#008800",
-                    "--main-font-family": "monospace",
-                    "--border-radius": "0px",
-                    "--border-width": "1px",
-                    "--spacing-unit": "6px",
-                    "--is-blinking": "none"
-                }
-            },
-            "geocities": {label: "GeoCities '96",
-                values: {
-                    "--main-color": "#0000FF",
-                    "--main-background-color": "#C0C0C0",
-                    "--secondary-background-color": "#FFFF00",
-                    "--link-color": "#FF0000",
-                    "--link-color-visited": "#800000",
-                    "--main-font-family": '"Comic Sans MS", "Comic Sans", cursive',
-                    "--border-radius": "0px",
-                    "--border-width": "3px",
-                    "--spacing-unit": "12px",
-                    "--is-blinking": "inline"
-                }
-            },
-        };
     }
 
+    // noinspection JSUnusedGlobalSymbols
     connectedCallback() {
         this.loadSavedTheme();
         this.render();
     }
 
+    /**
+     * Load the saved theme from local storage.
+     * @returns {void}
+     */
     loadSavedTheme() {
         const saved = localStorage.getItem(this._storageKey);
         if (saved) {
@@ -90,27 +123,43 @@ class ThemeEditor extends HTMLElement {
         }
     }
 
-    applyPreset(key) {
-        if (key === 'random') {
-            const randomHex = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-            const newTheme = Object.keys(this._translations).reduce((acc, prop) => {
-                if (prop.includes('font')) acc[prop] = this._fonts[Math.floor(Math.random() * this._fonts.length)].value;
-                else if (prop.includes('radius') || prop.includes('width') || prop.includes('spacing')) acc[prop] = Math.floor(Math.random() * 20) + "px";
-                else acc[prop] = randomHex();
-                return acc;
-            }, {});
-            Object.entries(newTheme).forEach(([p, v]) => document.documentElement.style.setProperty(p, v));
-            localStorage.setItem(this._storageKey, JSON.stringify(newTheme));
-        } else {
-            const preset = this._presets[key];
-            if (!preset) return;
-            document.documentElement.removeAttribute('style');
-            Object.entries(preset.values).forEach(([p, v]) => document.documentElement.style.setProperty(p, v));
-            localStorage.setItem(this._storageKey, JSON.stringify(preset.values));
+    /**
+     * Apply a preset to the theme.
+     * @param {string} presetKey
+     */
+    applyPreset(presetKey) {
+        const preset = this._presets[presetKey];
+        if (!preset) {
+            return;
         }
+
+        document.documentElement.removeAttribute('style');
+        this._cssProperties.forEach(
+            (property) => {
+                const value = preset.values[property] || "revert";
+                document.documentElement.style.setProperty(property, value)
+            });
+        localStorage.setItem(this._storageKey, JSON.stringify(preset.values));
+
         this.render();
     }
 
+    /**
+     * Convert a colour to a hex string.
+     * @param {string} colour The colour string, e.g. "rgb(255, 0, 0)" or "red".
+     * @param {string} defaultColour The default colour to use if the colour is invalid.
+     * @returns {string} The hex string, e.g. "#000000" or "#ffffff". Default is black.
+     */
+    colourToHex(colour, defaultColour = '#000000') {
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.fillStyle = colour || defaultColour
+        return ctx.fillStyle;
+    }
+
+    /**
+     * Render the theme editor dialog.
+     * @returns {void}
+     */
     render() {
         const style = `
             form { 
@@ -132,27 +181,21 @@ class ThemeEditor extends HTMLElement {
             }
         `;
 
-        const presetOptions = Object.entries(this._presets).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('');
+        const presetOptions = Object.entries(this._presets).map(([presetKey, preset]) => `<option value="${presetKey}">${preset.label}</option>`).join('');
 
-        const formFields = Object.entries(this._translations).map(([prop, label]) => {
-            const val = getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+        const formFields = Object.entries(this._translations).map(([property, label]) => {
+            const value = getComputedStyle(document.documentElement).getPropertyValue(property).trim();
+            console.log(property, value);
 
-            if (prop.includes('font')) {
-                const opts = this._fonts.map(f => `<option value="${f.value}" ${val.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`).join('');
-                return `<label>${label}</label><select name="${prop}">${opts}</select>`;
+            if (property.includes('font')) {
+                const options = this._fonts.map(f => `<option value="${f.value}" ${value.includes(f.value.split(',')[0]) ? 'selected' : ''}>${f.label}</option>`).join('');
+                return `<label>${label}</label><select name="${property}">${options}</select>`;
+            } else {
+                return `<label>${label}</label><input type="color" name="${property}" value="${this.colourToHex(value)}" />`;
             }
-
-            if (prop.includes('radius') || prop.includes('width') || prop.includes('spacing')) {
-                const num = parseInt(val) || 0;
-                return `<label>${label}</label><input type="range" name="${prop}" min="0" max="30" value="${num}" />`;
-            }
-
-            const ctx = document.createElement('canvas').getContext('2d');
-            ctx.fillStyle = val || '#000000';
-            return `<label>${label}</label><input type="color" name="${prop}" value="${ctx.fillStyle}" />`;
         }).join('');
 
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
             <style>${style}</style>
             <button type="button" id="open">Edit theme</button>
             <dialog id="modal">
@@ -165,7 +208,6 @@ class ThemeEditor extends HTMLElement {
                     <select id="pre-sel">
                         <option value="" disabled selected>Select...</option>
                         ${presetOptions}
-                        <option value="random">Randomize</option>
                     </select>
                 </p>
 
@@ -182,22 +224,22 @@ class ThemeEditor extends HTMLElement {
             </dialog>
         `;
 
-        this.shadowRoot.querySelector('#pre-sel').onchange = e => this.applyPreset(e.target.value);
-        this.shadowRoot.querySelectorAll('input, select:not(#pre-sel)').forEach(el => {
-            el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', e => {
-                let val = e.target.value;
-                if (e.target.type === 'range') val += 'px';
-                document.documentElement.style.setProperty(e.target.name, val);
+        this.querySelector('#pre-sel').onchange = e => this.applyPreset(e.target.value);
+        this.querySelectorAll('input, select:not(#pre-sel)').forEach(element => {
+            element.addEventListener(element.tagName === 'SELECT' ? 'change' : 'input', event => {
+                document.documentElement.style.setProperty(event.target.name, event.target.value);
+
                 const saved = JSON.parse(localStorage.getItem(this._storageKey) || '{}');
-                saved[e.target.name] = val;
+                saved[event.target.name] = event.target.value;
+
                 localStorage.setItem(this._storageKey, JSON.stringify(saved));
             });
         });
 
-        const d = this.shadowRoot.querySelector('#modal');
-        this.shadowRoot.querySelector('#open').onclick = () => d.showModal();
-        this.shadowRoot.querySelector('#close').onclick = () => d.close();
-        this.shadowRoot.querySelector('#reset').onclick = () => {
+        const dialog = this.querySelector('#modal');
+        this.querySelector('#open').onclick = () => dialog.showModal();
+        this.querySelector('#close').onclick = () => dialog.close();
+        this.querySelector('#reset').onclick = () => {
             localStorage.removeItem(this._storageKey);
             document.documentElement.removeAttribute('style');
             this.render();
