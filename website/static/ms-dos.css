@@ -5,73 +5,90 @@
 }
 
 html.ms-dos {
+    --ms-dos-black: rgb(0, 0, 0);
+    --ms-dos-maroon: rgb(128, 0, 0);
+    --ms-dos-green: rgb(0, 128, 0);
+    --ms-dos-olive: rgb(128, 128, 0);
+    --ms-dos-navy: rgb(0, 0, 128);
+    --ms-dos-purple: rgb(128, 0, 128);
+    --ms-dos-teal: rgb(0, 128, 128);
+    --ms-dos-silver: rgb(192, 192, 192);
+    --ms-dos-gray: rgb(128, 128, 128);
+    --ms-dos-red: rgb(255, 0, 0);
+    --ms-dos-lime: rgb(0, 255, 0);
+    --ms-dos-yellow: rgb(255, 255, 0);
+    --ms-dos-blue: rgb(0, 0, 255);
+    --ms-dos-fuchsia: rgb(255, 0, 255);
+    --ms-dos-aqua: rgb(0, 255, 255);
+    --ms-dos-white: rgb(255, 255, 255);
+
     --font-family: 'MS-DOS';
     --font-size: 22px;
-    --ms-dos-gray: #c0c0c0;
-    --font-color: #e4eaff;
-    --bg-color: #0100ab;
+    --bg-color: var(--ms-dos-black);
+    --font-color: var(--ms-dos-white);
+    --link-color: var(--ms-dos-white);
+    --link-color-visited: var(--ms-dos-white);
+    --link-color-hover: var(--ms-dos-yellow);
 
     body {
         margin: 0;
-    }
 
-    nav.main-navigation {
-        background-color: var(--ms-dos-gray);
+        :not(nav.main-navigation, footer) > ul {
+            list-style-type: none;
 
-        ul {
             li {
-                a {
-                    display: block;
-                    padding: .25em .5em;
-                    text-decoration: none;
-                    background-color: var(--ms-dos-gray);
-                    color: black;
-
-                    &:visited {
-                        color: black;
-                    }
-
-                    &:hover, &:focus {
-                        background-color: black;
-                        color: var(--ms-dos-gray);
-                        text-decoration: none;
-                        outline: none;
-                    }
-                }
-
-                &:first-child a {
-                    padding-inline-start: 1em;
+                &::before {
+                    content: '*';
+                    margin-inline-end: .5em;
                 }
             }
         }
-    }
 
-    main {
-        border-inline: 3px solid white;
-        border-block-start: 2px solid white;
-        margin-block-start: .5em;
-        margin-inline: .15em;
-        padding: 1em;
-    }
+        nav.main-navigation {
+            background-color: var(--ms-dos-silver);
 
-    footer {
-        background-color: #00aaa9;
-        color: white;
-        margin-inline: .15em;
-        padding: 1em;
+            ul {
+                li {
+                    a {
+                        display: block;
+                        padding: .25em .5em;
+                        text-decoration: none;
+                        background-color: var(--ms-dos-silver);
+                        color: var(--ms-dos-black);
 
-        a {
-            color: black;
-            text-decoration: none;
+                        &:visited {
+                            color: var(--ms-dos-black);
+                        }
 
-            :visited {
-                color: black;
+                        &:hover, &:focus {
+                            background-color: var(--ms-dos-black);
+                            color: var(--ms-dos-silver);
+                            text-decoration: none;
+                            outline: none;
+                        }
+                    }
+
+                    &:first-child a {
+                        padding-inline-start: 1em;
+                    }
+                }
             }
+        }
 
-            :hover {
-                color: black;
-                text-decoration: underline;
-            }
+        main {
+            background-color: var(--ms-dos-navy);
+            border-inline: 3px solid var(--ms-dos-white);
+            border-block-start: 2px solid var(--ms-dos-white);
+            margin-block-start: .5em;
+            margin-inline: .15em;
+            padding: 1em;
+        }
+
+        footer {
+            background-color: var(--ms-dos-teal);
+            color: var(--ms-dos-white);
+            margin-inline: .15em;
+            padding: 1em;
         }
     }
 }
