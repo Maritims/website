@@ -11,13 +11,16 @@ class ThemeSwitcher extends HTMLElement {
      */
     _themes = [{
         label: "Default",
-        value: 'default'
+        value: "default"
     }, {
         label: "Hacker",
-        value: 'hacker'
+        value: "hacker"
     }, {
         label: "LCARS",
-        value: 'lcars'
+        value: "lcars"
+    }, {
+        label: "MS-DOS",
+        value: "ms-dos"
     }];
 
     constructor() {

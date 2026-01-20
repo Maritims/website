@@ -3,52 +3,39 @@ class Lightbox extends HTMLElement {
         super();
     }
 
+    getCaptionWithTimeIfSet() {
+        let completeCaption = this.getAttribute('time');
+        if(completeCaption) {
+            completeCaption += ': ';
+        }
+        completeCaption += this.getAttribute('caption');
+        return completeCaption;
+    }
+
     /**
-     * @returns {HTMLElement}
+     * @returns {string}
      */
     createFigure() {
-        const figure = document.createElement("figure");
-
-        const img = document.createElement("img");
-        img.setAttribute("src", this.getAttribute("src"));
-        img.setAttribute("alt", this.getAttribute("alt"));
-
-        const figcaption = document.createElement("figcaption");
-        if(this.hasAttribute("time")) {
-            figcaption.innerHTML = `<time>${this.getAttribute("time")}</time>: ${this.getAttribute("caption")}`;
-        } else {
-            figcaption.textContent = this.getAttribute("caption");
-        }
-
-        figure.appendChild(img);
-        figure.appendChild(figcaption);
-        return figure;
+        return `
+            <figure>
+                <img src="${this.getAttribute("src")}" alt="${this.getAttribute("alt")}">
+                <figcaption>${this.getCaptionWithTimeIfSet()}</figcaption>
+            </figure>
+        `;
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({
-            mode: "open"
-        });
+        this.render();
+    }
 
-        const button = document.createElement("button");
-        button.setAttribute("class", "thumbnail");
-        button.setAttribute("popovertarget", `image-${this.getAttribute("data-image-id")}`);
-        button.appendChild(this.createFigure());
-
-        const dialog = document.createElement("dialog");
-        dialog.setAttribute("class", "lightbox");
-        dialog.setAttribute("id", `image-${this.getAttribute("data-image-id")}`);
-        dialog.setAttribute("popover", "");
-        dialog.appendChild(this.createFigure());
-
-        const style = document.createElement("style");
-
-        style.textContent = `
+    render() {
+        const style = `
         img {
             max-width:100%;
             height: auto;
             margin: 0;
             border: none;
+            object-fit: cover;
         }
 
         figure {
@@ -102,9 +89,11 @@ class Lightbox extends HTMLElement {
         }
         `;
 
-        shadow.appendChild(style);
-        shadow.appendChild(button);
-        shadow.appendChild(dialog);
+        this.innerHTML = `
+            <style>${style}</style>
+            <button class="thumbnail" popovertarget="image-${this.getAttribute("data-image-id")}">${this.createFigure()}</button>
+            <dialog class="lightbox" id="image-${this.getAttribute("data-image-id")}" popover="">${this.createFigure()}</dialog>
+        `;
     }
 }
 

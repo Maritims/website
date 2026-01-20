@@ -69,7 +69,7 @@ html.ms-dos {
                     }
 
                     &:first-child a {
-                        padding-inline-start: 1em;
+                        margin-inline-start: .5em;
                     }
                 }
             }
@@ -82,6 +82,24 @@ html.ms-dos {
             margin-block-start: .5em;
             margin-inline: .15em;
             padding: 1em;
+
+            section.gallery {
+                .image {
+                    button {
+                        background-color: var(--ms-dos-maroon);
+                        border: 5px double var(--ms-dos-white);
+                        box-shadow: 1em 1em 0 var(--ms-dos-black);
+                        padding: 1em;
+                    }
+
+                    dialog {
+                        background-color: var(--ms-dos-maroon);
+                        border: 5px double var(--ms-dos-white);
+                        box-shadow: 1em 1em 0 var(--ms-dos-black);
+                        color: var(--ms-dos-white);
+                    }
+                }
+            }
         }
 
         footer {
