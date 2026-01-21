@@ -159,7 +159,7 @@ class PageProcessor {
             renderOptions.scripts.push(`${page.name}.js`);
         }
         const renderedHtml = ejs.render(this.templateHtml, renderOptions);
-
+        
         await fs.writeFile(targetHtmlFilePath, renderedHtml);
 
     }
@@ -244,12 +244,15 @@ class StaticFileProcessor {
         }
     }
 }
-
 async function buildEverything() {
     const now = new Date();
     const buildDir = 'build';
     const srcDir = 'src';
     const staticDir = 'static';
+
+    if (!existsSync(buildDir)) {
+        await fs.mkdir(buildDir);
+    }
 
     /**
      * @type {Page[]}

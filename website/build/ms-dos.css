@@ -48,6 +48,13 @@ html.ms-dos {
             background-color: var(--ms-dos-silver);
 
             ul {
+                display: flex;
+                flex-direction: row;
+
+                @media (max-width: 768px) {
+                    flex-direction: column;
+                }
+
                 li {
                     a {
                         display: block;

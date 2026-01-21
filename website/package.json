@@ -1,23 +1,27 @@
 {
-  "name": "website",
-  "homepage": "https://clueless.no",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "My personal website.",
-  "main": "build.js",
-  "nodemonConfig": {},
-  "scripts": {
-    "build": "node build.js",
-    "dev": "nodemon server.js"
-  },
-  "keywords": [],
-  "author": "Martin Severin Steffensen",
-  "license": "ISC",
-  "devDependencies": {
-    "date-fns": "^4.1.0",
-    "date-fns-tz": "^3.2.0",
-    "ejs": "^3.1.10",
-    "nodemon": "^3.1.9",
-    "sharp": "^0.33.5"
-  }
+    "name": "website",
+    "homepage": "https://clueless.no",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "My personal website.",
+    "main": "render.js",
+    "nodemonConfig": {},
+    "scripts": {
+        "dev": "nodemon server.js",
+        "render": "node render.js",
+        "generate-sitemap": "node generate-sitemap.js",
+        "generate-robots": "node generate-robots.js",
+        "build": "node render.js && node generate-sitemap.js && node generate-robots.js",
+        "clean": "rm -rf build"
+    },
+    "keywords": [],
+    "author": "Martin Severin Steffensen",
+    "license": "ISC",
+    "devDependencies": {
+        "date-fns": "^4.1.0",
+        "date-fns-tz": "^3.2.0",
+        "ejs": "^3.1.10",
+        "nodemon": "^3.1.9",
+        "sharp": "^0.33.5"
+    }
 }
