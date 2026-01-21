@@ -107,6 +107,12 @@ html.ms-dos {
                     }
                 }
             }
+
+            section.terminal {
+                .terminal-container {
+                    border: 5px double var(--ms-dos-white);
+                }
+            }
         }
 
         footer {

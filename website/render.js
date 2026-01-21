@@ -281,6 +281,11 @@ async function buildEverything() {
         title: 'Links',
         description: 'Links to other areas of the Internet I enjoy.',
         name: 'links'
+    }, {
+        title: 'Terminal',
+        description: 'A virtual file system for the terminal.',
+        name: 'terminal',
+        scripts: ['terminal.js']
     }];
 
     const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');

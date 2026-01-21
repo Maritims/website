@@ -1,11 +1,11 @@
 {
     "watch": [
-        "build.js",
+        "render.js",
         "src/",
         "static/"
     ],
     "ext": "css,html,js",
     "events": {
-        "restart": "node build.js"
+        "restart": "node render.js"
     }
 }

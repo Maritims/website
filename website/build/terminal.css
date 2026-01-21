@@ -1,0 +1,67 @@
+.terminal-container {
+    --terminal-bg-color: #000000;
+    --terminal-input-label-fg-color: #00FF00;
+    --terminal-input-fg-color: #FFFFFF;
+    --terminal-font-family: monospace;
+    --terminal-font-size: 1rem;
+    --terminal-spacing: .5rem;
+
+    background-color: var(--terminal-bg-color);
+    color: var(--terminal-input-fg-color);
+    display: flex;
+    flex-direction: column;
+    font-family: var(--terminal-font-family);
+    font-size: var(--terminal-font-size);
+    height: 50vh;
+    overflow: auto;
+    padding: calc(0.5 * var(--terminal-spacing));
+
+    .terminal-output {
+        background-color: var(--terminal-bg-color);
+        border: none;
+        color: var(--terminal-input-fg-color);
+        font-family: var(--terminal-font-family);
+        font-size: var(--terminal-font-size);
+        resize: none;
+
+        &:active, &:focus {
+            outline: none;
+        }
+    }
+
+    .terminal-input-label {
+        background-color: var(--terminal-bg-color);
+        color: var(--terminal-input-label-fg-color);
+    }
+
+    .terminal-input-container {
+        background-color: var(--terminal-bg-color);
+        display: grid;
+        gap: .5em;
+        grid-template-columns: auto 1fr;
+
+        .terminal-input {
+            background-color: var(--terminal-bg-color);
+            border: none;
+            color: var(--terminal-input-fg-color);
+            font-family: var(--terminal-font-family);
+            font-size: var(--terminal-font-size);
+
+            &:active, &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .terminal-line {
+        background-color: var(--terminal-bg-color);
+        color: var(--terminal-input-fg-color);
+        font-family: var(--terminal-font-family);
+        font-size: var(--terminal-font-size);
+        margin: 0;
+        padding: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+}
