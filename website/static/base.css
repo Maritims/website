@@ -152,6 +152,56 @@ section.gallery {
     }
 }
 
+section.guestbook {
+    form {
+        display: grid;
+        gap: 1em;
+
+        .form-controls {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 1em;
+            align-items: baseline;
+
+            textarea {
+                min-height: 8em;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        div.result {
+            display: grid;
+
+            .result-title {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
+
+    .entries {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1em;
+        padding-block-start: 1em;
+
+        article {
+            h3, h4 {
+                margin: 0;
+            }
+
+            border: 1px solid white;
+            padding: 1em;
+        }
+    }
+}
+
 footer {
     padding: 5px 0 0 0;
 

@@ -75,7 +75,7 @@ public class SqliteGuestbookRepository {
         var entries = new ArrayList<Entry>();
 
         try (var connection = DriverManager.getConnection(connectionString)) {
-            var sql       = String.format("SELECT name, message, timestamp FROM entries WHERE isApproved = true ORDER BY %s %s LIMIT %d OFFSET %d", orderByColumn, orderDirection, pageSize, pageSize * pageNumber);
+            var sql       = String.format("SELECT id, isApproved, name, message, timestamp FROM entries WHERE isApproved = true ORDER BY %s %s LIMIT %d OFFSET %d", orderByColumn, orderDirection, pageSize, pageSize * pageNumber);
             var statement = connection.createStatement();
             var resultSet = statement.executeQuery(sql);
 

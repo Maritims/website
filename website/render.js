@@ -262,6 +262,11 @@ async function buildEverything() {
         description: 'My personal website.',
         name: 'index'
     }, {
+        title: 'Guestbook',
+        description: 'My guestbook.',
+        name: 'guestbook',
+        scripts: ['guestbook.js']
+    }, {
         title: 'EVE Online: Ninja Hacking Guide',
         description: 'A comprehensive guide to ninja hacking data and relic sites in C5 wormholes using a Myrmidon. Includes fit, tactics, and site-specific strategies.',
         name: 'eve-online-ninja-hacking-guide'

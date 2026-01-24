@@ -33,6 +33,34 @@ html.ms-dos {
     body {
         margin: 0;
 
+        button {
+            border: none;
+            background-color: var(--ms-dos-gray);
+            color: var(--ms-dos-silver);
+            font-family: var(--font-family);
+            font-size: var(--font-size);
+            padding: .5em;
+            box-shadow: .35em .35em 0 var(--ms-dos-black);
+
+            &[type=submit] {
+                background-color: var(--ms-dos-green);
+            }
+
+            &:active, &:focus {
+                color: var(--ms-dos-white);
+                outline: none;
+            }
+        }
+
+        input, textarea {
+            background-color: var(--ms-dos-black);
+            border: none;
+            color: var(--ms-dos-white);
+            font-family: var(--font-family);
+            font-size: var(--font-size);
+            padding: .25em;
+        }
+
         :not(nav.main-navigation, footer) > ul {
             list-style-type: none;
 
@@ -104,6 +132,104 @@ html.ms-dos {
                         border: 5px double var(--ms-dos-white);
                         box-shadow: 1em 1em 0 var(--ms-dos-black);
                         color: var(--ms-dos-white);
+                    }
+                }
+            }
+
+            section.guestbook {
+                form {
+                    div.result {
+                        border: 5px double var(--ms-dos-white);
+                        box-shadow: 1em 1em 0 var(--ms-dos-black);
+                        color: var(--ms-dos-white);
+                        padding: 1em;
+
+                        &.success {
+                            background-color: var(--ms-dos-green);
+                        }
+
+                        &.error {
+                            background-color: var(--ms-dos-maroon);
+                        }
+
+                        .result-title {
+                            button.close {
+                                border: none;
+                                background-color: var(--ms-dos-gray);
+                                color: var(--ms-dos-silver);
+                                font-family: var(--font-family);
+                                font-size: var(--font-size);
+                                padding: .25em;
+                                box-shadow: .35em .35em 0 var(--ms-dos-black);
+
+                                &:active, &:focus {
+                                    color: var(--ms-dos-white);
+                                    outline: none;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .entries {
+                    article {
+                        background-color: var(--ms-dos-gray);
+                        border: 5px double var(--ms-dos-white);
+                        box-shadow: .5em .5em 0 var(--ms-dos-black);
+                        color: var(--ms-dos-white);
+                        padding: 1em;
+
+                        &:nth-child(12n+1) {
+                            background-color: var(--ms-dos-red);
+                        }
+
+                        &:nth-child(12n+2) {
+                            background-color: var(--ms-dos-green);
+                        }
+
+                        &:nth-child(12n+3) {
+                            background-color: var(--ms-dos-blue);
+                        }
+
+                        &:nth-child(12n+4) {
+                            background-color: var(--ms-dos-yellow);
+                            color: var(--ms-dos-black);
+                        }
+
+                        &:nth-child(12n+5) {
+                            background-color: var(--ms-dos-fuchsia);
+                        }
+
+                        &:nth-child(12n+6) {
+                            background-color: var(--ms-dos-aqua);
+                            color: var(--ms-dos-black);
+                        }
+
+                        &:nth-child(12n+7) {
+                            background-color: var(--ms-dos-purple);
+                            color: var(--ms-dos-white);
+                        }
+
+                        &:nth-child(12n+8) {
+                            background-color: var(--ms-dos-teal);
+                        }
+
+                        &:nth-child(12n+9) {
+                            background-color: var(--ms-dos-olive);
+                        }
+
+                        &:nth-child(12n+10) {
+                            background-color: var(--ms-dos-navy);
+                        }
+
+                        &:nth-child(12n+11) {
+                            background-color: var(--ms-dos-silver);
+                            color: var(--ms-dos-black);
+                        }
+
+                        &:nth-child(12wn+12) {
+                            background-color: var(--ms-dos-gray);
+                        }
                     }
                 }
             }

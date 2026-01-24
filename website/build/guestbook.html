@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="ms-dos">
+    <head>
+        <title>Guestbook</title>
+        <meta name="description" content="My guestbook.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="stylesheet.css">
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="page-container">
+            <header>
+                <nav class="main-navigation">
+                    <ul>
+                        <li>
+                            <a href="index.html">Home</a>
+                        </li>
+                        <li>
+                            <a href="eve-online-ninja-hacking-guide.html">EVE Online: Ninja Hacking Guide</a>
+                        </li>
+                        <li>
+                            <a href="gallery.html">Gallery</a>
+                        </li>
+                        <li>
+                            <a href="cv.html">CV</a>
+                        </li>
+                        <li>
+                            <a href="projects.html">Projects</a>
+                        </li>
+                        <li>
+                            <a href="links.html">Links</a>
+                        </li>
+                        <li>
+                            <a href="terminal.html">Terminal</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            <main id="the-main-content">
+                <h1>Guestbook</h1>
+                <section class="guestbook">
+    <p>Please sign my guestbook! :)</p>
+    <form id="guestbook-form">
+        <div class="form-controls">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" required autofocus autocomplete="name"/>
+
+            <label for="message">Message</label>
+            <textarea name="message" id="message" required></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit">Submit message</button>
+        </div>
+        <div class="result success" style="display: none;">
+            <div class="result-title">
+                <span></span>
+                <button type="button" class="close">Close</button>
+            </div>
+            <span class="result-message"></span>
+        </div>
+    </form>
+    <div class="entries"></div>
+</section>
+            </main>
+            <footer>
+                <button id="scroll-to-top-button">☝️</button>
+                <ul>
+                    <li>Last updated: 2026-01-25 00:12:42 CET</li>
+                    <li>
+                        Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a>
+                    </li>
+                </ul>
+                <div class="badges">
+                    <theme-switcher></theme-switcher>
+                    <a href="https://pysj.party" target="_blank">
+                        <img src="images/pysjparty-badge.webp" alt="pysjparty">
+                    </a>
+                    <norsk-programmering-badge></norsk-programmering-badge>
+                    <frk-frontend-badge></frk-frontend-badge>
+                    <wiigen-badge></wiigen-badge>
+                    <a href="https://signup.upcloud.com/?promo=32BW92">
+                        <img src="images/upcloud.webp" alt="UpCloud Badge">
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <script src="main.js"></script>
+        <script src="norsk-programmering-badge.js"></script>
+        <script src="frk-frontend-badge.js"></script>
+        <script src="wiigen-badge.js"></script>
+        <script src="theme-switcher.js"></script>
+        
+            <script src="guestbook.js"></script>
+        
+    </body>
+</html>
