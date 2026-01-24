@@ -111,15 +111,16 @@ public class GuestbookController {
 
     public void postEntry(Context ctx) {
         if (!isAltchaPayloadVerified(ctx)) {
+            ctx.status(400);
             return;
         }
 
-        var bodyAsEntry = ctx.bodyValidator(Entry.class)
-                .check(entry -> entry.getId() == null, "id must be null")
-                .check(entry -> entry.getName() != null && !entry.getName().isBlank(), "name cannot be null or blank")
-                .check(entry -> entry.getMessage() != null && !entry.getMessage().isBlank(), "message cannot be null or blank")
+        var bodyAsEntry = ctx.bodyValidator(CreateEntryDto.class)
+                .check(entry -> entry.name() != null && !entry.name().isBlank(), "name cannot be null or blank")
+                .check(entry -> entry.message() != null && !entry.message().isBlank(), "message cannot be null or blank")
+                .check(entry -> entry.token() == null || entry.token().isBlank(), "unable to process request")
                 .get();
-        var createdEntry = guestbook.sign(bodyAsEntry.getName(), bodyAsEntry.getMessage());
+        var createdEntry = guestbook.sign(bodyAsEntry.name(), bodyAsEntry.message());
         ctx.json(createdEntry);
     }
 }

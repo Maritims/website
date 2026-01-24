@@ -9,6 +9,8 @@ import no.clueless.guestbook.web.JavalinServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.SubmissionPublisher;
 
@@ -23,6 +25,7 @@ public class Application {
         final var senderEmailAddress          = Optional.ofNullable(System.getenv("SENDER_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("SENDER_EMAIL_ADDRESS must be set"));
         final var recipientEmailAddress       = Optional.ofNullable(System.getenv("RECIPIENT_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("RECIPIENT_EMAIL_ADDRESS must be set"));
         final var isAltchaVerificationEnabled = Optional.ofNullable(System.getenv("IS_ALTCHA_VERIFICATION_ENABLED")).filter(property -> !property.isBlank()).map(Boolean::parseBoolean).orElse(false);
+        final var allowedOrigin               = Optional.ofNullable(System.getenv("ALLOWED_ORIGIN")).filter(property -> !property.isBlank()).map(property -> new HashSet<>(Arrays.asList(property.split(",")))).orElseThrow(() -> new IllegalStateException("ALLOWED_ORIGIN must be set"));
         final var jsonMapper                  = new ObjectMapper().registerModule(new JavaTimeModule());
 
         log.info("Starting application with settings:");
@@ -30,14 +33,15 @@ public class Application {
         log.info("DEFAULT_PAGE_SIZE: {}", defaultPageSize);
         log.info("SENDER_EMAIL_ADDRESS: {}", senderEmailAddress);
         log.info("RECIPIENT_EMAIL_ADDRESS: {}", recipientEmailAddress);
-
+        log.info("IS_ALTCHA_VERIFICATION_ENABLED: {}", isAltchaVerificationEnabled);
+        log.info("ALLOWED_ORIGIN: {}", allowedOrigin);
 
         var entrySubmissionPublisher = new SubmissionPublisher<Entry>();
         var guestbookRepository      = new SqliteGuestbookRepository(connectionString);
         var guestbook                = new Guestbook(guestbookRepository, entrySubmissionPublisher);
         var guestbookController      = new GuestbookController(guestbook, jsonMapper, defaultPageSize, altchaHmacKey, isAltchaVerificationEnabled);
         var altchaController         = new AltchaController(altchaHmacKey);
-        var javalinServer            = new JavalinServer(altchaController, guestbookController);
+        var javalinServer            = new JavalinServer(altchaController, guestbookController, allowedOrigin);
 
         guestbookRepository.initialize();
         guestbook.subscribeToEntryCreated(new EntryCreatedSubscriber(senderEmailAddress, recipientEmailAddress, jsonMapper));
