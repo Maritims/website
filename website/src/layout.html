@@ -6,6 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="stylesheet.css">
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <% scripts.filter(script => script.position === 'head').forEach(script => { %>
+        <script src="<%= script.src %>" type="<%= script.type || "text/javascript" %>" <% if(script.async) { %>async<% } %> <% if(script.defer) { %>defer<% } %>></script>
+        <% }); %>
     </head>
     <body>
         <div class="page-container">
@@ -68,8 +71,8 @@
         <script src="frk-frontend-badge.js"></script>
         <script src="wiigen-badge.js"></script>
         <script src="theme-switcher.js"></script>
-        <% scripts.forEach(script => { %>
-            <script src="<%= script %>"></script>
-        <% }) %>
+        <% scripts.filter(script => !script.position || script.position === 'body').forEach(script => { %>
+        <script src="<%= script.src %>" type="<%= script.type || "text/javascript" %>" <% if(script.async) { %>async<% } %> <% if(script.defer) { %>defer<% } %>></script>
+        <% }); %>
     </body>
 </html>

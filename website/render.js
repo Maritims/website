@@ -6,10 +6,20 @@ import path from 'path';
 import sharp from 'sharp';
 
 /**
+ * @typedef {object} Script
+ * @property {string} src
+ * @property {'module'|undefined} type
+ * @property {boolean|undefined} async
+ * @property {boolean|undefined} defer
+ * @property {'head'|'body'|undefined} position
+ */
+
+/**
  * @typedef {object} Page
  * @property {string} title
  * @property {string} description
  * @property {string} name
+ * @property {Script[]|undefined} scripts
  */
 
 class ImageProcessor {
@@ -26,7 +36,7 @@ class ImageProcessor {
     }
 
     /**
-     * Optimize the image in the source directory and copy it to the target directory.
+     * Optimise the image in the source directory and copy it to the target directory.
      * @param {string} sourceDirectory
      * @param {string} targetDirectory
      * @param {string} fileName
@@ -41,8 +51,8 @@ class ImageProcessor {
             const targetFileLastModified = (await fs.stat(targetFilePath)).mtimeMs;
 
             if(targetFileLastModified > sourceFileLastModified) {
-                console.log(`Skipping ${sourceFilePath}`);
-                return;
+                //console.log(`Skipping ${sourceFilePath}`);
+                //return;
             }
         }
 
@@ -57,7 +67,7 @@ class ImageProcessor {
     }
 
     /**
-     * Optimize all images in the source directory and copy them to the target directory.
+     * Optimise all images in the source directory and copy them to the target directory.
      */
     async optimizeAndCopyFiles(sourceDirectory, targetDirectory) {
         if(!existsSync(targetDirectory)) {
@@ -122,7 +132,7 @@ class PageProcessor {
     }
 
     /**
-     * Build a specific page if the template is newer than the template file, or if the source page file is newer than the target page file.
+     * Build a specific page if the template is newer than the template file or if the source page file is newer than the target page file.
      * @param {Page} page 
      */
     async renderAndCopyFile(page) {
@@ -138,26 +148,24 @@ class PageProcessor {
             const targetFileLastModified = await fs.stat(targetHtmlFilePath);
 
             if (targetFileLastModified.mtimeMs >= sourceFileLastModified.mtimeMs && targetFileLastModified.mtimeMs >= this.templateFileLastModified) {
-                console.log(`Skipping ${sourceHtmlFilePath}`);
-                return;
+                //console.log(`Skipping ${sourceHtmlFilePath}`);
+                //return;
             }
         }
 
-        console.log(`Building ${sourceHtmlFilePath}`);
+        //console.log(`Building ${sourceHtmlFilePath}`);
 
         const rawHtml = await fs.readFile(sourceHtmlFilePath);
         const renderOptions = {
             ...page,
             htmlContent: rawHtml,
-            scripts: [],
             lastUpdated: formatInTimeZone(new Date(), 'Europe/Oslo', 'yyyy-MM-dd HH:mm:ss zzz')
         };
 
-        const scriptFilePath = path.join(this.scriptSourceDirectory, `${page.name}.js`);
-        const hasScriptFile = existsSync(scriptFilePath);
-        if (hasScriptFile) {
-            renderOptions.scripts.push(`${page.name}.js`);
+        if(!page.scripts) {
+            renderOptions.scripts = [];
         }
+
         const renderedHtml = ejs.render(this.templateHtml, renderOptions);
         
         await fs.writeFile(targetHtmlFilePath, renderedHtml);
@@ -220,8 +228,8 @@ class StaticFileProcessor {
                 const targetFileLastModified = (await fs.stat(targetFilePath)).mtimeMs;
 
                 if (targetFileLastModified >= sourceFileLastModified) {
-                    console.log(`Skipping ${sourceFilePath}`);
-                    return;
+                    //console.log(`Skipping ${sourceFilePath}`);
+                    //return;
                 }
             }
 
@@ -244,6 +252,7 @@ class StaticFileProcessor {
         }
     }
 }
+
 async function buildEverything() {
     const now = new Date();
     const buildDir = 'build';
@@ -265,7 +274,15 @@ async function buildEverything() {
         title: 'Guestbook',
         description: 'My guestbook.',
         name: 'guestbook',
-        scripts: ['guestbook.js']
+        scripts: [{
+            src: 'guestbook.js'
+        }, {
+            src: 'altcha.js',
+            type: 'module',
+            async: true,
+            defer: true,
+            position: 'head'
+        }]
     }, {
         title: 'EVE Online: Ninja Hacking Guide',
         description: 'A comprehensive guide to ninja hacking data and relic sites in C5 wormholes using a Myrmidon. Includes fit, tactics, and site-specific strategies.',
@@ -290,7 +307,9 @@ async function buildEverything() {
         title: 'Terminal',
         description: 'A virtual file system for the terminal.',
         name: 'terminal',
-        scripts: ['terminal.js']
+        scripts: [{
+            src: 'terminal.js'
+        }]
     }];
 
     const templateHtml = await fs.readFile(`${srcDir}/layout.html`, 'utf-8');

@@ -54,12 +54,14 @@ public class GuestbookController {
      */
     protected boolean isAltchaPayloadVerified(Context ctx) {
         if (!isAltchaVerificationEnabled) {
+            log.debug("Altcha verification is disabled. Skipping verification.");
             return true;
         }
 
         var altchaPayload = ctx.header("x-altcha");
         if (altchaPayload == null || altchaPayload.isBlank()) {
-            ctx.status(400).result("x-altcha header missing or blank");
+            log.warn("Altcha payload is missing from the request.");
+            ctx.status(400);
             return false;
         }
 
@@ -72,7 +74,8 @@ public class GuestbookController {
             var number    = ((Number) decoded.get("number")).intValue();
 
             if (!"SHA-256".equals(algorithm)) {
-                ctx.status(400).result("Invalid Altcha algorithm");
+                log.warn("Unsupported Altcha algorithm: {}.", algorithm);
+                ctx.status(400);
                 return false;
             }
 
@@ -82,7 +85,8 @@ public class GuestbookController {
             // Verify signature
             var expectedSignature = HexFormat.of().formatHex(mac.doFinal(challenge.getBytes(StandardCharsets.UTF_8)));
             if (!expectedSignature.equals(signature)) {
-                ctx.status(400).result("Invalid Altcha signature");
+                log.warn("Invalid Altcha signature.");
+                ctx.status(400);
                 return false;
             }
 
@@ -90,13 +94,14 @@ public class GuestbookController {
             var challengeBytes    = mac.doFinal((salt + number).getBytes(StandardCharsets.UTF_8));
             var expectedChallenge = HexFormat.of().formatHex(challengeBytes);
             if (!expectedChallenge.equals(challenge)) {
-                ctx.status(400).result("Invalid Altcha challenge");
+                log.warn("Invalid Altcha challenge.");
+                ctx.status(400);
                 return false;
             }
 
         } catch (Exception e) {
-            log.error("Altcha verification failed", e);
-            ctx.status(400).result("Altcha verification failed");
+            log.error("Altcha verification failed.", e);
+            ctx.status(400);
             return false;
         }
 

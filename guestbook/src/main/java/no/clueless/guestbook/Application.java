@@ -6,8 +6,6 @@ import no.clueless.guestbook.persistence.SqliteGuestbookRepository;
 import no.clueless.guestbook.web.AltchaController;
 import no.clueless.guestbook.web.GuestbookController;
 import no.clueless.guestbook.web.JavalinServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,8 +13,6 @@ import java.util.Optional;
 import java.util.concurrent.SubmissionPublisher;
 
 public class Application {
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
-
     public static void main(String[] args) {
         final var serverPort                  = Optional.ofNullable(System.getenv("SERVER_PORT")).filter(property -> !property.isBlank()).map(Integer::parseInt).orElse(8080);
         final var connectionString            = Optional.ofNullable(System.getenv("CONNECTION_STRING")).filter(property -> !property.isBlank()).orElse("jdbc:sqlite:guestbook.db");
@@ -24,17 +20,9 @@ public class Application {
         final var altchaHmacKey               = Optional.ofNullable(System.getenv("ALTCHA_HMAC_KEY")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("ALTCHA_HMAC_KEY must be set"));
         final var senderEmailAddress          = Optional.ofNullable(System.getenv("SENDER_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("SENDER_EMAIL_ADDRESS must be set"));
         final var recipientEmailAddress       = Optional.ofNullable(System.getenv("RECIPIENT_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("RECIPIENT_EMAIL_ADDRESS must be set"));
-        final var isAltchaVerificationEnabled = Optional.ofNullable(System.getenv("IS_ALTCHA_VERIFICATION_ENABLED")).filter(property -> !property.isBlank()).map(Boolean::parseBoolean).orElse(false);
+        final var isAltchaVerificationEnabled = Optional.ofNullable(System.getenv("IS_ALTCHA_VERIFICATION_ENABLED")).filter(property -> !property.isBlank()).map(Boolean::parseBoolean).orElseThrow(() -> new IllegalStateException("IS_ALTCHA_VERIFICATION_ENABLED must be set"));
         final var allowedOrigin               = Optional.ofNullable(System.getenv("ALLOWED_ORIGIN")).filter(property -> !property.isBlank()).map(property -> new HashSet<>(Arrays.asList(property.split(",")))).orElseThrow(() -> new IllegalStateException("ALLOWED_ORIGIN must be set"));
         final var jsonMapper                  = new ObjectMapper().registerModule(new JavaTimeModule());
-
-        log.info("Starting application with settings:");
-        log.info("SERVER_PORT: {}", serverPort);
-        log.info("DEFAULT_PAGE_SIZE: {}", defaultPageSize);
-        log.info("SENDER_EMAIL_ADDRESS: {}", senderEmailAddress);
-        log.info("RECIPIENT_EMAIL_ADDRESS: {}", recipientEmailAddress);
-        log.info("IS_ALTCHA_VERIFICATION_ENABLED: {}", isAltchaVerificationEnabled);
-        log.info("ALLOWED_ORIGIN: {}", allowedOrigin);
 
         var entrySubmissionPublisher = new SubmissionPublisher<Entry>();
         var guestbookRepository      = new SqliteGuestbookRepository(connectionString);

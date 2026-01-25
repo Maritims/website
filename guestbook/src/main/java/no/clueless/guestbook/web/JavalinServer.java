@@ -3,7 +3,6 @@ package no.clueless.guestbook.web;
 import io.javalin.Javalin;
 import io.javalin.http.ForbiddenResponse;
 
-import java.util.Arrays;
 import java.util.Set;
 
 public class JavalinServer {
