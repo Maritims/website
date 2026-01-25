@@ -275,8 +275,6 @@ async function buildEverything() {
         description: 'My guestbook.',
         name: 'guestbook',
         scripts: [{
-            src: 'guestbook.js'
-        }, {
             src: 'altcha.js',
             type: 'module',
             async: true,

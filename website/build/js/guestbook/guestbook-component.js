@@ -1,69 +1,4 @@
-/**
- * @typedef {object} Entry
- * @property {string} id The ID of the entry.
- * @property {string} name The name of the person who wrote the entry.
- * @property {string} message The message written by the person.
- * @property {string} timestamp The time the entry was written.
- */
-
-/**
- * @typedef {object} FetchEntriesResult
- * @property {Entry[]} entries The entries returned by the API.
- * @property {number} totalEntries The total number of entries returned by the API.
- * @property {number} totalPages
- * @property {number} currentPage
- * @property {number} size
- */
-
-/**
- * @typedef {object} PostEntryRequest
- * @property {string} name
- * @property {string} message
- * @property {string} altcha
- * @property {string} token
- */
-
-class GuestbookService {
-    /**
-     * @param {string} baseUrl
-     */
-    constructor(baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    /**
-     * @param page
-     * @return {Promise<FetchEntriesResult>}
-     */
-    async fetchEntries(page = 0) {
-        const response = await fetch(`${this.baseUrl}/entries?page=${page}`);
-        if (response.ok) {
-            return await response.json();
-        }
-        throw new Error(`Could not fetch entries for ${response.status}`);
-    }
-
-    /**
-     * @param {PostEntryRequest} postEntryRequest
-     * @return {Promise<Entry>}
-     */
-    async postEntry(postEntryRequest) {
-        const response = await fetch(`${this.baseUrl}/entries`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(postEntryRequest),
-        });
-        if (response.ok) {
-            return await response.json();
-        }
-
-        throw new Error(`An error occurred while attempting to post your message. Please try again later.`);
-    }
-}
-
-class Guestbook extends HTMLElement {
+export default class GuestbookComponent extends HTMLElement {
     constructor() {
         super();
         this._challengeUrl = null;
@@ -212,11 +147,3 @@ class Guestbook extends HTMLElement {
         this.render();
     }
 }
-
-customElements.define('clueless-guestbook', Guestbook);
-
-(() => {
-    const element = document.querySelector('clueless-guestbook');
-    element.challengeUrl = 'http://localhost:8080/altcha';
-    element.service = new GuestbookService('http://localhost:8080');
-})();
