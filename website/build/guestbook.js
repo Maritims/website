@@ -55,18 +55,14 @@
              * @type {HTMLFormElement}
              */
             const form = event.target;
-            const formData = new FormData(form);
 
             try {
                 const response = await fetch(`${guestbookApiUrl}/entries`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify({
-                        "name": formData.get('name'),
-                        "message": formData.get('message')
-                    })
+                    body: new URLSearchParams(new FormData(form)).toString()
                 });
 
                 if (response.ok) {

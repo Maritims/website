@@ -29,6 +29,9 @@ html.ms-dos {
     --link-color: var(--ms-dos-white);
     --link-color-visited: var(--ms-dos-white);
     --link-color-hover: var(--ms-dos-yellow);
+    --altcha-color-base: var(--ms-dos-navy);
+    --altcha-border-width: 5px;
+    --altcha-border-color: var(--ms-dos-white);
 
     body {
         margin: 0;

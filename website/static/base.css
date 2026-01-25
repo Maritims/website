@@ -23,10 +23,12 @@
     --font-family: system-ui, sans-serif, serif;
     --font-size: 16px;
     --font-color: black;
+    --bg-color: white;
 
     --link-color: #0000EE;
     --link-color-visited: #551A8B;
     --link-color-hover: var(--link-color);
+    --altcha-color-base: var(--bg-color);
 }
 
 html {

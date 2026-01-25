@@ -34,7 +34,7 @@ public class JavalinServer {
                         throw new ForbiddenResponse();
                     }
                 })
-                .get("/altcha", altchaController::getChallenge)
+                .get("/altcha", altchaController::createChallenge)
                 .get("/entries", guestbookController::getEntries)
                 .post("/entries", guestbookController::postEntry);
     }
