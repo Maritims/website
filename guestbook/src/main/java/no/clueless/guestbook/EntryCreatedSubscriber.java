@@ -38,6 +38,7 @@ public class EntryCreatedSubscriber implements Flow.Subscriber<Entry> {
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
         this.subscription = subscription;
+        subscription.request(1);
     }
 
     @Override
@@ -50,10 +51,9 @@ public class EntryCreatedSubscriber implements Flow.Subscriber<Entry> {
                     .method("POST", HttpRequest.BodyPublishers.ofString(jsonMapper.writeValueAsString(Map.of(
                             "from", senderEmailAddress,
                             "to", recipientEmailAddress,
-                            "subject",
-                            "foobar",
+                            "subject", "[clueless.no guestbook] New entry pending approval",
                             "html",
-                            "<p>Yikes!</p>"
+                            String.format("<p>There's a new guestbook entry with ID %d from %s pending approval.</p>", entry.getId(), entry.getName())
                     ))))
                     .build();
             var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());

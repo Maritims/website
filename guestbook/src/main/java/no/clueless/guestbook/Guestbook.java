@@ -46,6 +46,10 @@ public class Guestbook {
         return guestbookRepository.getApprovedEntries(pageNumber, pageSize, orderByColumn, orderDirection);
     }
 
+    public Long getTotalEntries() {
+        return guestbookRepository.getNumberOfApprovedEntries();
+    }
+
     public Entry sign(String name, String message) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name cannot be null or blank");

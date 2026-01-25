@@ -36,21 +36,28 @@ html {
     font-size: var(--font-size);
     color: var(--font-color);
     background-color: var(--bg-color);
-}
 
-a {
-    color: var(--link-color);
+    a {
+        color: var(--link-color);
 
-    &:visited {
-        color: var(--link-color-visited);
+        &:visited {
+            color: var(--link-color-visited);
+        }
+
+        &:hover {
+            color: var(--link-color-hover);
+        }
+
+        &:active {
+            color: hsl(from var(--link-color) h s 80%);
+        }
     }
 
-    &:hover {
-        color: var(--link-color-hover);
-    }
-
-    &:active {
-        color: hsl(from var(--link-color) h s 80%);
+    ul {
+        &.horizontal-list {
+            display: flex;
+            list-style: none;
+        }
     }
 }
 
@@ -87,8 +94,6 @@ button#scroll-to-top-button {
 
 nav.main-navigation {
     ul {
-        display: flex;
-        list-style: none;
         margin: 0;
         padding: 0;
     }
@@ -157,7 +162,6 @@ section.gallery {
 section.guestbook {
     form {
         display: grid;
-        gap: 1em;
 
         .form-controls {
             display: grid;
@@ -174,11 +178,15 @@ section.guestbook {
             display: flex;
             justify-content: flex-end;
         }
+    }
 
-        div.result {
-            display: grid;
+    .notification-container {
+        display: grid;
 
-            .result-title {
+        .notification {
+            margin-block-end: 1em;
+
+            .notification-header {
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
@@ -187,11 +195,17 @@ section.guestbook {
         }
     }
 
+    .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1em;
+        padding-block-end: 1em;
+    }
+
     .entries {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 1em;
-        padding-block-start: 1em;
 
         article {
             h3, h4 {

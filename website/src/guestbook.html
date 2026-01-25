@@ -1,26 +1,4 @@
 <section class="guestbook">
-    <p>Please sign my guestbook! :)</p>
-    <form id="guestbook-form">
-        <div class="form-controls">
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" required autofocus autocomplete="name"/>
-
-            <label for="message">Message</label>
-            <textarea name="message" id="message" required></textarea>
-        </div>
-        <div class="form-actions">
-            <button type="submit">Submit message</button>
-        </div>
-        <div class="result success" style="display: none;">
-            <div class="result-title">
-                <span></span>
-                <button type="button" class="close">Close</button>
-            </div>
-            <span class="result-message"></span>
-        </div>
-
-        <input type="hidden" name="token" style="display: none !important;" tabindex="-1" autocomplete="off">
-        <altcha-widget challengeUrl="http://localhost:8080/altcha" name="altcha" floating hidefooter></altcha-widget>
-    </form>
-    <div class="entries"></div>
+    <p>Sign my guestbook! :)</p>
+    <clueless-guestbook></clueless-guestbook>
 </section>

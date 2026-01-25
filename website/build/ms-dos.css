@@ -39,7 +39,7 @@ html.ms-dos {
         button {
             border: none;
             background-color: var(--ms-dos-gray);
-            color: var(--ms-dos-silver);
+            color: var(--ms-dos-white);
             font-family: var(--font-family);
             font-size: var(--font-size);
             padding: .5em;
@@ -50,8 +50,8 @@ html.ms-dos {
             }
 
             &:active, &:focus {
-                color: var(--ms-dos-white);
-                outline: none;
+                background-color: var(--ms-dos-black);
+                box-shadow: none;
             }
         }
 
@@ -64,7 +64,7 @@ html.ms-dos {
             padding: .25em;
         }
 
-        :not(nav.main-navigation, footer) > ul {
+        ul:not(.horizontal-list) {
             list-style-type: none;
 
             li {
@@ -140,8 +140,8 @@ html.ms-dos {
             }
 
             section.guestbook {
-                form {
-                    div.result {
+                .notification-container {
+                    .notification {
                         border: 5px double var(--ms-dos-white);
                         box-shadow: 1em 1em 0 var(--ms-dos-black);
                         color: var(--ms-dos-white);
@@ -155,21 +155,37 @@ html.ms-dos {
                             background-color: var(--ms-dos-maroon);
                         }
 
-                        .result-title {
+                        .notification-header {
                             button.close {
                                 border: none;
                                 background-color: var(--ms-dos-gray);
-                                color: var(--ms-dos-silver);
+                                color: var(--ms-dos-white);
                                 font-family: var(--font-family);
                                 font-size: var(--font-size);
                                 padding: .25em;
                                 box-shadow: .35em .35em 0 var(--ms-dos-black);
 
                                 &:active, &:focus {
-                                    color: var(--ms-dos-white);
-                                    outline: none;
+                                    background-color: var(--ms-dos-black);
+                                    box-shadow: none;
                                 }
                             }
+                        }
+                    }
+                }
+
+                .pagination {
+                    button {
+                        background-color: var(--ms-dos-silver);
+                        color: var(--ms-dos-black);
+
+                        &.active {
+                            background-color: var(--ms-dos-green);
+                            color: var(--ms-dos-white);
+                        }
+
+                        &:active {
+                            background-color: var(--ms-dos-gray);
                         }
                     }
                 }

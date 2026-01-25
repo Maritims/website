@@ -6,6 +6,17 @@ html.hacker {
     --link-color-visited: #008800;
     --link-color-hover: hsl(from var(--link-color) h s calc(l + 10));
 
+    button {
+        background-color: var(--bg-color);
+        border: 1px solid var(--font-color);
+        color: var(--font-color);
+        padding: .5em;
+
+        &:active {
+            background-color: var(--link-color-visited);
+        }
+    }
+
     nav.main-navigation {
         ul {
             li {

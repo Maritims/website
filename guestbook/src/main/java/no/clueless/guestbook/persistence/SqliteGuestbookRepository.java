@@ -95,6 +95,17 @@ public class SqliteGuestbookRepository {
         return entries;
     }
 
+    public Long getNumberOfApprovedEntries() {
+        try(var connection = DriverManager.getConnection(connectionString)) {
+            var statement = connection.createStatement();
+            var resultSet = statement.executeQuery("SELECT COUNT(*) FROM entries WHERE isApproved = true");
+            resultSet.next();
+            return resultSet.getLong(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect to database", e);
+        }
+    }
+
     public Entry createEntry(Entry entry) {
         if (entry == null) {
             throw new IllegalArgumentException("entry cannot be null");

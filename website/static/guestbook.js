@@ -1,97 +1,222 @@
-(
+/**
+ * @typedef {object} Entry
+ * @property {string} id The ID of the entry.
+ * @property {string} name The name of the person who wrote the entry.
+ * @property {string} message The message written by the person.
+ * @property {string} timestamp The time the entry was written.
+ */
+
+/**
+ * @typedef {object} FetchEntriesResult
+ * @property {Entry[]} entries The entries returned by the API.
+ * @property {number} totalEntries The total number of entries returned by the API.
+ * @property {number} totalPages
+ * @property {number} currentPage
+ * @property {number} size
+ */
+
+/**
+ * @typedef {object} PostEntryRequest
+ * @property {string} name
+ * @property {string} message
+ * @property {string} altcha
+ * @property {string} token
+ */
+
+class GuestbookService {
     /**
-     * @param {string} guestbookApiUrl The URL of the guestbook API.
-     * @returns {Promise<void>}
+     * @param {string} baseUrl
      */
-    async (guestbookApiUrl) => {
-        /**
-         * @typedef {object} Entry
-         * @property {string} id The ID of the entry.
-         * @property {string} name The name of the person who wrote the entry.
-         * @property {string} message The message written by the person.
-         * @property {string} timestamp The time the entry was written.
-         */
+    constructor(baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
-        /**
-         * Renders an entry as HTML.
-         * @param {Entry} entry The entry to render.
-         * @returns {string} The rendered HTML.
-         */
-        function renderEntry(entry) {
-            return `<article>
-                    <h3>${entry.name}</h3>
-                    <h4>${entry.timestamp}</h4>
-                    <p>${entry.message}</p>
-                </article>`;
+    /**
+     * @param page
+     * @return {Promise<FetchEntriesResult>}
+     */
+    async fetchEntries(page = 0) {
+        const response = await fetch(`${this.baseUrl}/entries?page=${page}`);
+        if (response.ok) {
+            return await response.json();
+        }
+        throw new Error(`Could not fetch entries for ${response.status}`);
+    }
+
+    /**
+     * @param {PostEntryRequest} postEntryRequest
+     * @return {Promise<Entry>}
+     */
+    async postEntry(postEntryRequest) {
+        const response = await fetch(`${this.baseUrl}/entries`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postEntryRequest),
+        });
+        if (response.ok) {
+            return await response.json();
         }
 
-        /**
-         * Renders a result message as HTML.
-         * @param {string} title The title of the result message.
-         * @param {string} message The message to display.
-         * @param {'success'|'error'} className The CSS class to apply to the result message.
-         */
-        function renderResult(title, message, className) {
-            const result = document.querySelector('.result');
-            result.querySelector('.result-title > span').innerHTML = title;
-            result.querySelector('.result-message').innerHTML = message;
-            result.classList.add(className);
-            result.removeAttribute('style');
+        throw new Error(`An error occurred while attempting to post your message. Please try again later.`);
+    }
+}
+
+class Guestbook extends HTMLElement {
+    constructor() {
+        super();
+        this._challengeUrl = null;
+        this._service = null;
+        this._state = {
+            entries: [],
+            totalEntries: 0,
+            totalPages: 0,
+            currentPage: 0,
+            size: 0
         }
+    }
 
-        document.querySelector('button.close').addEventListener('click', () => {
-            const result = document.querySelector('.result');
-            result.style.display = 'none';
-            result.classList.remove('success', 'error');
-            result.innerHTML = '';
-        });
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * @param {string} challengeUrl
+     */
+    set challengeUrl(challengeUrl) {
+        this._challengeUrl = challengeUrl;
+    }
 
-        document.querySelector('form#guestbook-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            event.submitter.disabled = true;
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * @param {GuestbookService} service
+     */
+    set service(service) {
+        this._service = service;
+        this.loadPage(0).then(_ => {});
+    }
 
-            /**
-             * The form element that was submitted.
-             * @type {HTMLFormElement}
-             */
-            const form = event.target;
-
-            try {
-                const response = await fetch(`${guestbookApiUrl}/entries`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(new FormData(form)).toString()
-                });
-
-                if (response.ok) {
-                    form.reset();
-                    event.submitter.disabled = false;
-                    renderResult('Success!', '<p>Thank you for your message! Your message has been submitted for moderator review.</p>', 'success');
-                } else {
-                    renderResult('Error!', `<p>Sorry, there was an error submitting your message. Please try again later.</p>`, 'error');
-                }
-            } catch (error) {
-                renderResult('Error!', `<p>Sorry, there was an error submitting your message. Please try again later.</p>`, 'error');
-            }
-        });
+    async loadPage(page) {
+        if(!this._service) {
+            return;
+        }
 
         try {
-            const response = await fetch(`${guestbookApiUrl}/entries`);
-            if (response.ok) {
-                /**
-                 * @type {Entry[]}
-                 */
-                const entries = await response.json();
-
-                entries.map(entry => document.querySelector('.entries').insertAdjacentHTML('beforeend', renderEntry(entry)))
-            } else {
-                console.error(`Failed to fetch entries: ${response.statusText}`);
-                renderResult('Error!', `<p>Failed to fetch entries. Please try again later.`, 'error');
-            }
+            const result = await this._service.fetchEntries(page);
+            this._state = {
+                ...this._state,
+                entries: result.entries,
+                totalEntries: result.totalEntries,
+                totalPages: result.totalPages,
+                currentPage: result.currentPage,
+                size: result.size,
+            };
+            this.render();
         } catch (error) {
-            console.error(`Failed to fetch entries: ${error}`);
-            renderResult('Error!', `<p>Failed to fetch entries. Please try again later.`, 'error');
+            this.notify('Error!', error.message, 'error');
         }
-    })('http://localhost:8080');
+    }
+
+    /**
+     * @param {SubmitEvent} event
+     * @return {Promise<void>}
+     */
+    async handleSubmit(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        /**
+         * @type {PostEntryRequest}
+         */
+        const payload = {
+            name: formData.get('name').toString(),
+            message: formData.get('message').toString(),
+            altcha: formData.get('altcha').toString(),
+            token: formData.get('token').toString()
+        };
+
+        try {
+            await this._service.postEntry(payload);
+            this.notify('Success!', 'Entry posted successfully.', 'success');
+            event.target.reset();
+        } catch (error) {
+            this.notify('Error!', error.message, 'error');
+        }
+    }
+
+    /**
+     * @param {string} title
+     * @param {string} message
+     * @param {string} type
+     */
+    notify(title, message, type) {
+        this.querySelector('.notification-container').innerHTML = `
+            <div class="notification ${type}" role="alert">
+                <div class="notification-header">
+                    <span>${title}</span>
+                    <button type="button" class="close" aria-label="Close">Close</button>
+                </div>
+                <div class="notification-body">${message}</div>
+            </div>
+        `;
+    }
+
+    render() {
+        this.style.display = 'grid';
+        this.style.gap = '1em';
+
+        this.innerHTML = `
+            <form id="guestbook-form">
+                <div class="form-controls">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" required autofocus autocomplete="name"/>
+        
+                    <label for="message">Message</label>
+                    <textarea name="message" id="message" required></textarea>
+                    
+                    <input type="text" name="token" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <altcha-widget name="altcha" challengeUrl="${this._challengeUrl}" floating="top"></altcha-widget>
+                </div>
+                <div class="form-actions">
+                    <button type="submit">Submit message</button>
+                </div>
+            </form>
+            
+            <div class="notification-container"></div>
+            
+            <div class="entries">
+                ${this._state.entries.map(entry => `
+                    <article>
+                        <h3>${entry.name}</h3>
+                        <h4>${new Date(entry.timestamp + 'Z').toLocaleString()}</h4>
+                        <p>${entry.message}</p>
+                    </article>
+                `).join('')}
+            </div>
+            
+            <nav class="pagination">${Array.from({length: this._state.totalPages}, (_, i) => i)
+            .map(num => `<button class="${num === this._state.currentPage ? 'active' : ''}" data-page="${num}">${num + 1}</button>`)
+            .join('')}</nav>
+        `;
+
+        this.querySelector("#guestbook-form").onsubmit = (event) => this.handleSubmit(event);
+        this.querySelector('.notification-container').addEventListener('click', (event) => {
+            if (event.target.classList.contains('close')) {
+                event.target.closest('.notification').remove();
+            }
+        });
+        this.querySelectorAll(".pagination button").forEach(button => {
+            button.onclick = () => this.loadPage(button.dataset.page);
+        });
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    connectedCallback() {
+        this.render();
+    }
+}
+
+customElements.define('clueless-guestbook', Guestbook);
+
+(() => {
+    const element = document.querySelector('clueless-guestbook');
+    element.challengeUrl = 'http://localhost:8080/altcha';
+    element.service = new GuestbookService('http://localhost:8080');
+})();
