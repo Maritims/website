@@ -98,7 +98,7 @@ html.ms-dos {
                             color: var(--ms-dos-black);
                         }
 
-                        &:hover, &:focus {
+                        &:hover, &:focus, &.active {
                             background-color: var(--ms-dos-black);
                             color: var(--ms-dos-silver);
                             text-decoration: none;

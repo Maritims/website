@@ -52,6 +52,8 @@ export default class Guestbook extends HTMLElement {
             currentPage: 0,
             size: 0
         }
+
+        this.loadPage(this._state.currentPage).then()
     }
 
     async loadPage(page) {

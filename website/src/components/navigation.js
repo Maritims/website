@@ -7,7 +7,7 @@
 /**
  * A navigation component.
  */
-export default class Navigation extends HTMLElement {
+class Navigation extends HTMLElement {
     /**
      * @type {NavigationLink[]}
      * @private
@@ -19,6 +19,9 @@ export default class Navigation extends HTMLElement {
         this._navigationLinks = [{
             label: 'Home',
             href: '/',
+        }, {
+            label: 'Guestbook',
+            href: '/guestbook.html',
         }, {
             label: 'EVE Online: Ninja Hacking Guide',
             href: '/eve-online-ninja-hacking-guide.html'
@@ -44,12 +47,13 @@ export default class Navigation extends HTMLElement {
         this.innerHTML = `
             <nav class="main-navigation">
                 <ul class="horizontal-list">
-                    ${this._navigationLinks.map(({ href, label }) =>`<li><a href="${href}">${label}</a></li>`).join('')}
+                    ${this._navigationLinks.map(({ href, label }) =>`<li><a href="${href}" class="${window.location.pathname === href ? 'active' : ''}">${label}</a></li>`).join('')}
                 </ul>
             </nav>
         `;
     }
 
+    // noinspection JSUnusedGlobalSymbols
     connectedCallback() {
         this.render();
     }
