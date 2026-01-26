@@ -4,14 +4,14 @@
     "version": "1.0.0",
     "type": "module",
     "description": "My personal website.",
-    "main": "render.js",
+    "main": "build.js",
     "nodemonConfig": {},
     "scripts": {
         "dev": "nodemon server.js",
-        "render": "node render.js",
+        "render": "node build.js",
         "generate-sitemap": "node generate-sitemap.js",
         "generate-robots": "node generate-robots.js",
-        "build": "node render.js && node generate-sitemap.js && node generate-robots.js",
+        "build": "node build.js && node generate-sitemap.js && node generate-robots.js",
         "clean": "rm -rf build"
     },
     "keywords": [],

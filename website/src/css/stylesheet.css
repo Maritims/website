@@ -1,0 +1,20 @@
+@layer base, theme;
+
+@import url(base.css) layer(base);
+@import url(terminal.css) layer(base);
+@import url(default.css) layer(theme);
+@import url(hacker.css) layer(theme);
+@import url(lcars.css) layer(theme);
+@import url(ms-dos.css) layer(theme);
+
+/* Hide the component while it's still just a generic HTML tag */
+clueless-layout:not(:defined) {
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* Smoothly fade it in once the JS has executed */
+clueless-layout:defined {
+    visibility: visible;
+    opacity: 1;
+}

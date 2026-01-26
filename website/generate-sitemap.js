@@ -51,7 +51,7 @@ function buildUrl(filePath, sourceDir, siteUrl) {
  * @param siteUrl The URL of the website.
  * @returns {string} The sitemap XML.
  */
-function generateSitemap(sourceDir, siteUrl) {
+export function generateSitemap(sourceDir, siteUrl) {
     console.log('Generating sitemap...');
 
     const htmlFiles = getHtmlFiles(sourceDir);
@@ -68,10 +68,3 @@ ${htmlFiles.map(filePath => `    <url>
     </url>`).join('\n')}   
 </urlset>`;
 }
-
-const sourceDir = process.env.SOURCE_DIR || 'build';
-const siteUrl = process.env.SITE_URL || 'https://clueless.no/';
-const siteMapXml = generateSitemap(sourceDir, siteUrl);
-
-fs.writeFileSync(path.join(sourceDir, 'sitemap.xml'), siteMapXml);
-console.log('Sitemap written.');

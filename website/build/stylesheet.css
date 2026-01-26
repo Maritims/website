@@ -1,8 +1,0 @@
-@layer base, theme;
-
-@import url(base.css) layer(base);
-@import url(terminal.css) layer(base);
-@import url(default.css) layer(theme);
-@import url(hacker.css) layer(theme);
-@import url(lcars.css) layer(theme);
-@import url(ms-dos.css) layer(theme);

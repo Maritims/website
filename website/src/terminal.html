@@ -1,10 +1,26 @@
-<section class="terminal">
-    <p>Navigate my website using a Linux-style terminal.</p>
-    <div class="terminal-container">
-        <div class="terminal-output"></div>
-        <div class="terminal-input-container">
-            <label for="terminal-input" class="terminal-input-label">anonymous@clueless.no:~$</label>
-            <input type="text" id="terminal-input" class="terminal-input" autofocus/>
+<!DOCTYPE html>
+<html lang="en" class="ms-dos">
+<head>
+    <title>Terminal</title>
+    <meta name="description" content="Navigate my website using a Linux-style terminal.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/stylesheet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+<clueless-layout>
+    <section class="terminal">
+        <p>Navigate my website using a Linux-style terminal.</p>
+        <div class="terminal-container">
+            <div class="terminal-output"></div>
+            <div class="terminal-input-container">
+                <label for="terminal-input" class="terminal-input-label">anonymous@clueless.no:~$</label>
+                <input type="text" id="terminal-input" class="terminal-input" autofocus/>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+</clueless-layout>
+<script src="./components/layout.js" type="module"></script>
+<script src="./scripts/terminal.js"></script>
+</body>
+</html>
