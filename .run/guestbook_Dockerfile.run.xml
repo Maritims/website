@@ -1,0 +1,43 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="guestbook/Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Podman">
+    <deployment type="dockerfile">
+      <settings>
+        <option name="containerName" value="guestbook" />
+        <option name="envVars">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="ALLOWED_ORIGIN" />
+              <option name="value" value="http://localhost:3000" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="ALTCHA_HMAC_KEY" />
+              <option name="value" value="ABC123" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="MAXIMUM_SUBMISSIONS_PER_USER_PER_MINUTE" />
+              <option name="value" value="2" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="RECIPIENT_EMAIL_ADDRESS" />
+              <option name="value" value="recipient@localhost" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="SENDER_EMAIL_ADDRESS" />
+              <option name="value" value="no-reply@localhost" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="8080" />
+              <option name="hostPort" value="8080" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="sourceFilePath" value="guestbook/Dockerfile" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

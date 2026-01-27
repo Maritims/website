@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.json.JavalinJackson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public class JavalinServer {
-    private final AltchaController    altchaController;
+    private static final Logger log = LoggerFactory.getLogger(JavalinServer.class);
+    private final AltchaController altchaController;
     private final GuestbookController guestbookController;
     private final Set<String>         allowedOrigin;
     private final ObjectMapper        jsonMapper;
@@ -40,6 +43,7 @@ public class JavalinServer {
                 .before(ctx -> {
                     var origin = ctx.header("Origin");
                     if (origin == null || !allowedOrigin.contains(origin)) {
+                        log.warn("Received request from forbidden origin: {}", ctx.ip());
                         throw new ForbiddenResponse();
                     }
                 })

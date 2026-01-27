@@ -2,22 +2,22 @@
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
-# Copy the pom.xml and source code
+# Cache dependencies: Only re-run if pom.xml changes.
 COPY pom.xml .
-COPY src ./src
+RUN mvn dependency:go-offline
 
-# Package the application
+COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Use a slim JRE for the final image
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine AS run
 WORKDIR /app
 
-# Copy the fat JAR from the build stage
-COPY --from=build /app/target/guestbook-1.0-SNAPSHOT.jar app.jar
+# Copy with ownership directly to a specific UID
+COPY --from=build --chown=1000:1000 /app/target/guestbook-*.jar app.jar
 
-# Expose the default port
+# Tell Podman to run as this UID
+USER 1000
+
 EXPOSE 8080
-
-# Run the application
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
