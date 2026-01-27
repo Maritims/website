@@ -13,11 +13,18 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine AS run
 WORKDIR /app
 
+# 1. Create a data directory and set ownership
+# We do this as root before switching to USER 1000
+RUN mkdir /app/data && chown 1000:1000 /app/data
+
 # Copy with ownership directly to a specific UID
 COPY --from=build --chown=1000:1000 /app/target/guestbook-*.jar app.jar
 
 # Tell Podman to run as this UID
 USER 1000
+
+# 2. Use a Volume for persistence
+VOLUME /app/data
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
