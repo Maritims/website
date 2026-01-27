@@ -22,6 +22,7 @@ public class Application {
         final var senderEmailAddress                 = Optional.ofNullable(System.getenv("SENDER_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("SENDER_EMAIL_ADDRESS must be set"));
         final var recipientEmailAddress              = Optional.ofNullable(System.getenv("RECIPIENT_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("RECIPIENT_EMAIL_ADDRESS must be set"));
         final var allowedOrigin                      = Optional.ofNullable(System.getenv("ALLOWED_ORIGIN")).filter(property -> !property.isBlank()).map(property -> new HashSet<>(Arrays.asList(property.split(",")))).orElseThrow(() -> new IllegalStateException("ALLOWED_ORIGIN must be set"));
+        final var allowedReferrers                   = Optional.ofNullable(System.getenv("ALLOWED_REFERRERS")).filter(property -> !property.isBlank()).map(property -> new HashSet<>(Arrays.asList(property.split(",")))).orElseThrow(() -> new IllegalStateException("ALLOWED_REFERRERS must be set"));
         final var maximumSubmissionsPerUserPerMinute = Optional.ofNullable(System.getenv("MAXIMUM_SUBMISSIONS_PER_USER_PER_MINUTE")).filter(property -> !property.isBlank()).map(Integer::parseInt).orElseThrow(() -> new IllegalStateException("MAXIMUM_SUBMISSIONS_PER_USER_PER_MINUTE must be set"));
         final var jsonMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -32,7 +33,7 @@ public class Application {
         var guestbook                = new Guestbook(guestbookRepository, entrySubmissionPublisher);
         var guestbookController      = new GuestbookController(guestbook, jsonMapper, defaultPageSize, altchaHmacKey, maximumSubmissionsPerUserPerMinute);
         var altchaController         = new AltchaController(altchaHmacKey);
-        var javalinServer            = new JavalinServer(altchaController, guestbookController, allowedOrigin, jsonMapper);
+        var javalinServer            = new JavalinServer(altchaController, guestbookController, allowedOrigin, allowedReferrers, jsonMapper);
 
         guestbookRepository.initialize();
         guestbook.subscribeToEntryCreated(new EntryCreatedSubscriber(senderEmailAddress, recipientEmailAddress, jsonMapper));

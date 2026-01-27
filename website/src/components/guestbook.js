@@ -17,7 +17,7 @@ class GuestbookService {
         if (response.ok) {
             return await response.json();
         }
-        throw new Error(`Could not fetch entries for ${response.status}`);
+        throw new Error(`Could not fetch entries: ${response.status}`);
     }
 
     /**
@@ -43,8 +43,8 @@ class GuestbookService {
 export default class Guestbook extends HTMLElement {
     constructor() {
         super();
-        this._challengeUrl = 'http://localhost:8080/altcha';
-        this._service = new GuestbookService('http://localhost:8080');
+        this._challengeUrl = '/api/guestbook/altcha';
+        this._service = new GuestbookService('/api/guestbook');
         this._state = {
             entries: [],
             totalEntries: 0,
