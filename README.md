@@ -1,19 +1,23 @@
 # clueless-website
 My personal website.
 
-## website
+## Dependencies
 
-This package contains the actual website. The website itself is contained within the `build/` directory. This package does not contain any functionality for serving the files.
+- JDK 21
+- Maven 3.9.9
+- Podman 5.4.2
+- OpenSSH
+- ImageMagick 7
 
-### Run and develop locally
+## Modules
 
-To run the website locally, use the top-level `package.json` scripts.
+- website: the site itself.
+- guestbook: a microservice powering the website's guestbook.
 
-- `npm run dev`: Runs the `website` dev script as defined in its `package.json` file.
-- `npm run install`: Installs dependencies for the `website` package.
+## Run and develop locally
 
-### Deploy
+To run the website locally for development, run `./dev.sh` to start a web server listening on port 3000 serving the static content from `website/src`.
 
-To deploy the website, use the top-level `package.json` script:
+## Deploy to production
 
-- `npm run deploy`: Builds the website container image, creates an OCI artifact and uploads it to the server via SFTP.
+Run `./deploy.sh` to build and deploy the container images for the website and guestbook modules.
