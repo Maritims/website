@@ -44,15 +44,25 @@ done
 
 # --- 2. Single Session Upload Stage ---
 echo "> Ensuring remote directory exists..."
-# We use standard ssh here because it handles 'mkdir -p' correctly
 ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p $DEST_DIR"
 
-echo "> Uploading all files to $DEPLOY_HOST..."
+echo "> Uploading all files to $DEPLOY_HOST (as .part)..."
 {
     for f in "${CREATED_FILES[@]}"; do
-        echo "put $f $DEST_DIR/$f"
+        # Upload as .part so the systemd watcher ignores it during transfer
+        echo "put $f $DEST_DIR/$f.part"
     done
     echo "quit"
 } | sftp -b - "${DEPLOY_USER}@${DEPLOY_HOST}"
+
+# --- 3. Atomic Rename Stage ---
+echo "> Atomically moving files to trigger watchers..."
+RENAME_COMMANDS=""
+for f in "${CREATED_FILES[@]}"; do
+    RENAME_COMMANDS+="mv $DEST_DIR/$f.part $DEST_DIR/$f; "
+done
+
+# This triggers the .path unit only AFTER the file is fully moved/present
+ssh "${DEPLOY_USER}@${DEPLOY_HOST}" "$RENAME_COMMANDS"
 
 echo "Deployment complete!"
