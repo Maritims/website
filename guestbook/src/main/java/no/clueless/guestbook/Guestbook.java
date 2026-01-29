@@ -1,14 +1,20 @@
 package no.clueless.guestbook;
 
 import no.clueless.guestbook.persistence.SqliteGuestbookRepository;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
 public class Guestbook {
-    private final SqliteGuestbookRepository  guestbookRepository;
-    private final SubmissionPublisher<Entry> entryCreatedPublisher;
+    private static final Logger                     log = LoggerFactory.getLogger(Guestbook.class);
+    private final        SqliteGuestbookRepository  guestbookRepository;
+    private final        SubmissionPublisher<Entry> entryCreatedPublisher;
 
     public Guestbook(SqliteGuestbookRepository guestbookRepository, SubmissionPublisher<Entry> entryCreatedPublisher) {
         if (guestbookRepository == null) {
@@ -50,7 +56,14 @@ public class Guestbook {
         return guestbookRepository.getNumberOfApprovedEntries();
     }
 
-    public Entry sign(String name, String message) {
+    /**
+     * Sign the guestbook.
+     *
+     * @param name    The name of the author.
+     * @param message The message from the author.
+     * @return The created entry, or {@link Optional#empty()} if cleaning the name and/or message resulted in empty strings.
+     */
+    public Optional<Entry> sign(String name, String message) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("name cannot be null or blank");
         }
@@ -58,8 +71,20 @@ public class Guestbook {
             throw new IllegalArgumentException("message cannot be null or blank");
         }
 
-        var createdEntry = guestbookRepository.createEntry(Entry.newEntry(name, message));
+        var cleanName = Jsoup.clean(name, Safelist.none());
+        if (cleanName.isBlank()) {
+            log.info("Cleaning name ({}) resulted in a blank string. Entry will not be created.", name);
+            return Optional.empty();
+        }
+
+        var cleanMessage = Jsoup.clean(message, Safelist.none());
+        if (cleanMessage.isBlank()) {
+            log.info("Cleaning message ({}) resulted in a blank string. Entry will not be created.", message);
+            return Optional.empty();
+        }
+
+        var createdEntry = guestbookRepository.createEntry(Entry.newEntry(cleanName, cleanMessage));
         entryCreatedPublisher.submit(createdEntry);
-        return createdEntry;
+        return Optional.ofNullable(createdEntry);
     }
 }

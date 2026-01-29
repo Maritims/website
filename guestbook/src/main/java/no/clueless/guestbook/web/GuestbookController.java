@@ -79,7 +79,7 @@ public class GuestbookController {
                 }, "unable to process request")
                 .get();
 
-        var createdEntry = guestbook.sign(postEntryrequest.name(), postEntryrequest.message());
+        var createdEntry = guestbook.sign(postEntryrequest.name(), postEntryrequest.message()).orElseThrow(BadRequestResponse::new);
         ctx.json(createdEntry);
     }
 

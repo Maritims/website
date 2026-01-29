@@ -12,6 +12,7 @@ import java.util.HexFormat;
 import java.util.concurrent.SubmissionPublisher;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 class GuestbookTest {
@@ -30,6 +31,22 @@ class GuestbookTest {
 
         //noinspection unchecked
         verify(submissionPublisher, times(1)).submit(createdEntry);
+    }
+
+    @Test
+    void signingTheGuestbookShouldCleanNameAndMessageForHtml() {
+        // arrange
+        var guestbookRepository = mock(SqliteGuestbookRepository.class);
+        var submissionPublisher = mock(SubmissionPublisher.class);
+
+        //noinspection unchecked
+        var guestbook = spy(new Guestbook(guestbookRepository, submissionPublisher));
+
+        // act
+        var result = guestbook.sign("<script>foo bar</script>", "<script>alert('foo bar');</script>").orElse(null);
+
+        // arrange
+        assertNull(result);
     }
 
     @Test

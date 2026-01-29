@@ -18,8 +18,13 @@ public class JavalinServer {
     private final        Set<String>         allowedReferrers;
     private final        ObjectMapper        jsonMapper;
 
-    public JavalinServer(AltchaController altchaController, GuestbookController guestbookController, Set<String> allowedOrigin, Set<String> allowedReferrers, ObjectMapper jsonMapper) {
-        this.allowedReferrers = allowedReferrers;
+    public JavalinServer(
+            AltchaController altchaController,
+            GuestbookController guestbookController,
+            Set<String> allowedOrigin,
+            Set<String> allowedReferrers,
+            ObjectMapper jsonMapper
+    ) {
         if (altchaController == null) {
             throw new IllegalArgumentException("altchaController cannot be null");
         }
@@ -36,6 +41,7 @@ public class JavalinServer {
         this.altchaController    = altchaController;
         this.guestbookController = guestbookController;
         this.allowedOrigin       = allowedOrigin;
+        this.allowedReferrers    = allowedReferrers;
         this.jsonMapper          = jsonMapper;
     }
 

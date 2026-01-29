@@ -2,9 +2,11 @@ html.default {
     nav.main-navigation {
         ul {
             li {
-                &:not(:last-child)::after {
-                    content: '/';
-                    padding-inline: 5px;
+                @media (min-width: 768px) {
+                    &:not(:last-child)::after {
+                        content: '/';
+                        padding-inline: 5px;
+                    }
                 }
             }
         }

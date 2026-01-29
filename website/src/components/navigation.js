@@ -46,7 +46,7 @@ class Navigation extends HTMLElement {
     render() {
         this.innerHTML = `
             <nav class="main-navigation">
-                <ul class="horizontal-list">
+                <ul>
                     ${this._navigationLinks.map(({ href, label }) =>`<li><a href="${href}" class="${window.location.pathname === href ? 'active' : ''}">${label}</a></li>`).join('')}
                 </ul>
             </nav>
