@@ -2,13 +2,14 @@ package no.clueless.webmention.sender;
 
 import no.clueless.webmention.UnexpectedStatusCodeException;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
+import no.clueless.webmention.http.SecureHttpClient;
+import no.clueless.webmention.http.WebmentionHttpRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -23,11 +24,11 @@ import java.util.stream.Collectors;
  */
 public class WebmentionSender {
     private static final Logger                               log = LoggerFactory.getLogger(WebmentionSender.class);
-    private final        HttpClient                           httpClient;
-    private final SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher;
-    private final WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
+    private final        SecureHttpClient                     httpClient;
+    private final        SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher;
+    private final        WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
 
-    public WebmentionSender(HttpClient httpClient, SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher, WebmentionEndpointDiscoverer webmentionEndpointDiscoverer) {
+    public WebmentionSender(SecureHttpClient httpClient, SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher, WebmentionEndpointDiscoverer webmentionEndpointDiscoverer) {
         this.httpClient                   = httpClient;
         this.onReceiverNotifiedPublisher  = Objects.requireNonNull(onReceiverNotifiedPublisher, "onReceiverNotifiedPublisher cannot be null");
         this.webmentionEndpointDiscoverer = webmentionEndpointDiscoverer;
@@ -43,15 +44,15 @@ public class WebmentionSender {
     void notifyReceiver(String webmentionEndpoint, String sourceUrl, String targetUrl) {
         var formData    = Map.of("source", sourceUrl, "target", targetUrl);
         var encodedForm = formData.entrySet().stream().map(entry -> entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("&"));
-        var httpRequest = HttpRequest.newBuilder()
+        var httpRequest = WebmentionHttpRequestBuilder.newBuilder()
                 .uri(URI.create(webmentionEndpoint))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(encodedForm))
                 .build();
 
-        HttpResponse<Void> postResponse;
+        HttpResponse<String> postResponse;
         try {
-            postResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+            postResponse = httpClient.send(httpRequest);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("HTTP request to webmentionEndpoint " + webmentionEndpoint + " failed", e);
         }
@@ -71,5 +72,37 @@ public class WebmentionSender {
     public void send(String sourceUrl, String targetUrl) {
         var webmentionEndpoint = webmentionEndpointDiscoverer.discover(URI.create(targetUrl)).orElseThrow(() -> new WebmentionEndpointNotFoundException(targetUrl));
         notifyReceiver(webmentionEndpoint, sourceUrl, targetUrl);
+    }
+
+    public static class Builder {
+        private SecureHttpClient                     httpClient;
+        private SubmissionPublisher<HttpResponse<?>> submissionPublisher;
+        private WebmentionEndpointDiscoverer         endpointDiscoverer;
+
+        private Builder() {
+        }
+
+        public Builder httpClient(SecureHttpClient httpClient) {
+            this.httpClient = httpClient;
+            return this;
+        }
+
+        public Builder submissionPublisher(SubmissionPublisher<HttpResponse<?>> submissionPublisher) {
+            this.submissionPublisher = submissionPublisher;
+            return this;
+        }
+
+        public Builder endpointDiscoverer(WebmentionEndpointDiscoverer endpointDiscoverer) {
+            this.endpointDiscoverer = endpointDiscoverer;
+            return this;
+        }
+
+        public WebmentionSender build() {
+            return new WebmentionSender(httpClient, submissionPublisher, endpointDiscoverer);
+        }
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 }

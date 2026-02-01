@@ -1,5 +1,6 @@
 package no.clueless.webmention;
 
+import no.clueless.webmention.http.SecureHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -7,13 +8,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.net.URI;
-import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WebmentionEndpointDiscovererIntegrationTest {
-    HttpClient                   httpClient;
+    SecureHttpClient             httpClient;
     WebmentionEndpointDiscoverer sut;
 
     public static Stream<Arguments> discover() {
@@ -47,7 +48,7 @@ class WebmentionEndpointDiscovererIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+        httpClient = SecureHttpClient.newClient(Duration.ofSeconds(5), true);
         sut        = new WebmentionEndpointDiscoverer(httpClient);
     }
 

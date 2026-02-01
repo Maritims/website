@@ -3,8 +3,6 @@ package no.clueless.webmention.receiver;
 import no.clueless.webmention.WebmentionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -14,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class WebmentionRequestVerifierTest {
-    private static final Logger log = LoggerFactory.getLogger(WebmentionRequestVerifierTest.class);
     WebmentionTargetVerifier  targetVerifier;
     WebmentionRequestVerifier sut;
 
@@ -43,7 +40,7 @@ class WebmentionRequestVerifierTest {
     }
 
     @Test
-    void verify_shouldThrow_whenTargetVerificationDoesNotPass() {
+    void verify_shouldThrow_whenTargetVerificationDoesNotPass() throws WebmentionException {
         when(targetVerifier.verify(any(URI.class))).thenReturn(false);
         var result = assertThrows(WebmentionException.class, () -> sut.verify("https://example.com/page/1", "https://example.com/webmention-endpoint/2"));
         assertEquals("Target URL https://example.com/webmention-endpoint/2 is not a valid resource for this receiver", result.getMessage());

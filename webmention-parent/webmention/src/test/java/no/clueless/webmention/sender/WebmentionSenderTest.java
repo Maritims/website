@@ -2,6 +2,7 @@ package no.clueless.webmention.sender;
 
 import no.clueless.webmention.UnexpectedStatusCodeException;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
+import no.clueless.webmention.http.SecureHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,7 +10,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -21,14 +21,14 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 class WebmentionSenderTest {
-    HttpClient                           httpClient;
+    SecureHttpClient                     httpClient;
     SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher;
     WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
     WebmentionSender                     sut;
 
     @BeforeEach
     void setUp() {
-        httpClient                   = mock(HttpClient.class);
+        httpClient                   = mock(SecureHttpClient.class);
         onReceiverNotifiedPublisher  = mock(SubmissionPublisher.class);
         webmentionEndpointDiscoverer = mock(WebmentionEndpointDiscoverer.class);
         sut                          = spy(new WebmentionSender(httpClient, onReceiverNotifiedPublisher, webmentionEndpointDiscoverer));
@@ -40,7 +40,7 @@ class WebmentionSenderTest {
         // arrange
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.statusCode()).thenReturn(statusCode);
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         // act & assert
         assertThrows(UnexpectedStatusCodeException.class, () -> sut.notifyReceiver("https://example.com", "foo", "bar"));
@@ -53,7 +53,7 @@ class WebmentionSenderTest {
         var httpHeaders  = mock(HttpHeaders.class);
         when(httpResponse.statusCode()).thenReturn(statusCode);
         when(httpResponse.headers()).thenReturn(httpHeaders);
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         // act
         sut.notifyReceiver("https://example.com", "foo", "bar");

@@ -1,5 +1,6 @@
 package no.clueless.webmention;
 
+import no.clueless.webmention.http.SecureHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.never;
 
 @SuppressWarnings("unchecked")
 class WebmentionEndpointDiscovererTest {
-    HttpClient                   httpClient;
+    SecureHttpClient             httpClient;
     WebmentionEndpointDiscoverer sut;
 
     public static Stream<Arguments> discover_shouldPrefer_findInHeaders() {
@@ -240,7 +240,7 @@ class WebmentionEndpointDiscovererTest {
 
     @BeforeEach
     void setUp() {
-        httpClient = mock(HttpClient.class);
+        httpClient = mock(SecureHttpClient.class);
         sut        = spy(new WebmentionEndpointDiscoverer(httpClient));
     }
 
@@ -248,7 +248,7 @@ class WebmentionEndpointDiscovererTest {
     @MethodSource
     void discover(@SuppressWarnings("unused") String name, HttpResponse<String> httpResponse, String expected) throws IOException, InterruptedException {
         // arrange
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         // act
         var result = sut.discover(URI.create("https://example.com")).orElse(null);
@@ -294,7 +294,7 @@ class WebmentionEndpointDiscovererTest {
         var httpHeaders  = mock(HttpHeaders.class);
         when(httpHeaders.map()).thenReturn(Map.of(linkHeaderName, List.of(linkHeaderValue), "content-type", List.of("text/html")));
         when(httpResponse.headers()).thenReturn(httpHeaders);
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         // act
         var result = sut.discover(URI.create("https://example.com")).orElse(null);
@@ -317,7 +317,7 @@ class WebmentionEndpointDiscovererTest {
         doReturn(document).when(sut).parseHtml(nullable(String.class));
         doReturn(Optional.empty()).when(sut).findInHeaders(eq(httpHeaders));
         doReturn(Optional.of("https://example.com/webmention-endpoint")).when(sut).findInHtml(any(Document.class));
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         // act
         var result = sut.discover(URI.create("https://example.com")).orElse(null);
@@ -337,7 +337,7 @@ class WebmentionEndpointDiscovererTest {
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
 
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         doReturn(Optional.of("/webmention-endpoint")).when(sut).findInHeaders(eq(httpHeaders));
 
         // act
@@ -356,7 +356,7 @@ class WebmentionEndpointDiscovererTest {
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
 
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         doReturn(Optional.of("")).when(sut).findInHeaders(nullable(HttpHeaders.class));
 
         // act
@@ -370,7 +370,7 @@ class WebmentionEndpointDiscovererTest {
     @Test
     void discover_shouldThrow_whenContentTypeIsMissing() throws IOException, InterruptedException {
         var httpResponse = mock(HttpResponse.class);
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         assertThrows(RuntimeException.class, () -> sut.discover(URI.create("https://example.com/webmention-endpoint")).orElse(null));
     }
@@ -381,7 +381,7 @@ class WebmentionEndpointDiscovererTest {
         when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/plain")));
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
         assertThrows(UnexpectedContentTypeException.class, () -> sut.discover(URI.create("https://example.com/webmention-endpoint")).orElse(null));
     }

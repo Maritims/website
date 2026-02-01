@@ -1,5 +1,7 @@
 package no.clueless.webmention;
 
+import no.clueless.webmention.http.SecureHttpClient;
+import no.clueless.webmention.http.WebmentionHttpRequestBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -7,18 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class WebmentionEndpointDiscoverer {
-    private static final Logger log = LoggerFactory.getLogger(WebmentionEndpointDiscoverer.class);
-    private final HttpClient httpClient;
+    private static final Logger           log = LoggerFactory.getLogger(WebmentionEndpointDiscoverer.class);
+    private final        SecureHttpClient httpClient;
 
-    public WebmentionEndpointDiscoverer(HttpClient httpClient) {
+    public WebmentionEndpointDiscoverer(SecureHttpClient httpClient) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient cannot be null");
     }
 
@@ -78,7 +78,7 @@ public class WebmentionEndpointDiscoverer {
                 .flatMap(entry -> entry.getValue().stream())
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("HTTP response from target URL " + targetUri + " did not contain a Content-Type header"));
-        if(!"text/html".equalsIgnoreCase(contentType)) {
+        if (!"text/html".equalsIgnoreCase(contentType)) {
             throw new UnexpectedContentTypeException(targetUri.toString(), contentType);
         }
 
@@ -92,7 +92,7 @@ public class WebmentionEndpointDiscoverer {
                         return targetUri.toString();
                     }
 
-                    if(URI.create(webmentionEndpoint).isAbsolute()) {
+                    if (URI.create(webmentionEndpoint).isAbsolute()) {
                         return webmentionEndpoint;
                     }
 
@@ -101,18 +101,37 @@ public class WebmentionEndpointDiscoverer {
     }
 
     public Optional<String> discover(URI targetUri) {
-        var httpRequest = HttpRequest.newBuilder()
+        var httpRequest = WebmentionHttpRequestBuilder.newBuilder()
                 .uri(targetUri)
                 .GET()
                 .build();
 
         HttpResponse<String> httpResponse;
         try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            httpResponse = httpClient.send(httpRequest);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("HTTP request to target URL " + targetUri + " failed", e);
         }
 
         return discover(targetUri, httpResponse);
+    }
+
+    public static class Builder {
+        private SecureHttpClient httpClient;
+
+        private Builder() {}
+
+        public Builder httpClient(SecureHttpClient httpClient) {
+            this.httpClient = httpClient;
+            return this;
+        }
+
+        public WebmentionEndpointDiscoverer build() {
+            return new WebmentionEndpointDiscoverer(httpClient);
+        }
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 }

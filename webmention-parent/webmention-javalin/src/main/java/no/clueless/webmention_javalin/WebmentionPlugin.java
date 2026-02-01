@@ -1,10 +1,8 @@
 package no.clueless.webmention_javalin;
 
 import io.javalin.config.JavalinConfig;
-import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ContentType;
 import io.javalin.plugin.Plugin;
-import no.clueless.webmention.WebmentionException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -28,7 +26,7 @@ public class WebmentionPlugin extends Plugin<WebmentionConfig> {
     @Override
     public void onInitialize(@NotNull JavalinConfig config) {
         config.router.mount(router -> {
-            if(pluginConfig.isTestMode()) {
+            if (pluginConfig.isTestMode()) {
                 log.info("Plugin is running in test mode. Test endpoints will be available!");
 
                 router.get("/test-source-page", ctx -> ctx.status(200).contentType(ContentType.TEXT_HTML).html("""
@@ -50,17 +48,8 @@ public class WebmentionPlugin extends Plugin<WebmentionConfig> {
             router.post(pluginConfig.getEndpoint(), ctx -> {
                 var source = ctx.formParam("source");
                 var target = ctx.formParam("target");
-
-                var success = false;
-
-                try {
-                    pluginConfig.getReceiver().receive(source, target);
-                } catch (WebmentionException e) {
-                    throw new BadRequestResponse(e.getMessage());
-                }
-
-                // TODO: Support HTTP 201.
-                ctx.status(success ? 202 : 422);
+                pluginConfig.getProcessor().queue(source, target);
+                ctx.status(202);
             });
         });
     }

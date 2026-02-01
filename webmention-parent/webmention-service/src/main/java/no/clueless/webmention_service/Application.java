@@ -2,10 +2,8 @@ package no.clueless.webmention_service;
 
 import io.javalin.Javalin;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
-import no.clueless.webmention.WebmentionHttpClientBuilder;
-import no.clueless.webmention.receiver.DefaultWebmentionTargetVerifier;
-import no.clueless.webmention.receiver.WebmentionReceiver;
-import no.clueless.webmention.receiver.WebmentionRequestVerifier;
+import no.clueless.webmention.http.SecureHttpClient;
+import no.clueless.webmention.receiver.*;
 import no.clueless.webmention_javalin.WebmentionPlugin;
 import no.clueless.webmention.sender.WebmentionSender;
 
@@ -23,16 +21,24 @@ public class Application {
         final var testMode           = Optional.ofNullable(System.getenv("TEST_MODE")).map("true"::equalsIgnoreCase).orElse(false);
         final var connectTimeout     = Optional.ofNullable(System.getenv("CONNECTION_TIMEOUT_IN_MILLISECONDS")).map(Long::parseLong).map(Duration::ofMillis).orElse(Duration.ofMillis(5000));
 
+        var httpClient                   = SecureHttpClient.newClient(connectTimeout, !testMode);
+        var webmentionEndpointDiscoverer = WebmentionEndpointDiscoverer.newBuilder().httpClient(httpClient).build();
+        var targetVerifier               = DefaultWebmentionTargetVerifier.newBuilder().supportedDomains(supportedDomains).httpClient(httpClient).endpointDiscoverer(webmentionEndpointDiscoverer).build();
+        var requestVerifier              = WebmentionRequestVerifier.newBuilder().targetVerifier(targetVerifier).build();
+        var receiver                     = WebmentionReceiver.newBuilder().httpClient(httpClient).requestVerifier(requestVerifier).build();
+        var rateLimiter                  = WebmentionRateLimiter.newBuilder().maxEntries(5000).cooldownMillis(5).build();
+        var webmentionProcessor          = WebmentionProcessor.newBuilder().rateLimiter(rateLimiter).receiver(receiver).build();
+        var webmentionSender             = WebmentionSender.newBuilder().httpClient(httpClient).submissionPublisher(new SubmissionPublisher<>()).endpointDiscoverer(webmentionEndpointDiscoverer).build();
+
+        webmentionProcessor.start();
+
         var javalin = Javalin.create(config -> config.registerPlugin(new WebmentionPlugin(plugin -> {
             plugin.setEndpoint(webmentionEndpoint);
-            plugin.setReceiver(new WebmentionReceiver(WebmentionHttpClientBuilder.newBuilder(!testMode, connectTimeout).build(), new WebmentionRequestVerifier(new DefaultWebmentionTargetVerifier(
-                    supportedDomains,
-                    WebmentionHttpClientBuilder.newBuilder(!testMode, connectTimeout).build(),
-                    new WebmentionEndpointDiscoverer(WebmentionHttpClientBuilder.newBuilder(!testMode, connectTimeout).build())
-            ))));
-            plugin.setSender(new WebmentionSender(WebmentionHttpClientBuilder.newBuilder(!testMode, connectTimeout).build(), new SubmissionPublisher<>(), new WebmentionEndpointDiscoverer(WebmentionHttpClientBuilder.newBuilder(!testMode, connectTimeout).build())));
+            plugin.setProcessor(webmentionProcessor);
+            plugin.setSender(webmentionSender);
             plugin.setTestMode(testMode);
         })));
+
         javalin.start(serverPort);
     }
 }
