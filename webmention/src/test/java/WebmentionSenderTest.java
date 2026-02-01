@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -7,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 import java.util.concurrent.SubmissionPublisher;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,5 +55,11 @@ class WebmentionSenderTest {
 
         // assert
         verify(onReceiverNotifiedPublisher, times(1)).submit(eq(httpResponse));
+    }
+
+    @Test
+    void send_shouldThrow_whenWebmentionEndpointIsNotDiscovered() {
+        when(webmentionEndpointDiscoverer.discover("https://example.com/target")).thenReturn(Optional.empty());
+        assertThrows(WebmentionEndpointNotFoundException.class, () -> sut.send("https://example.com/source", "https://example.com/target"));
     }
 }
