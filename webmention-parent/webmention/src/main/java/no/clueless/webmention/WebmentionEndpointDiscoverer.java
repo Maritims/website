@@ -71,14 +71,15 @@ public class WebmentionEndpointDiscoverer {
 
     public Optional<String> discover(URI targetUri, HttpResponse<String> httpResponse) {
         var contentType = httpResponse.headers()
-                .map()
+                .firstValue("Content-Type")
+                /*.map()
                 .entrySet()
                 .stream()
                 .filter(entry -> "content-type".equalsIgnoreCase(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
-                .findFirst()
+                .findFirst()*/
                 .orElseThrow(() -> new RuntimeException("HTTP response from target URL " + targetUri + " did not contain a Content-Type header"));
-        if (!"text/html".equalsIgnoreCase(contentType)) {
+        if (!contentType.startsWith("text/html")) {
             throw new UnexpectedContentTypeException(targetUri.toString(), contentType);
         }
 

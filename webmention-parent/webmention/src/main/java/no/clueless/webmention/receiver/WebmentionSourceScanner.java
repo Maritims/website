@@ -7,8 +7,11 @@ public interface WebmentionSourceScanner {
     Optional<String> scan(String body, String targetUrl);
 
     static WebmentionSourceScanner resolve(String contentType) {
+        if (contentType.startsWith("text/html")) {
+            return new WebmentionHtmlSourceScanner();
+        }
+
         return switch (contentType.toLowerCase()) {
-            case "text/html" -> new WebmentionHtmlSourceScanner();
             case "text/plain" -> new WebmentionTextSourceScanner();
             case "application/json" -> new WebmentionJsonSourceScanner();
             default -> throw new IllegalArgumentException("Unsupported content type: " + contentType);

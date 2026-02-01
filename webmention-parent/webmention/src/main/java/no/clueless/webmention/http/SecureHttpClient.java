@@ -27,7 +27,7 @@ public class SecureHttpClient {
 
         return httpClient.send(httpRequest, responseInfo -> {
             if (responseInfo.statusCode() >= 200 && responseInfo.statusCode() <= 299) {
-                var contentLength = responseInfo.headers().firstValueAsLong("Content-Length").orElseThrow(() -> new RuntimeException("HTTP request to " + httpRequest.uri() + " did not return a Content-Length header"));
+                var contentLength = responseInfo.headers().firstValueAsLong("Content-Length").orElse(0L);
                 if (contentLength > maxContentLengthInBytes * 1024) {
                     return HttpResponse.BodySubscribers.replacing("File too large");
                 }

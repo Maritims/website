@@ -40,19 +40,20 @@ public class WebmentionProcessor {
     }
 
     private void processNext() {
-        var task = queue.poll();
-        if (task == null) {
-            // The queue is empty.
-            return;
-        }
-
-        currentQueueSize.decrementAndGet();
-
         try {
+            var task = queue.poll();
+            if (task == null) {
+                // The queue is empty.
+                return;
+            }
+            currentQueueSize.decrementAndGet();
+
             log.info("Processing queued mention: {} -> {}", task.source(), task.target());
             webmentionReceiver.receive(task.source(), task.target());
         } catch (WebmentionException e) {
             log.error("Failed to process mention", e);
+        } catch (Throwable t) {
+            log.error("Unexpected error in thread. Scheduler is still alive", t);
         }
     }
 

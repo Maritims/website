@@ -5,12 +5,15 @@ import no.clueless.webmention.UnexpectedStatusCodeException;
 import no.clueless.webmention.WebmentionException;
 import no.clueless.webmention.http.SecureHttpClient;
 import no.clueless.webmention.http.WebmentionHttpRequestBuilder;
+import no.clueless.webmention.persistence.Webmention;
+import no.clueless.webmention.persistence.WebmentionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -20,10 +23,12 @@ public class WebmentionReceiver {
     private static final Logger                    log = LoggerFactory.getLogger(WebmentionReceiver.class);
     private final        SecureHttpClient          httpClient;
     private final        WebmentionRequestVerifier webmentionRequestVerifier;
+    private final        WebmentionRepository<?>   webmentionRepository;
 
-    public WebmentionReceiver(SecureHttpClient httpClient, WebmentionRequestVerifier webmentionRequestVerifier) {
+    public WebmentionReceiver(SecureHttpClient httpClient, WebmentionRequestVerifier webmentionRequestVerifier, WebmentionRepository<?> webmentionRepository) {
         this.httpClient                = Objects.requireNonNull(httpClient, "httpClient cannot be null");
         this.webmentionRequestVerifier = Objects.requireNonNull(webmentionRequestVerifier, "requestVerifier cannot be null");
+        this.webmentionRepository      = Objects.requireNonNull(webmentionRepository, "webmentionRepository cannot be null");
     }
 
     public void receive(String sourceUrl, String targetUrl) throws WebmentionException {
@@ -56,14 +61,24 @@ public class WebmentionReceiver {
                 .orElseThrow(() -> new RuntimeException("HTTP request to sourceUrl " + sourceUrl + " did not return a Content-Type header"));
 
         var sourceScanner = WebmentionSourceScanner.resolve(contentType);
-        var mention       = sourceScanner.scan(httpResponse.body(), targetUrl).orElseThrow(() -> new WebmentionException("The target URL " + targetUrl + " is not mentioned in the document at source URL " + sourceUrl));
+        var mentionText       = sourceScanner.scan(httpResponse.body(), targetUrl).orElseThrow(() -> new WebmentionException("The target URL " + targetUrl + " is not mentioned in the document at source URL " + sourceUrl));
 
-        log.info("target: {}, source: {}, text: {}", targetUrl, sourceUrl, mention);
+        var existingWebmention = webmentionRepository.getWebmentionBySourceUrl(sourceUrl);
+        if (existingWebmention == null) {
+            log.info("Creating webmention: {} -> {}", sourceUrl, targetUrl);
+            var newWebmention = Webmention.newWebmention(sourceUrl, targetUrl, mentionText);
+            webmentionRepository.createWebmention(newWebmention);
+        } else {
+            log.info("Updating webmention with ID {}: {} -> {}", existingWebmention.id(), existingWebmention.sourceUrl(), existingWebmention.targetUrl());
+            existingWebmention = existingWebmention.update(existingWebmention.isApproved(), mentionText, LocalDateTime.now());
+            webmentionRepository.updateWebmention(existingWebmention);
+        }
     }
 
     public static class Builder {
         private SecureHttpClient          secureHttpClient;
         private WebmentionRequestVerifier requestVerifier;
+        private WebmentionRepository<?>   webmentionRepository;
 
         private Builder() {
         }
@@ -78,8 +93,13 @@ public class WebmentionReceiver {
             return this;
         }
 
+        public Builder repository(WebmentionRepository<?> webmentionRepository) {
+            this.webmentionRepository = webmentionRepository;
+            return this;
+        }
+
         public WebmentionReceiver build() {
-            return new WebmentionReceiver(secureHttpClient, requestVerifier);
+            return new WebmentionReceiver(secureHttpClient, requestVerifier, webmentionRepository);
         }
     }
 
