@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="no.clueless.webmention.Application" type="no.clueless.webmention.Application" factoryName="no.clueless.webmention.Application" nameIsGenerated="true">
+  <configuration default="false" name="no.clueless.webmention_service.Application" type="no.clueless.webmention_service.Application" factoryName="no.clueless.webmention_service.Application" nameIsGenerated="true">
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/guestbook/.env" />
     </option>
-    <option name="MAIN_CLASS_NAME" value="no.clueless.guestbook.no.clueless.webmention.Application" />
+    <option name="MAIN_CLASS_NAME" value="no.clueless.guestbook.no.clueless.webmention_service.Application" />
     <module name="guestbook" />
     <extension name="coverage">
       <pattern>
