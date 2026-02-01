@@ -1,9 +1,14 @@
+package no.clueless.webmention.sender;
+
+import no.clueless.webmention.UnexpectedStatusCodeException;
+import no.clueless.webmention.WebmentionEndpointDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -59,7 +64,7 @@ class WebmentionSenderTest {
 
     @Test
     void send_shouldThrow_whenWebmentionEndpointIsNotDiscovered() {
-        when(webmentionEndpointDiscoverer.discover("https://example.com/target")).thenReturn(Optional.empty());
+        when(webmentionEndpointDiscoverer.discover(URI.create("https://example.com/target"))).thenReturn(Optional.empty());
         assertThrows(WebmentionEndpointNotFoundException.class, () -> sut.send("https://example.com/source", "https://example.com/target"));
     }
 }

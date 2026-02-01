@@ -1,5 +1,9 @@
+package no.clueless.webmention;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,6 +15,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class WebmentionEndpointDiscoverer {
+    private static final Logger log = LoggerFactory.getLogger(WebmentionEndpointDiscoverer.class);
     private final HttpClient httpClient;
 
     public WebmentionEndpointDiscoverer(HttpClient httpClient) {
@@ -41,6 +46,8 @@ public class WebmentionEndpointDiscoverer {
                         var value  = matcher.group(1);
                         var tokens = Arrays.asList(value.split("\\s+"));
                         return tokens.contains("webmention");
+                    } else {
+                        log.debug("No webmention match was found in Link header: {}", header);
                     }
 
                     return false;
@@ -62,20 +69,7 @@ public class WebmentionEndpointDiscoverer {
                 .findFirst();
     }
 
-    public Optional<String> discover(String targetUrl) {
-        var targetUri = URI.create(targetUrl);
-        var httpRequest = HttpRequest.newBuilder()
-                .uri(targetUri)
-                .GET()
-                .build();
-
-        HttpResponse<String> httpResponse;
-        try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("HTTP request to targetUrl " + targetUrl + " failed", e);
-        }
-
+    public Optional<String> discover(URI targetUri, HttpResponse<String> httpResponse) {
         var contentType = httpResponse.headers()
                 .map()
                 .entrySet()
@@ -83,9 +77,9 @@ public class WebmentionEndpointDiscoverer {
                 .filter(entry -> "content-type".equalsIgnoreCase(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("HTTP response from targetUrl " + targetUrl + " did not contain a Content-Type header"));
+                .orElseThrow(() -> new RuntimeException("HTTP response from target URL " + targetUri + " did not contain a Content-Type header"));
         if(!"text/html".equalsIgnoreCase(contentType)) {
-            throw new UnexpectedContentTypeException(targetUrl, contentType);
+            throw new UnexpectedContentTypeException(targetUri.toString(), contentType);
         }
 
         return findInHeaders(httpResponse.headers())
@@ -95,14 +89,30 @@ public class WebmentionEndpointDiscoverer {
                 })
                 .map(webmentionEndpoint -> {
                     if (webmentionEndpoint.isBlank()) {
-                        return targetUrl;
+                        return targetUri.toString();
                     }
 
                     if(URI.create(webmentionEndpoint).isAbsolute()) {
                         return webmentionEndpoint;
                     }
 
-                    return webmentionEndpoint.startsWith("/") ? targetUri.getScheme() + "://" + targetUri.getAuthority() + webmentionEndpoint : targetUrl + "/" + webmentionEndpoint;
+                    return webmentionEndpoint.startsWith("/") ? targetUri.getScheme() + "://" + targetUri.getAuthority() + webmentionEndpoint : targetUri + "/" + webmentionEndpoint;
                 });
+    }
+
+    public Optional<String> discover(URI targetUri) {
+        var httpRequest = HttpRequest.newBuilder()
+                .uri(targetUri)
+                .GET()
+                .build();
+
+        HttpResponse<String> httpResponse;
+        try {
+            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("HTTP request to target URL " + targetUri + " failed", e);
+        }
+
+        return discover(targetUri, httpResponse);
     }
 }

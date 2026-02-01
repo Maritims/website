@@ -1,3 +1,5 @@
+package no.clueless.webmention;
+
 import java.util.Objects;
 
 public class UnexpectedStatusCodeException extends RuntimeException {
@@ -32,7 +34,7 @@ public class UnexpectedStatusCodeException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "UnexpectedStatusCodeException{" +
+        return "no.clueless.webmention.UnexpectedStatusCodeException{" +
                 "url='" + url + '\'' +
                 ", statusCode=" + statusCode +
                 '}';

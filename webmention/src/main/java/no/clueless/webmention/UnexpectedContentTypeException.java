@@ -1,3 +1,5 @@
+package no.clueless.webmention;
+
 import java.util.Objects;
 
 public class UnexpectedContentTypeException extends RuntimeException {
@@ -32,7 +34,7 @@ public class UnexpectedContentTypeException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "UnexpectedContentTypeException{" +
+        return "no.clueless.webmention.UnexpectedContentTypeException{" +
                 "url='" + url + '\'' +
                 ", contentType='" + contentType + '\'' +
                 '}';

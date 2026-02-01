@@ -1,3 +1,5 @@
+package no.clueless.webmention.sender;
+
 import java.util.Objects;
 
 public class WebmentionEndpointNotFoundException extends RuntimeException {
@@ -26,7 +28,7 @@ public class WebmentionEndpointNotFoundException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "WebmentionEndpointNotFoundException{" +
+        return "no.clueless.webmention.sender.WebmentionEndpointNotFoundException{" +
                 "url='" + url + '\'' +
                 '}';
     }

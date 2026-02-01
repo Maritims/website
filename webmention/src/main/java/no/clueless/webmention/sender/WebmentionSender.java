@@ -1,3 +1,7 @@
+package no.clueless.webmention.sender;
+
+import no.clueless.webmention.UnexpectedStatusCodeException;
+import no.clueless.webmention.WebmentionEndpointDiscoverer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +19,13 @@ import java.util.concurrent.SubmissionPublisher;
 import java.util.stream.Collectors;
 
 /**
- * A Webmention Sender implementation.
+ * A no.clueless.webmention.receiver.Webmention Sender implementation.
  */
 public class WebmentionSender {
     private static final Logger                               log = LoggerFactory.getLogger(WebmentionSender.class);
     private final        HttpClient                           httpClient;
-    private final        SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher;
-    private final        WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
+    private final SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher;
+    private final WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
 
     public WebmentionSender(HttpClient httpClient, SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher, WebmentionEndpointDiscoverer webmentionEndpointDiscoverer) {
         this.httpClient                   = httpClient;
@@ -65,7 +69,7 @@ public class WebmentionSender {
     }
 
     public void send(String sourceUrl, String targetUrl) {
-        var webmentionEndpoint = webmentionEndpointDiscoverer.discover(targetUrl).orElseThrow(() -> new WebmentionEndpointNotFoundException(targetUrl));
+        var webmentionEndpoint = webmentionEndpointDiscoverer.discover(URI.create(targetUrl)).orElseThrow(() -> new WebmentionEndpointNotFoundException(targetUrl));
         notifyReceiver(webmentionEndpoint, sourceUrl, targetUrl);
     }
 }

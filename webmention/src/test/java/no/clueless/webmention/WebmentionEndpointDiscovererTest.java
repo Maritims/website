@@ -1,3 +1,5 @@
+package no.clueless.webmention;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -130,7 +133,7 @@ class WebmentionEndpointDiscovererTest {
                         </html>
                         """), "https://example.com/webmention-endpoint"),
                 Arguments.of("Discovery Test #10 - Multiple rel values on a Link header", mockHttpResponse(Map.of("link", List.of("<https://example.com/webmention-endpoint>; rel=foo webmention bar")), ""), "https://example.com/webmention-endpoint"),
-                Arguments.of("Discovery Test #11 - Multiple Webmention endpoints advertised: Link, <link>, <a>", mockHttpResponse(Map.of("link", List.of("</webmention-endpoint>; rel=webmention")), """
+                Arguments.of("Discovery Test #11 - Multiple no.clueless.webmention.receiver.Webmention endpoints advertised: Link, <link>, <a>", mockHttpResponse(Map.of("link", List.of("</webmention-endpoint>; rel=webmention")), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -172,7 +175,7 @@ class WebmentionEndpointDiscovererTest {
                             </body>
                         </html>
                         """), "https://example.com/webmention-endpoint"),
-                Arguments.of("Discovery Test #15 - Webmention href is an empty string", mockHttpResponse(Map.of(), """
+                Arguments.of("Discovery Test #15 - no.clueless.webmention.receiver.Webmention href is an empty string", mockHttpResponse(Map.of(), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -181,7 +184,7 @@ class WebmentionEndpointDiscovererTest {
                             <body></body>
                         </htmL>
                         """), "https://example.com"),
-                Arguments.of("Discovery Test #16 - Multiple Webmention endpoints advertised: <a>, <link>", mockHttpResponse(Map.of(), """
+                Arguments.of("Discovery Test #16 - Multiple no.clueless.webmention.receiver.Webmention endpoints advertised: <a>, <link>", mockHttpResponse(Map.of(), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -192,7 +195,7 @@ class WebmentionEndpointDiscovererTest {
                             </body>
                         </html>
                         """), "https://example.com/webmention-endpoint"),
-                Arguments.of("Discovery Test #17 - Multiple Webmention endpoints advertised: <link>, <a>", mockHttpResponse(Map.of(), """
+                Arguments.of("Discovery Test #17 - Multiple no.clueless.webmention.receiver.Webmention endpoints advertised: <link>, <a>", mockHttpResponse(Map.of(), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -214,7 +217,7 @@ class WebmentionEndpointDiscovererTest {
                             <body></body>
                         </html>
                         """), "https://example.com"),
-                Arguments.of("Discovery Test #21 - Webmention endpoint has query string parameters", mockHttpResponse(Map.of(), """
+                Arguments.of("Discovery Test #21 - no.clueless.webmention.receiver.Webmention endpoint has query string parameters", mockHttpResponse(Map.of(), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -223,7 +226,7 @@ class WebmentionEndpointDiscovererTest {
                             <body></body>
                         </html>
                         """), "https://example.com/webmention-endpoint?foo=bar"),
-                Arguments.of("Discovery Test #22 - Webmention endpoint is relative to the path", mockHttpResponse(Map.of(), """
+                Arguments.of("Discovery Test #22 - no.clueless.webmention.receiver.Webmention endpoint is relative to the path", mockHttpResponse(Map.of(), """
                         <!DOCTYPE html>
                         <html>
                             <head>
@@ -248,7 +251,7 @@ class WebmentionEndpointDiscovererTest {
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
         // act
-        var result = sut.discover("https://example.com").orElse(null);
+        var result = sut.discover(URI.create("https://example.com")).orElse(null);
 
         // assert
         assertEquals(expected, result);
@@ -294,7 +297,7 @@ class WebmentionEndpointDiscovererTest {
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
         // act
-        var result = sut.discover("https://example.com").orElse(null);
+        var result = sut.discover(URI.create("https://example.com")).orElse(null);
 
         // assert
         verify(sut, never()).findInHtml(nullable(Document.class));
@@ -317,7 +320,7 @@ class WebmentionEndpointDiscovererTest {
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
         // act
-        var result = sut.discover("https://example.com").orElse(null);
+        var result = sut.discover(URI.create("https://example.com")).orElse(null);
 
         // assert
         verify(sut, times(1)).findInHeaders(nullable(HttpHeaders.class));
@@ -338,7 +341,7 @@ class WebmentionEndpointDiscovererTest {
         doReturn(Optional.of("/webmention-endpoint")).when(sut).findInHeaders(eq(httpHeaders));
 
         // act
-        var result = sut.discover("https://example.com/hello-world?foo=bar").orElse(null);
+        var result = sut.discover(URI.create("https://example.com/hello-world?foo=bar")).orElse(null);
 
         // assert
         assertNotNull(result);
@@ -357,7 +360,7 @@ class WebmentionEndpointDiscovererTest {
         doReturn(Optional.of("")).when(sut).findInHeaders(nullable(HttpHeaders.class));
 
         // act
-        var result = sut.discover("https://example.com/hello-world").orElse(null);
+        var result = sut.discover(URI.create("https://example.com/hello-world")).orElse(null);
 
         // assert
         assertNotNull(result);
@@ -369,7 +372,7 @@ class WebmentionEndpointDiscovererTest {
         var httpResponse = mock(HttpResponse.class);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
-        assertThrows(RuntimeException.class, () -> sut.discover("https://example.com/webmention-endpoint").orElse(null));
+        assertThrows(RuntimeException.class, () -> sut.discover(URI.create("https://example.com/webmention-endpoint")).orElse(null));
     }
 
     @Test
@@ -380,6 +383,6 @@ class WebmentionEndpointDiscovererTest {
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
-        assertThrows(UnexpectedContentTypeException.class, () -> sut.discover("https://example.com/webmention-endpoint").orElse(null));
+        assertThrows(UnexpectedContentTypeException.class, () -> sut.discover(URI.create("https://example.com/webmention-endpoint")).orElse(null));
     }
 }
