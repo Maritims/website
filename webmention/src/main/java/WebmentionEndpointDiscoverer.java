@@ -76,6 +76,18 @@ public class WebmentionEndpointDiscoverer {
             throw new RuntimeException("HTTP request to targetUrl " + targetUrl + " failed", e);
         }
 
+        var contentType = httpResponse.headers()
+                .map()
+                .entrySet()
+                .stream()
+                .filter(entry -> "content-type".equalsIgnoreCase(entry.getKey()))
+                .flatMap(entry -> entry.getValue().stream())
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("HTTP response from targetUrl " + targetUrl + " did not contain a Content-Type header"));
+        if(!"text/html".equalsIgnoreCase(contentType)) {
+            throw new UnexpectedContentTypeException(targetUrl, contentType);
+        }
+
         return findInHeaders(httpResponse.headers())
                 .or(() -> {
                     var document = parseHtml(httpResponse.body());

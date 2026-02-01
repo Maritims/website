@@ -1,7 +1,6 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +70,8 @@ class WebmentionEndpointDiscovererTest {
     static HttpResponse<String> mockHttpResponse(Map<String, List<String>> headers, String body) {
         var httpHeaders  = mock(HttpHeaders.class);
         var httpResponse = mock(HttpResponse.class);
+        headers = new HashMap<>(headers);
+        headers.put("Content-Type", List.of("text/html"));
         when(httpHeaders.map()).thenReturn(headers);
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpResponse.body()).thenReturn(body);
@@ -281,34 +283,13 @@ class WebmentionEndpointDiscovererTest {
         assertEquals(expected, result);
     }
 
-    @Test
-    void findInBody() {
-        // arrange
-        var document = Jsoup.parse("""
-                <!DOCTYPE html>
-                <html>
-                    <head></head>
-                    <body>
-                        <a rel="webmention" href="https://example.com/webmention-endpoint">
-                    </body>
-                </html>
-                """);
-
-        // act
-        var result = sut.findInHtml(document).orElse(null);
-
-        // assert
-        assertNotNull(result);
-        assertEquals("https://example.com/webmention-endpoint", result);
-    }
-
     @ParameterizedTest
     @MethodSource
     void discover_shouldPrefer_findInHeaders(String linkHeaderName, String linkHeaderValue, String expected) throws IOException, InterruptedException {
         // arrange
         var httpResponse = mock(HttpResponse.class);
         var httpHeaders  = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of(linkHeaderName, List.of(linkHeaderValue)));
+        when(httpHeaders.map()).thenReturn(Map.of(linkHeaderName, List.of(linkHeaderValue), "content-type", List.of("text/html")));
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
@@ -317,19 +298,21 @@ class WebmentionEndpointDiscovererTest {
 
         // assert
         verify(sut, never()).findInHtml(nullable(Document.class));
-        //verify(sut, never()).findInBody(nullable(Document.class));
         assertNotNull(result);
         assertEquals(expected, result);
     }
 
     @Test
-    void discover_shouldPrefer_findInHead_when_findInHeaders_is_empty() throws IOException, InterruptedException {
+    void discover_shouldPrefer_findInHtml_when_findInHeaders_is_empty() throws IOException, InterruptedException {
         // arrange
+        var httpHeaders = mock(HttpHeaders.class);
+        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
         var httpResponse = mock(HttpResponse.class);
-        var document     = mock(Document.class);
+        when(httpResponse.headers()).thenReturn(httpHeaders);
+        var document = mock(Document.class);
 
         doReturn(document).when(sut).parseHtml(nullable(String.class));
-        doReturn(Optional.empty()).when(sut).findInHeaders(nullable(HttpHeaders.class));
+        doReturn(Optional.empty()).when(sut).findInHeaders(eq(httpHeaders));
         doReturn(Optional.of("https://example.com/webmention-endpoint")).when(sut).findInHtml(any(Document.class));
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
@@ -339,30 +322,6 @@ class WebmentionEndpointDiscovererTest {
         // assert
         verify(sut, times(1)).findInHeaders(nullable(HttpHeaders.class));
         verify(sut, times(1)).findInHtml(any(Document.class));
-        //verify(sut, never()).findInBody(nullable(Document.class));
-        assertNotNull(result);
-        assertEquals("https://example.com/webmention-endpoint", result);
-    }
-
-    @Test
-    void discover_shouldPrefer_findInBody_when_findInHtml_is_empty() throws IOException, InterruptedException {
-        // arrange
-        var httpResponse = mock(HttpResponse.class);
-        var document     = mock(Document.class);
-
-        doReturn(document).when(sut).parseHtml(nullable(String.class));
-        doReturn(Optional.empty()).when(sut).findInHeaders(nullable(HttpHeaders.class));
-        doReturn(Optional.empty()).when(sut).findInHtml(eq(document));
-        //doReturn(Optional.of("https://example.com/webmention-endpoint")).when(sut).findInBody(eq(document));
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
-
-        // act
-        var result = sut.discover("https://example.com").orElse(null);
-
-        // assert
-        verify(sut, times(1)).findInHeaders(nullable(HttpHeaders.class));
-        verify(sut, times(1)).findInHtml(any(Document.class));
-        //verify(sut, times(1)).findInBody(any(Document.class));
         assertNotNull(result);
         assertEquals("https://example.com/webmention-endpoint", result);
     }
@@ -370,10 +329,13 @@ class WebmentionEndpointDiscovererTest {
     @Test
     void discover_shouldResolveRelativeUrl_relativeToTargetUrl() throws IOException, InterruptedException {
         // arrange
+        var httpHeaders = mock(HttpHeaders.class);
+        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
         var httpResponse = mock(HttpResponse.class);
+        when(httpResponse.headers()).thenReturn(httpHeaders);
 
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
-        doReturn(Optional.of("/webmention-endpoint")).when(sut).findInHeaders(nullable(HttpHeaders.class));
+        doReturn(Optional.of("/webmention-endpoint")).when(sut).findInHeaders(eq(httpHeaders));
 
         // act
         var result = sut.discover("https://example.com/hello-world?foo=bar").orElse(null);
@@ -386,7 +348,10 @@ class WebmentionEndpointDiscovererTest {
     @Test
     void discover_shouldResolveEmptyUrl_toTargetUrl() throws IOException, InterruptedException {
         // arrange
+        var httpHeaders = mock(HttpHeaders.class);
+        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
         var httpResponse = mock(HttpResponse.class);
+        when(httpResponse.headers()).thenReturn(httpHeaders);
 
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
         doReturn(Optional.of("")).when(sut).findInHeaders(nullable(HttpHeaders.class));
@@ -397,5 +362,24 @@ class WebmentionEndpointDiscovererTest {
         // assert
         assertNotNull(result);
         assertEquals("https://example.com/hello-world", result);
+    }
+
+    @Test
+    void discover_shouldThrow_whenContentTypeIsMissing() throws IOException, InterruptedException {
+        var httpResponse = mock(HttpResponse.class);
+        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+
+        assertThrows(RuntimeException.class, () -> sut.discover("https://example.com/webmention-endpoint").orElse(null));
+    }
+
+    @Test
+    void discover_shouldThrow_whenContentTypeIsNotTextHtml() throws IOException, InterruptedException {
+        var httpHeaders = mock(HttpHeaders.class);
+        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/plain")));
+        var httpResponse = mock(HttpResponse.class);
+        when(httpResponse.headers()).thenReturn(httpHeaders);
+        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+
+        assertThrows(UnexpectedContentTypeException.class, () -> sut.discover("https://example.com/webmention-endpoint").orElse(null));
     }
 }
