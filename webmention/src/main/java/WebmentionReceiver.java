@@ -3,6 +3,6 @@
  */
 public class WebmentionReceiver {
 
-    public void receive() {
+    public void receive(String sourceUrl, String targetUrl) {
     }
 }

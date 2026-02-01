@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.stream.Collectors;
 
@@ -28,41 +29,12 @@ public class WebmentionSender {
         this.webmentionEndpointDiscoverer = webmentionEndpointDiscoverer;
     }
 
-    /*public void subscribeToReceiverNotified(Flow.Subscriber<HttpResponse<?>> subscriber) {
+    public void subscribeToReceiverNotified(Flow.Subscriber<HttpResponse<?>> subscriber) {
         if (subscriber == null) {
             throw new IllegalArgumentException("subscriber cannot be null");
         }
         onReceiverNotifiedPublisher.subscribe(subscriber);
-    }*/
-
-    /**
-     * Fetches a response from the target URL.
-     *
-     * @param targetUrl The target URL to fetch.
-     * @return The HTTP response.
-     * @throws RuntimeException when no Content-Type header is returned, or the Content-Type header is not text/html, or the HTTP status code is not 200.
-     */
-    HttpResponse<String> fetch(String targetUrl) {
-        var                  httpRequest = HttpRequest.newBuilder(URI.create(targetUrl)).GET().build();
-        HttpResponse<String> httpResponse;
-        try {
-            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("HTTP request to targetUrl " + targetUrl + " failed", e);
-        }
-
-        if (httpResponse.statusCode() != 200) {
-            throw new UnexpectedStatusCodeException(targetUrl, httpResponse.statusCode());
-        }
-
-        var contentType = httpResponse.headers().firstValue("Content-Type").orElse(null);
-        if (!"text/html".equalsIgnoreCase(contentType)) {
-            throw new UnexpectedContentTypeException(targetUrl, contentType);
-        }
-
-        return httpResponse;
     }
-
 
     void notifyReceiver(String webmentionEndpoint, String sourceUrl, String targetUrl) {
         var formData    = Map.of("source", sourceUrl, "target", targetUrl);
