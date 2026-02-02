@@ -4,7 +4,7 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface WebmentionSourceScanner {
-    Optional<String> scan(String body, String targetUrl);
+    Optional<String> findTargetUrlMention(String body, String targetUrl);
 
     static WebmentionSourceScanner resolve(String contentType) {
         if (contentType.startsWith("text/html")) {

@@ -75,6 +75,7 @@ class WebmentionEndpointDiscovererTest {
         var httpResponse = mock(HttpResponse.class);
         headers = new HashMap<>(headers);
         headers.put("Content-Type", List.of("text/html"));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of(headers.get("Content-Type").getFirst()));
         when(httpHeaders.map()).thenReturn(headers);
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpResponse.body()).thenReturn(body);
@@ -292,7 +293,8 @@ class WebmentionEndpointDiscovererTest {
         // arrange
         var httpResponse = mock(HttpResponse.class);
         var httpHeaders  = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of(linkHeaderName, List.of(linkHeaderValue), "content-type", List.of("text/html")));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
+        when(httpHeaders.map()).thenReturn(Map.of(linkHeaderName, List.of(linkHeaderValue)));
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
@@ -309,7 +311,7 @@ class WebmentionEndpointDiscovererTest {
     void discover_shouldPrefer_findInHtml_when_findInHeaders_is_empty() throws IOException, InterruptedException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
         var document = mock(Document.class);
@@ -333,7 +335,7 @@ class WebmentionEndpointDiscovererTest {
     void discover_shouldResolveRelativeUrl_relativeToTargetUrl() throws IOException, InterruptedException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
 
@@ -352,7 +354,7 @@ class WebmentionEndpointDiscovererTest {
     void discover_shouldResolveEmptyUrl_toTargetUrl() throws IOException, InterruptedException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/html")));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
 
@@ -378,7 +380,7 @@ class WebmentionEndpointDiscovererTest {
     @Test
     void discover_shouldThrow_whenContentTypeIsNotTextHtml() throws IOException, InterruptedException {
         var httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.map()).thenReturn(Map.of("content-type", List.of("text/plain")));
+        when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/plain"));
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
         when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);

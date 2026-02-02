@@ -60,7 +60,7 @@ public class WebmentionReceiver {
                 .orElseThrow(() -> new RuntimeException("HTTP request to sourceUrl " + sourceUrl + " did not return a Content-Type header"));
 
         var sourceScanner = WebmentionSourceScanner.resolve(contentType);
-        var mentionText   = sourceScanner.scan(httpResponse.body(), targetUrl).orElseThrow(() -> new WebmentionException("The targetUrl URL " + targetUrl + " is not mentioned in the document at sourceUrl URL " + sourceUrl));
+        var mentionText   = sourceScanner.findTargetUrlMention(httpResponse.body(), targetUrl).orElseThrow(() -> new WebmentionException("The targetUrl URL " + targetUrl + " is not mentioned in the document at sourceUrl URL " + sourceUrl));
 
         onWebmentionReceived.submit(new WebmentionEvent(sourceUrl, targetUrl, mentionText));
     }
