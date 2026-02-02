@@ -53,7 +53,7 @@ public class WebmentionEmailViaResendNotifier implements WebmentionNotifier<Webm
         try (var httpClient = HttpClient.newHttpClient()) {
             var httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.resend.com/emails"))
-                    .header("Authorization", "Bearer " + System.getenv("RESEND_API_KEY"))
+                    .header("Authorization", "Bearer " + System.getenv("WEBMENTION_RESEND_API_KEY"))
                     .header("Content-Type", "application/json")
                     .method("POST", HttpRequest.BodyPublishers.ofString(jsonMapper.writeValueAsString(Map.of(
                             "from", notification.senderEmailAddress(),
