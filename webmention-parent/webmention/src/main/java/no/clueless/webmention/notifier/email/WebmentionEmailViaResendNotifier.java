@@ -17,12 +17,12 @@ import java.util.Optional;
 public class WebmentionEmailViaResendNotifier implements WebmentionNotifier<WebmentionEmailNotification> {
     private static final Logger       log                     = LoggerFactory.getLogger(WebmentionEmailViaResendNotifier.class);
     private static final ObjectMapper jsonMapper              = new ObjectMapper();
-    private static final String       SENDER_EMAIL_ADDRESS    = Optional.ofNullable(System.getenv("SENDER_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("SENDER_EMAIL_ADDRESS must be set"));
-    private static final String       RECIPIENT_EMAIL_ADDRESS = Optional.ofNullable(System.getenv("RECIPIENT_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("RECIPIENT_EMAIL_ADDRESS must be set"));
-    private static final String       EMAIL_SUBJECT           = Optional.ofNullable(System.getenv("EMAIL_SUBJECT")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("EMAIL_SUBJECT must be set"));
+    private static final String       SENDER_EMAIL_ADDRESS    = Optional.ofNullable(System.getenv("WEBMENTION_SENDER_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("WEBMENTION_SENDER_EMAIL_ADDRESS must be set"));
+    private static final String       RECIPIENT_EMAIL_ADDRESS = Optional.ofNullable(System.getenv("WEBMENTION_RECIPIENT_EMAIL_ADDRESS")).filter(property -> !property.isBlank()).orElseThrow(() -> new IllegalStateException("WEBMENTION_RECIPIENT_EMAIL_ADDRESS must be set"));
+    private static final String       EMAIL_SUBJECT           = Optional.ofNullable(System.getenv("WEBMENTION_EMAIL_SUBJECT")).filter(property -> !property.isBlank()).orElse("New webmention pending approval");
 
     public WebmentionEmailViaResendNotifier() {
-        Optional.ofNullable(System.getenv("RESEND_API_KEY")).filter(value -> !value.isBlank()).orElseThrow(() -> new IllegalStateException("RESEND_API_KEY must be set"));
+        Optional.ofNullable(System.getenv("WEBMENTION_RESEND_API_KEY")).filter(value -> !value.isBlank()).orElseThrow(() -> new IllegalStateException("WEBMENTION_RESEND_API_KEY must be set"));
     }
 
     @Override
