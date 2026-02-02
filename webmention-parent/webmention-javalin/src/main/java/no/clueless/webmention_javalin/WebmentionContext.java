@@ -11,8 +11,8 @@ public record WebmentionContext(Context ctx, WebmentionConfig config) {
     }
 
     public void send(String source, String target) {
-        Objects.requireNonNull(source, "source cannot be null");
-        Objects.requireNonNull(target, "target cannot be null");
+        Objects.requireNonNull(source, "sourceUrl cannot be null");
+        Objects.requireNonNull(target, "targetUrl cannot be null");
         config.getSender().send(source, target);
     }
 }

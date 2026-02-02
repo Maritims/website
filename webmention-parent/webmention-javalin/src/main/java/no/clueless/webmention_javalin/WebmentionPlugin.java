@@ -1,6 +1,7 @@
 package no.clueless.webmention_javalin;
 
 import io.javalin.config.JavalinConfig;
+import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ContentType;
 import io.javalin.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class WebmentionPlugin extends Plugin<WebmentionConfig> {
@@ -43,13 +45,21 @@ public class WebmentionPlugin extends Plugin<WebmentionConfig> {
                 router.get("/test-target-page", ctx -> ctx.status(200).header("Link", "</webmention-endpoint>; rel=webmention").contentType(ContentType.TEXT_HTML));
             }
 
-            router.get(pluginConfig.getEndpoint(), ctx -> ctx.status(200));
-
+            // The specification dictates the parameters are named "source" and "target".
             router.post(pluginConfig.getEndpoint(), ctx -> {
-                var source = ctx.formParam("source");
-                var target = ctx.formParam("target");
-                pluginConfig.getProcessor().queue(source, target);
+                var sourceUrl = Optional.ofNullable(ctx.formParam("source")).filter(param -> !param.isBlank()).orElseThrow(() -> new BadRequestResponse("source cannot be null or blank"));
+                var targetUrl = Optional.ofNullable(ctx.formParam("target")).filter(param -> !param.isBlank()).orElseThrow(() -> new BadRequestResponse("target cannot be null or blank"));
+                pluginConfig.getProcessor().queue(sourceUrl, targetUrl);
                 ctx.status(202);
+            });
+
+            router.get(pluginConfig.getEndpoint(), ctx -> {
+                var pageNumber          = ctx.queryParamAsClass("pageNumber", Integer.class).getOrDefault(0);
+                var pageSize            = ctx.queryParamAsClass("pageSize", Integer.class).getOrDefault(10);
+                var orderByColumn       = ctx.queryParamAsClass("orderByColumn", String.class).getOrDefault(pluginConfig.getWebmentionRepository().getOrderByColumn());
+                var orderByDirection    = ctx.queryParamAsClass("orderByDirection", String.class).getOrDefault(pluginConfig.getWebmentionRepository().getOrderByDirection());
+                var approvedWebmentions = pluginConfig.getWebmentionRepository().getApprovedWebmentions(pageNumber, pageSize, orderByColumn, orderByDirection);
+                ctx.json(approvedWebmentions);
             });
         });
     }

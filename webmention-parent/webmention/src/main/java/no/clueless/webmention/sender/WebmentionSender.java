@@ -42,7 +42,7 @@ public class WebmentionSender {
     }
 
     void notifyReceiver(String webmentionEndpoint, String sourceUrl, String targetUrl) {
-        var formData    = Map.of("source", sourceUrl, "target", targetUrl);
+        var formData    = Map.of("sourceUrl", sourceUrl, "targetUrl", targetUrl);
         var encodedForm = formData.entrySet().stream().map(entry -> entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8)).collect(Collectors.joining("&"));
         var httpRequest = WebmentionHttpRequestBuilder.newBuilder()
                 .uri(URI.create(webmentionEndpoint))

@@ -42,7 +42,7 @@ public class WebmentionRequestVerifier {
             validateScheme(targetUri);
 
             if (sourceUri.equals(targetUri)) {
-                throw new WebmentionException("Source and target URLs cannot be equal");
+                throw new WebmentionException("Source and targetUrl URLs cannot be equal");
             }
 
             if (!webmentionTargetVerifier.verify(stripFragment(targetUri))) {

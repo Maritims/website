@@ -2,16 +2,20 @@ package no.clueless.webmention.persistence.sqlite;
 
 import no.clueless.webmention.persistence.Webmention;
 import no.clueless.webmention.persistence.WebmentionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SqliteWebmentionRepository implements WebmentionRepository<Integer> {
+    private static final Logger log = LoggerFactory.getLogger(SqliteWebmentionRepository.class);
     private final String connectionString;
 
     public SqliteWebmentionRepository(String connectionString) {
@@ -171,6 +175,20 @@ public class SqliteWebmentionRepository implements WebmentionRepository<Integer>
             return getWebmentionById(webmention.id());
         } catch (SQLException e) {
             throw new RuntimeException("Failed to connect to database", e);
+        }
+    }
+
+    @Override
+    public Webmention upsertWebmention(Webmention webmention) {
+        var existingWebmention = getWebmentionBySourceUrl(webmention.sourceUrl());
+        if (existingWebmention == null) {
+            log.debug("Creating webmention: {} -> {}", webmention.sourceUrl(), webmention.targetUrl());
+            var newWebmention = Webmention.newWebmention(webmention.sourceUrl(), webmention.targetUrl(), webmention.mentionText());
+            return createWebmention(newWebmention);
+        } else {
+            log.info("Updating webmention with ID {}: {} -> {}", existingWebmention.id(), existingWebmention.sourceUrl(), existingWebmention.targetUrl());
+            existingWebmention = existingWebmention.update(existingWebmention.isApproved(), webmention.mentionText(), LocalDateTime.now());
+            return updateWebmention(existingWebmention);
         }
     }
 }

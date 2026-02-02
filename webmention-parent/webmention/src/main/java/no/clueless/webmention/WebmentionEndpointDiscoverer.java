@@ -78,7 +78,7 @@ public class WebmentionEndpointDiscoverer {
                 .filter(entry -> "content-type".equalsIgnoreCase(entry.getKey()))
                 .flatMap(entry -> entry.getValue().stream())
                 .findFirst()*/
-                .orElseThrow(() -> new RuntimeException("HTTP response from target URL " + targetUri + " did not contain a Content-Type header"));
+                .orElseThrow(() -> new RuntimeException("HTTP response from targetUrl URL " + targetUri + " did not contain a Content-Type header"));
         if (!contentType.startsWith("text/html")) {
             throw new UnexpectedContentTypeException(targetUri.toString(), contentType);
         }
@@ -111,7 +111,7 @@ public class WebmentionEndpointDiscoverer {
         try {
             httpResponse = httpClient.send(httpRequest);
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("HTTP request to target URL " + targetUri + " failed", e);
+            throw new RuntimeException("HTTP request to targetUrl URL " + targetUri + " failed", e);
         }
 
         return discover(targetUri, httpResponse);

@@ -42,7 +42,7 @@ class WebmentionEndpointDiscovererIntegrationTest {
                 Arguments.of("Discovery Test #21 - no.clueless.webmention.receiver.Webmention endpoint has query string parameters", "https://webmention.rocks/test/21", "https://webmention.rocks/test/21/webmention?query=yes"),
                 Arguments.of("Discovery Test #22 - no.clueless.webmention.receiver.Webmention endpoint is relative to the path", "https://webmention.rocks/test/22", "https://webmention.rocks/test/22/22/webmention")
                 // webmention.rocks generates a unique code per request, so performing an assertion is pointless. There's also no point in testing that HttpClient can follow redirects, because we know that it does as long as we configure it to do so.
-                //Arguments.of("Discovery Test #23 - no.clueless.webmention.receiver.Webmention target is a redirect and the endpoint is relative", "https://webmention.rocks/test/23/page", "https://webmention.rocks/test/23/webmention")
+                //Arguments.of("Discovery Test #23 - no.clueless.webmention.receiver.Webmention targetUrl is a redirect and the endpoint is relative", "https://webmention.rocks/test/23/page", "https://webmention.rocks/test/23/webmention")
         );
     }
 

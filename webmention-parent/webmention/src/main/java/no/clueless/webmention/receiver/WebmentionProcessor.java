@@ -12,6 +12,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WebmentionProcessor {
+    private record WebmentionTask(String sourceUrl, String targetUrl) {
+        public WebmentionTask {
+            if (sourceUrl == null || sourceUrl.isBlank()) {
+                throw new IllegalArgumentException("sourceUrl cannot be null or blank");
+            }
+            if (targetUrl == null || targetUrl.isBlank()) {
+                throw new IllegalArgumentException("targetUrl cannot be null or blank");
+            }
+        }
+    }
+
     private static final Logger                                log       = LoggerFactory.getLogger(WebmentionProcessor.class);
     private static final ConcurrentLinkedQueue<WebmentionTask> queue     = new ConcurrentLinkedQueue<>();
     private final        ScheduledExecutorService              scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -48,8 +59,8 @@ public class WebmentionProcessor {
             }
             currentQueueSize.decrementAndGet();
 
-            log.info("Processing queued mention: {} -> {}", task.source(), task.target());
-            webmentionReceiver.receive(task.source(), task.target());
+            log.info("Processing queued mention: {} -> {}", task.sourceUrl(), task.targetUrl());
+            webmentionReceiver.receive(task.sourceUrl(), task.targetUrl());
         } catch (WebmentionException e) {
             log.error("Failed to process mention", e);
         } catch (Throwable t) {
@@ -57,18 +68,25 @@ public class WebmentionProcessor {
         }
     }
 
-    public void queue(String source, String target) {
-        if (!webmentionRateLimiter.isAllowed(source)) {
-            log.warn("Rate limit exceeded for source {}", source);
+    public void queue(String sourceUrl, String targetUrl) {
+        if (sourceUrl == null || sourceUrl.isBlank()) {
+            throw new IllegalArgumentException("sourceUrl cannot be null or blank");
+        }
+        if (targetUrl == null || targetUrl.isBlank()) {
+            throw new IllegalArgumentException("targetUrl cannot be null or blank");
+        }
+
+        if (!webmentionRateLimiter.isAllowed(sourceUrl)) {
+            log.warn("Rate limit exceeded for sourceUrl {}", sourceUrl);
             return;
         }
 
         if (currentQueueSize.get() >= maxQueueSize) {
-            log.warn("The queue is full! Dropping mention from {}", source);
+            log.warn("The queue is full! Dropping mention from {}", sourceUrl);
             return;
         }
 
-        queue.add(new WebmentionTask(source, target));
+        queue.add(new WebmentionTask(sourceUrl, targetUrl));
         currentQueueSize.incrementAndGet();
     }
 

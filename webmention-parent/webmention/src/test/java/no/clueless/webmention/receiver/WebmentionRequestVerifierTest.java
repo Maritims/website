@@ -36,7 +36,7 @@ class WebmentionRequestVerifierTest {
     @Test
     void verify_shouldThrow_whenUrisAreValidButEqualToEachOther() {
         var result = assertThrows(WebmentionException.class, () -> sut.verify("https://example.com", "https://example.com"));
-        assertEquals("Source and target URLs cannot be equal", result.getMessage());
+        assertEquals("Source and targetUrl URLs cannot be equal", result.getMessage());
     }
 
     @Test

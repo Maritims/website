@@ -31,7 +31,7 @@ public class WebmentionRateLimiter {
             return false; // Still wearing the cone of shame.
         }
 
-        // We haven't seen this source for a while, or maybe ever.
+        // We haven't seen this sourceUrl for a while, or maybe ever.
         lruCache.put(source, now);
         return true;
     }

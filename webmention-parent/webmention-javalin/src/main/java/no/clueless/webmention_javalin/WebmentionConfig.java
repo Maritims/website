@@ -1,13 +1,15 @@
 package no.clueless.webmention_javalin;
 
+import no.clueless.webmention.persistence.WebmentionRepository;
 import no.clueless.webmention.receiver.WebmentionProcessor;
 import no.clueless.webmention.sender.WebmentionSender;
 
 public class WebmentionConfig {
-    private String              endpoint;
-    private WebmentionProcessor webmentionProcessor;
-    private WebmentionSender    sender;
-    private boolean             testMode;
+    private String                  endpoint;
+    private WebmentionProcessor     webmentionProcessor;
+    private WebmentionSender        sender;
+    private WebmentionRepository<?> webmentionRepository;
+    private boolean                 testMode;
 
     public String getEndpoint() {
         return endpoint;
@@ -31,6 +33,14 @@ public class WebmentionConfig {
 
     public void setSender(WebmentionSender sender) {
         this.sender = sender;
+    }
+
+    public WebmentionRepository<?> getWebmentionRepository() {
+        return webmentionRepository;
+    }
+
+    public void setWebmentionRepository(WebmentionRepository<?> webmentionRepository) {
+        this.webmentionRepository = webmentionRepository;
     }
 
     public boolean isTestMode() {

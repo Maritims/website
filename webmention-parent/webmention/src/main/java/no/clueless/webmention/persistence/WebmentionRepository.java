@@ -11,9 +11,23 @@ public interface WebmentionRepository<IdType> {
 
     long getApprovedCount();
 
+    default String getOrderByColumn() {
+        return "id";
+    }
+
+    default String getOrderByDirection() {
+        return "desc";
+    }
+
     List<Webmention> getApprovedWebmentions(int pageNumber, int pageSize, String orderByColumn, String orderByDirection);
+
+    default List<Webmention> getApprovedWebmentions(int pageNumber, int pageSize) {
+        return getApprovedWebmentions(pageNumber, pageSize, getOrderByColumn(), getOrderByDirection());
+    }
 
     Webmention createWebmention(Webmention webmention);
 
     Webmention updateWebmention(Webmention webmention);
+
+    Webmention upsertWebmention(Webmention webmention);
 }
