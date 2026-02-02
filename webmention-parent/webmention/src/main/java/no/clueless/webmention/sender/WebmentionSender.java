@@ -1,7 +1,9 @@
 package no.clueless.webmention.sender;
 
+import no.clueless.webmention.UnexpectedContentTypeException;
 import no.clueless.webmention.UnexpectedStatusCodeException;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
+import no.clueless.webmention.WebmentionException;
 import no.clueless.webmention.http.SecureHttpClient;
 import no.clueless.webmention.http.WebmentionHttpRequestBuilder;
 import org.slf4j.Logger;
@@ -15,7 +17,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.stream.Collectors;
 
@@ -29,16 +30,9 @@ public class WebmentionSender {
     private final        WebmentionEndpointDiscoverer         webmentionEndpointDiscoverer;
 
     public WebmentionSender(SecureHttpClient httpClient, SubmissionPublisher<HttpResponse<?>> onReceiverNotifiedPublisher, WebmentionEndpointDiscoverer webmentionEndpointDiscoverer) {
-        this.httpClient                   = httpClient;
-        this.onReceiverNotifiedPublisher  = Objects.requireNonNull(onReceiverNotifiedPublisher, "onReceiverNotifiedPublisher cannot be null");
-        this.webmentionEndpointDiscoverer = webmentionEndpointDiscoverer;
-    }
-
-    public void subscribeToReceiverNotified(Flow.Subscriber<HttpResponse<?>> subscriber) {
-        if (subscriber == null) {
-            throw new IllegalArgumentException("subscriber cannot be null");
-        }
-        onReceiverNotifiedPublisher.subscribe(subscriber);
+        this.httpClient                   = Objects.requireNonNull(httpClient, "httpClient cannot be null");
+        this.onReceiverNotifiedPublisher  = onReceiverNotifiedPublisher;
+        this.webmentionEndpointDiscoverer = Objects.requireNonNull(webmentionEndpointDiscoverer, "webmentionEndpointDiscoverer cannot be null");
     }
 
     void notifyReceiver(String webmentionEndpoint, String sourceUrl, String targetUrl) {
@@ -66,10 +60,12 @@ public class WebmentionSender {
             log.debug("Location: {}", location);
         }
 
-        onReceiverNotifiedPublisher.submit(postResponse);
+        if (onReceiverNotifiedPublisher != null) {
+            onReceiverNotifiedPublisher.submit(postResponse);
+        }
     }
 
-    public void send(String sourceUrl, String targetUrl) {
+    public void send(String sourceUrl, String targetUrl) throws WebmentionEndpointNotFoundException, WebmentionException, UnexpectedContentTypeException {
         var webmentionEndpoint = webmentionEndpointDiscoverer.discover(URI.create(targetUrl)).orElseThrow(() -> new WebmentionEndpointNotFoundException(targetUrl));
         notifyReceiver(webmentionEndpoint, sourceUrl, targetUrl);
     }

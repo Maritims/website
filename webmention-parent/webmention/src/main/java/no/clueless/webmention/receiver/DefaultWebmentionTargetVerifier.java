@@ -1,5 +1,6 @@
 package no.clueless.webmention.receiver;
 
+import no.clueless.webmention.UnexpectedContentTypeException;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
 import no.clueless.webmention.WebmentionException;
 import no.clueless.webmention.http.SecureHttpClient;
@@ -52,7 +53,11 @@ public class DefaultWebmentionTargetVerifier implements WebmentionTargetVerifier
         }
 
         var httpResponse = fetch(targetUri);
-        discoverer.discover(targetUri, httpResponse).orElseThrow(() -> new WebmentionException("Target URL " + targetUri + " does not accept webmentions"));
+        try {
+            discoverer.discover(targetUri, httpResponse).orElseThrow(() -> new WebmentionException("Target URL " + targetUri + " does not accept webmentions"));
+        } catch (UnexpectedContentTypeException e) {
+            throw new WebmentionException("Unexpected Content-Type from " + targetUri + ": " + e.getContentType(), e);
+        }
 
         return true;
     }

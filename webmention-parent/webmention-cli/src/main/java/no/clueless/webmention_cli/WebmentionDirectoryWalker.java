@@ -5,9 +5,11 @@ import no.clueless.webmention.receiver.WebmentionHtmlSourceScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
@@ -18,9 +20,15 @@ public class WebmentionDirectoryWalker {
     private static final Logger log = LoggerFactory.getLogger(WebmentionDirectoryWalker.class);
 
     private final WebmentionHtmlSourceScanner webmentionHtmlSourceScanner;
+    private final Set<String>                 supportedFileExtensions;
 
-    public WebmentionDirectoryWalker(WebmentionHtmlSourceScanner webmentionHtmlSourceScanner) {
+    public WebmentionDirectoryWalker(WebmentionHtmlSourceScanner webmentionHtmlSourceScanner, Set<String> supportedFileExtensions) {
         this.webmentionHtmlSourceScanner = Objects.requireNonNull(webmentionHtmlSourceScanner, "webmentionHtmlSourceScanner");
+        this.supportedFileExtensions     = Objects.requireNonNull(supportedFileExtensions, "supportedFileExtensions cannot be null");
+
+        if (supportedFileExtensions.isEmpty()) {
+            throw new IllegalArgumentException("supportedFileExtensions cannot be empty");
+        }
     }
 
     String createSourceUrl(URI baseUri, Path rootDir, Path file) {
@@ -41,22 +49,21 @@ public class WebmentionDirectoryWalker {
         return URI.create(base).resolve(pathFragment).toString();
     }
 
-    public Set<WebmentionEvent> walk(URI baseUri, Path rootDir, Set<WebmentionEvent> webmentionEvents) {
+    public Set<WebmentionEvent> walk(URI baseUri, Path rootDir, Set<WebmentionEvent> webmentionEvents) throws IOException {
         Objects.requireNonNull(rootDir, "rootDir cannot be null");
         Objects.requireNonNull(webmentionEvents, "webmentionEvents cannot be null");
 
         if (!Files.exists(rootDir)) {
-            log.error("{} does not exist", rootDir);
-            return webmentionEvents;
+            throw new FileNotFoundException("Path does not exist: " + rootDir);
         }
 
         if (!Files.isDirectory(rootDir)) {
-            log.error("{} is not a directory", rootDir);
-            return webmentionEvents;
+            throw new NotDirectoryException(rootDir.toString());
         }
 
         try (var stream = Files.walk(rootDir)) {
             return stream.filter(Files::isRegularFile)
+                    .filter(file -> supportedFileExtensions.stream().anyMatch(fileExtension -> file.getFileName().toString().endsWith("." + fileExtension)))
                     .flatMap(file -> {
                         try {
                             var body      = Files.readString(file);
@@ -71,9 +78,6 @@ public class WebmentionDirectoryWalker {
                         }
                     })
                     .collect(Collectors.toSet());
-        } catch (IOException e) {
-            log.error("An exception occurred while walking the directory", e);
         }
-        return webmentionEvents;
     }
 }

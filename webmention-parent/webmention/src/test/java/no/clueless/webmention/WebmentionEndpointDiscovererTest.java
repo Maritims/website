@@ -247,7 +247,7 @@ class WebmentionEndpointDiscovererTest {
 
     @ParameterizedTest
     @MethodSource
-    void discover(@SuppressWarnings("unused") String name, HttpResponse<String> httpResponse, String expected) throws IOException, InterruptedException {
+    void discover(@SuppressWarnings("unused") String name, HttpResponse<String> httpResponse, String expected) throws IOException, InterruptedException, UnexpectedContentTypeException {
         // arrange
         when(httpClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
 
@@ -289,7 +289,7 @@ class WebmentionEndpointDiscovererTest {
 
     @ParameterizedTest
     @MethodSource
-    void discover_shouldPrefer_findInHeaders(String linkHeaderName, String linkHeaderValue, String expected) throws IOException, InterruptedException {
+    void discover_shouldPrefer_findInHeaders(String linkHeaderName, String linkHeaderValue, String expected) throws IOException, InterruptedException, UnexpectedContentTypeException {
         // arrange
         var httpResponse = mock(HttpResponse.class);
         var httpHeaders  = mock(HttpHeaders.class);
@@ -308,12 +308,16 @@ class WebmentionEndpointDiscovererTest {
     }
 
     @Test
-    void discover_shouldPrefer_findInHtml_when_findInHeaders_is_empty() throws IOException, InterruptedException {
+    void discover_shouldPrefer_findInHtml_when_findInHeaders_is_empty() throws IOException, InterruptedException, UnexpectedContentTypeException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
+        when(httpHeaders.firstValue("Content-Length")).thenReturn(Optional.of("10"));
         when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
+
         var httpResponse = mock(HttpResponse.class);
         when(httpResponse.headers()).thenReturn(httpHeaders);
+        when(httpResponse.body()).thenReturn("foobar");
+
         var document = mock(Document.class);
 
         doReturn(document).when(sut).parseHtml(nullable(String.class));
@@ -332,7 +336,7 @@ class WebmentionEndpointDiscovererTest {
     }
 
     @Test
-    void discover_shouldResolveRelativeUrl_relativeToTargetUrl() throws IOException, InterruptedException {
+    void discover_shouldResolveRelativeUrl_relativeToTargetUrl() throws IOException, InterruptedException, UnexpectedContentTypeException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
         when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));
@@ -351,7 +355,7 @@ class WebmentionEndpointDiscovererTest {
     }
 
     @Test
-    void discover_shouldResolveEmptyUrl_toTargetUrl() throws IOException, InterruptedException {
+    void discover_shouldResolveEmptyUrl_toTargetUrl() throws IOException, InterruptedException, UnexpectedContentTypeException {
         // arrange
         var httpHeaders = mock(HttpHeaders.class);
         when(httpHeaders.firstValue("Content-Type")).thenReturn(Optional.of("text/html"));

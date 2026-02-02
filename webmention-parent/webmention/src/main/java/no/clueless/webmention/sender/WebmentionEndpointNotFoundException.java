@@ -2,7 +2,7 @@ package no.clueless.webmention.sender;
 
 import java.util.Objects;
 
-public class WebmentionEndpointNotFoundException extends RuntimeException {
+public class WebmentionEndpointNotFoundException extends Exception {
     private final String url;
 
     public WebmentionEndpointNotFoundException(String url) {

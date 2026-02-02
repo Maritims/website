@@ -2,13 +2,18 @@ package no.clueless.webmention.receiver;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WebmentionHtmlSourceScanner implements WebmentionSourceScanner {
+    private static final Logger log = LoggerFactory.getLogger(WebmentionHtmlSourceScanner.class);
+
     private String resolveText(Element element) {
         var tagName = element.tagName().toLowerCase();
         return switch (tagName) {
@@ -37,7 +42,14 @@ public class WebmentionHtmlSourceScanner implements WebmentionSourceScanner {
                         case "a", "img" -> {
                             var href = element.attr("href");
                             var html = element.html();
-                            yield Map.entry(URI.create(href), html);
+
+                            try {
+                                var hrefUri = new URI(href);
+                                yield Map.entry(hrefUri, html);
+                            } catch (URISyntaxException e) {
+                                log.error("href is not a valid uri", e);
+                                yield null;
+                            }
                         }
                         case "video" -> {
                             var src = element.attr("src");
@@ -47,7 +59,7 @@ public class WebmentionHtmlSourceScanner implements WebmentionSourceScanner {
                         default -> throw new IllegalStateException("Unexpected value: " + tagName);
                     };
                 })
-                .filter(entry -> entry.getKey().isAbsolute())
+                .filter(entry -> entry != null && entry.getKey().isAbsolute())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

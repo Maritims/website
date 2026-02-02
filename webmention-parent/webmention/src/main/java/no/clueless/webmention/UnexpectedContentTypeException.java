@@ -2,7 +2,7 @@ package no.clueless.webmention;
 
 import java.util.Objects;
 
-public class UnexpectedContentTypeException extends RuntimeException {
+public class UnexpectedContentTypeException extends Exception {
     private final String url;
     private final String contentType;
 
@@ -10,6 +10,12 @@ public class UnexpectedContentTypeException extends RuntimeException {
         super(contentType == null ? String.format("The URL %s did not return any Content-Type header", url) : String.format("The URL %s returned Content-Type header with the unexpected value %s", url, contentType));
         this.url         = url;
         this.contentType = contentType;
+    }
+
+    public UnexpectedContentTypeException(String message) {
+        super(message);
+        this.url         = null;
+        this.contentType = null;
     }
 
     public String getUrl() {

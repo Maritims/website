@@ -1,5 +1,9 @@
 package no.clueless.webmention_cli;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -7,31 +11,62 @@ import java.nio.file.Path;
 public class Application {
     private static void printUsage() {
         System.out.println("""
-                Expected 1 argument: <base_uri> <root_dir>
-                
-                Example:
-                  java -jar app.jar https://clueless.no /home/user/documents
-                  java -jar app.jar https://clueless.no C:\\Users\\Desktop
+                Usage: webmention-cli [options]
+                Options:
+                  -u, --uri <uri>    The base URI to use
+                  -d, --dir <path>   The root directory to scan
+                  --dry-run          Show what would happen without sending
+                  -h, --help         Show this help message
                 """);
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
+        String  uriStr = null;
+        String  dirStr = null;
+        boolean dryRun = false;
+
+        for (var i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--uri", "-u" -> {
+                    if (++i < args.length) {
+                        uriStr = args[i];
+                    }
+                }
+                case "--dir", "-d" -> {
+                    if (++i < args.length) {
+                        dirStr = args[i];
+                    }
+                }
+                case "--dry-run" -> dryRun = true;
+                case "--help", "-h" -> {
+                    printUsage();
+                    return;
+                }
+                default -> {
+                    System.err.println("Unknown argument: " + args[i]);
+                    printUsage();
+                    System.exit(1);
+                }
+            }
+        }
+
+        if (uriStr == null || dirStr == null) {
+            System.err.println("Both --uri and --dir are required");
             printUsage();
             System.exit(1);
         }
 
-        final var rootDir = Path.of(args[1]);
-        final URI baseUri;
         try {
-            baseUri = new URI(args[0]);
-        } catch (URISyntaxException e) {
-            System.err.println(args[0] + " is not a valid URI!");
-            System.exit(1);
-            return;
-        }
+            final var rootDir = Path.of(dirStr);
+            final var baseUri = new URI(uriStr);
 
-        final var webmentionCli = new WebmentionCli();
-        webmentionCli.findAndSendWebmentions(baseUri, rootDir);
+            new WebmentionCli().findAndSendWebmentions(baseUri, rootDir, dryRun);
+        } catch (URISyntaxException e) {
+            System.err.println("Invalid URI: " + uriStr);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Execution failed: " + e);
+            System.exit(1);
+        }
     }
 }

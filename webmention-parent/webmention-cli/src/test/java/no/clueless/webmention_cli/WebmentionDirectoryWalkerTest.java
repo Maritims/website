@@ -20,8 +20,9 @@ class WebmentionDirectoryWalkerTest {
     @Test
     void walk(@TempDir Path tempDir) throws IOException {
         // arrange
-        var sut = spy(new WebmentionDirectoryWalker(new WebmentionHtmlSourceScanner()));
+        var sut = spy(new WebmentionDirectoryWalker(new WebmentionHtmlSourceScanner(), Set.of("htm", "html")));
         var indexHtml = Files.createFile(tempDir.resolve("index.html"));
+        Files.createFile(tempDir.resolve("foo.json"));
 
         Files.writeString(indexHtml, """
                 <html>

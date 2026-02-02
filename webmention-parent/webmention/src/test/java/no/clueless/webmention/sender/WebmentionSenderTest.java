@@ -1,5 +1,6 @@
 package no.clueless.webmention.sender;
 
+import no.clueless.webmention.UnexpectedContentTypeException;
 import no.clueless.webmention.UnexpectedStatusCodeException;
 import no.clueless.webmention.WebmentionEndpointDiscoverer;
 import no.clueless.webmention.http.SecureHttpClient;
@@ -63,7 +64,7 @@ class WebmentionSenderTest {
     }
 
     @Test
-    void send_shouldThrow_whenWebmentionEndpointIsNotDiscovered() {
+    void send_shouldThrow_whenWebmentionEndpointIsNotDiscovered() throws UnexpectedContentTypeException {
         when(webmentionEndpointDiscoverer.discover(URI.create("https://example.com/target"))).thenReturn(Optional.empty());
         assertThrows(WebmentionEndpointNotFoundException.class, () -> sut.send("https://example.com/source", "https://example.com/target"));
     }

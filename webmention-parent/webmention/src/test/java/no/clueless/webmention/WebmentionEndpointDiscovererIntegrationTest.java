@@ -3,6 +3,7 @@ package no.clueless.webmention;
 import no.clueless.webmention.http.SecureHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -55,12 +56,17 @@ class WebmentionEndpointDiscovererIntegrationTest {
     @ParameterizedTest
     @MethodSource
     @DisplayName("{0}")
-    void discover(@SuppressWarnings("unused") String name, String targetUrl, String expected) {
+    void discover(@SuppressWarnings("unused") String name, String targetUrl, String expected) throws UnexpectedContentTypeException {
         // act
         var result = sut.discover(URI.create(targetUrl)).orElse(null);
 
         // assert
         assertNotNull(result);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void discover_kode24() {
+        assertDoesNotThrow(() -> sut.discover(URI.create("https://kode24.no")));
     }
 }

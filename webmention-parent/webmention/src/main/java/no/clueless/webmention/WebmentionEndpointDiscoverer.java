@@ -69,16 +69,45 @@ public class WebmentionEndpointDiscoverer {
                 .findFirst();
     }
 
-    public Optional<String> discover(URI targetUri, HttpResponse<String> httpResponse) {
+    public Optional<String> discover(URI targetUri, HttpResponse<String> httpResponse) throws UnexpectedContentTypeException {
+        Objects.requireNonNull(targetUri, "targetUri cannot be null");
+        Objects.requireNonNull(httpResponse, "httpResponse cannot be null");
+
         var contentType = httpResponse.headers()
                 .firstValue("Content-Type")
-                .orElseThrow(() -> new RuntimeException("HTTP response from targetUrl URL " + targetUri + " did not contain a Content-Type header"));
+                .orElseGet(() -> httpResponse.headers()
+                        .firstValue("content-type")
+                        .orElse(null)
+                );
+
+        if (contentType == null) {
+            throw new UnexpectedContentTypeException("HTTP response from targetUrl URL " + targetUri + " did not contain a Content-Type header");
+        }
+
         if (!contentType.startsWith("text/html")) {
             throw new UnexpectedContentTypeException(targetUri.toString(), contentType);
         }
 
         return findInHeaders(httpResponse.headers())
                 .or(() -> {
+                    var contentLength = httpResponse.headers()
+                            .firstValue("Content-Length")
+                            .map(Long::parseLong)
+                            .orElseGet(() -> httpResponse.headers()
+                                    .firstValue("content-length")
+                                    .map(Long::parseLong)
+                                    .orElse(null)
+                            );
+                    if (contentLength != null && contentLength == 0) {
+                        log.info("HTTP response from {} returned Content-Length = 0", targetUri);
+                        return Optional.empty();
+                    }
+
+                    if (httpResponse.body().isBlank()) {
+                        log.info("HTTP response from {} contained an empty body", targetUri);
+                        return Optional.empty();
+                    }
+
                     var document = parseHtml(httpResponse.body());
                     return findInHtml(document);
                 })
@@ -95,7 +124,9 @@ public class WebmentionEndpointDiscoverer {
                 });
     }
 
-    public Optional<String> discover(URI targetUri) {
+    public Optional<String> discover(URI targetUri) throws UnexpectedContentTypeException {
+        Objects.requireNonNull(targetUri, "targetUri cannot be null");
+
         var httpRequest = WebmentionHttpRequestBuilder.newBuilder()
                 .uri(targetUri)
                 .GET()
@@ -114,7 +145,8 @@ public class WebmentionEndpointDiscoverer {
     public static class Builder {
         private SecureHttpClient httpClient;
 
-        private Builder() {}
+        private Builder() {
+        }
 
         public Builder httpClient(SecureHttpClient httpClient) {
             this.httpClient = httpClient;
