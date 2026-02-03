@@ -29,6 +29,7 @@
         <!-- Required by Javalin for serialization and deserialization -->
         <jackson.version>2.17.2</jackson.version>
         <commons-text.version>1.15.0</commons-text.version>
+        <native.maven.plugin.version>0.11.4</native.maven.plugin.version>
     </properties>
 
     <dependencyManagement>
