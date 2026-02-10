@@ -1,7 +1,13 @@
 /**
+ * @typedef {object} NavigationLinkOptions
+ * @property {boolean} startsWith Whether the link should be active when the current URL path starts with the link's href.
+ */
+
+/**
  * @typedef {object} NavigationLink
- * @property {string} href
- * @property {string} label
+ * @property {string} href The link's href.
+ * @property {string} label The link's label.
+ * @property {NavigationLinkOptions|undefined} [options] The link's options.
  */
 
 /**
@@ -17,25 +23,31 @@ class Navigation extends HTMLElement {
     constructor() {
         super();
         this._navigationLinks = [{
-            label: 'Home',
+            label: 'Hjem',
             href: '/',
         }, {
-            label: 'Guestbook',
+            label: 'Blogg',
+            href: '/blogg',
+            options: {
+                startsWith: true
+            }
+        }, {
+            label: 'Om meg',
+            href: '/about.html',
+        }, {
+            label: 'Gjestebok',
             href: '/guestbook.html',
         }, {
-            label: 'EVE Online: Ninja Hacking Guide',
-            href: '/eve-online-ninja-hacking-guide.html'
-        }, {
-            label: 'Gallery',
+            label: 'Galleri',
             href: '/gallery.html',
         }, {
             label: 'CV',
             href: '/cv.html',
         }, {
-            label: 'Projects',
+            label: 'Prosjekter',
             href: '/projects.html',
         }, {
-            label: 'Links',
+            label: 'Lenker',
             href: '/links.html',
         }, {
             label: 'Terminal',
@@ -43,11 +55,20 @@ class Navigation extends HTMLElement {
         }];
     }
 
+    /**
+     * Checks if the given navigation link is active.
+     * @param navigationLink The navigation link to check.
+     * @return {boolean} Whether the link is active.
+     */
+    isActiveNavigationLink(navigationLink) {
+        return navigationLink.options?.startsWith ? window.location.pathname.startsWith(navigationLink.href) : window.location.pathname === navigationLink.href;
+    }
+
     render() {
         this.innerHTML = `
             <nav class="main-navigation">
                 <ul>
-                    ${this._navigationLinks.map(({ href, label }) =>`<li><a href="${href}" class="${window.location.pathname === href ? 'active' : ''}">${label}</a></li>`).join('')}
+                    ${this._navigationLinks.map(navigationLink => `<li><a href="${navigationLink.href}" class="${this.isActiveNavigationLink(navigationLink) ? 'active' : ''}">${navigationLink.label}</a></li>`).join('')}
                 </ul>
             </nav>
         `;

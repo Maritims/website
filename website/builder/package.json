@@ -1,0 +1,30 @@
+{
+    "name": "builder",
+    "version": "1.0.0",
+    "description": "A tool for building my website.",
+    "homepage": "https://github.com/Maritims/website#readme",
+    "bugs": {
+        "url": "https://github.com/Maritims/website/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Maritims/website.git"
+    },
+    "license": "MIT",
+    "author": "Martin Severin Steffensen <martin.severin.steffensen@proton.me> (https://clueless.no)",
+    "type": "module",
+    "main": "optimize-images.js",
+    "scripts": {
+        "test": "node test-suite.js",
+        "verify": "node document-verifier.js",
+        "optimize-images": "node optimize-images.js",
+        "generate-sitemap": "node generate-sitemap.js",
+        "generate-robots": "node generate-robots.js",
+        "build": "node index.js"
+    },
+    "devDependencies": {
+        "jsdom": "^28.0.0",
+        "sharp": "^0.34.5",
+        "winston": "^3.19.0"
+    }
+}

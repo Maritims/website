@@ -1,7 +1,10 @@
-.env
 target/
 .idea/
 node_modules/
+webmention-web-components
+
+.env
 **/*.db
+*.log
 *.tar
 dependency-reduced-pom.xml

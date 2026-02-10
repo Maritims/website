@@ -2234,7 +2234,7 @@ function kl(e, t) {
             }));
     }
     function A(...n) {
-        (v() || n.some((u) => u instanceof Error)) && console[n[0] instanceof Error ? "error" : "log"]("ALTCHA", `[name=${Ge()}]`, ...n);
+        (v() || n.some((u) => u instanceof Error)) && console[n[0] instanceof Error ? "error" : "utils"]("ALTCHA", `[name=${Ge()}]`, ...n);
     }
     function ei() {
         b(W, Q.PAUSED, !0);

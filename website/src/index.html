@@ -3,45 +3,33 @@
 <head>
     <title>Martin Severin Steffensen</title>
     <meta charset="UTF-8">
-    <meta name="description" content="My personal website.">
+    <meta name="description" content="Min personlige hjemmeside.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/stylesheet.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="/api/webmention" rel="webmention">
 </head>
 <body>
-    <clueless-layout>
-        <p>Welcome to my personal website, which does not attempt in any way to resemble what websites tend to look and act
-            like these days. I'm trying to keep it as plain and simple as possible.</p>
-        <section id="who-am-i">
-            <h2>Who am I?</h2>
-            <ul>
-                <li>👧 Father</li>
-                <li>👩 Life partner</li>
-                <li>😻🐶 Animal lover</li>
-                <li>❤️ Volunteer in the <a href="https://www.rodekors.no/hjelpekorps">Norwegian Red Cross Search and Rescue Corps</a></li>
-                <li>🖥️ Software developer working at <a href="https://www.gurusoft.no">Gurusoft</a></li>
-                <li>🕹️ Retro game enthusiast and volunteer coordinator at <a href="https://www.retromessa.no">Retromessa</a>
-                </li>
-                <li>🎮 Gamer: Currently playing EVE Online</li>
-                <li>👽 Sci-fi nerd</li>
-                <li>📖 Book enthusiast: Currently listening to Failure Is Not An Option by Gene Kranz on Storytel (at some point I'll be creating a library section around here somewhere)</li>
-                <li>🏋️ Aspiring gym rat</li>
-            </ul>
-        </section>
-        <section id="what-will-i-find-here">
-            <h2>What will I find here?</h2>
-            <p>Whatever I wish to publish somewhere, and I don't want to use the Meta platform. I've recently added <a
-                    href="./gallery.html">the gallery</a> to replace my Instagram feed.</p>
-            <p>You might find that the main menu isn't necessarily divided into generic categories, and that's perfectly
-                fine. It's part of what I used to find charming about websites back in the 90s and early 2000s. What's next,
-                maybe a painting tool and a gallery to showcase the art you submit?</p>
-        </section>
-        <section id="credits">
-            <h2>Credits</h2>
-            <p>LCARS Inspired Website Template by <a href="https://www.TheLCARS.com">www.TheLCARS.com</a> and modified by
-                myself and <a href="https://vegar.codes">NullSprite.</a></p>
-        </section>
-    </clueless-layout>
-    <script src="./components/layout.js" type="module"></script>
+<clueless-layout>
+    <p>Velkommen til min personlige hjemmeside som på ingen måte forsøker å se ut som eller oppføre seg som nettsider
+        gjør i dag. Jeg forsøker å holde ting så enkelt og greit som mulig.</p>
+    <section id="whats-new">
+
+    </section>
+    <section id="what-will-i-find-here">
+        <h2>Hva finner jeg her?</h2>
+        <p>Hva enn jeg ønsker å publisere, og jeg ønsker ikke å bruke Meta-plattformen lengre. Jeg har nylig lagt til et <a href="./gallery.html">galleri</a> for å erstatte Instagram-kontoen min.</p>
+        <p>Det kan hende at hovedmenyen ikke er inndelt på spesielt kategorisk eller logisk vis og det er helt greit. Det var noe av sjarmen med hjemmesidene man fant rundt omkring på nettet på 90- og 2000-tallet.</p>
+        <p>Jeg tror det neste jeg kommer til å lage er et bibliotek som kan erstatte Goodreads-kontoen min.</p>
+    </section>
+    <section id="credits">
+        <h2>Anerkjennelse</h2>
+        <p>LCARS Inspired Website Template by <a href="https://www.TheLCARS.com">www.TheLCARS.com</a> and modified by
+            myself and <a href="https://vegar.codes">NullSprite.</a></p>
+    </section>
+    <webmention-list endpoint="/webmention" hide-when-empty="true"></webmention-list>
+</clueless-layout>
+<script src="./components/layout.js" type="module"></script>
+<script src="./components/webmention-web-components/index.js" type="module"></script>
 </body>
 </html>
