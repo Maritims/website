@@ -13,6 +13,11 @@
     src: url('../fonts/digital-7.ttf');
 }
 
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf');
+}
+
 :root {
     --font-family: system-ui, sans-serif, serif;
     --font-size: 16px;
@@ -170,6 +175,22 @@ section.guestbook {
 
         article {
             h3, h4 {
+                margin: 0;
+            }
+
+            border: 1px solid white;
+        }
+    }
+}
+
+section.licenses {
+    .license-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: calc(0.5 * var(--spacing)) var(--spacing);
+
+        .license-card {
+            h3 {
                 margin: 0;
             }
 

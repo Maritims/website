@@ -66,9 +66,6 @@ function verifyDocumentHead(sourcePath) {
         description: "Stylesheet must be present",
         fn: () => assert.ok(document.head.querySelector('link[rel="stylesheet"]')?.getAttribute('href'), 'Document stylesheet not found.')
     }, {
-        description: "Google fonts must be present",
-        fn: () => assert.ok(document.head.querySelector('link[rel="stylesheet"][href^="https://fonts.googleapis.com"]'), 'Document fonts not found.')
-    }, {
         description: "Webmention endpoint must be present",
         fn: () => assert.ok(document.head.querySelector('link[rel="webmention"]'), 'Document webmention not found.')
     }, {

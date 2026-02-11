@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" class="ms-dos">
+<head>
+    <title>Martin Severin Steffensen</title>
+    <meta charset="UTF-8">
+    <meta name="description"
+          content="En oversikt over mine programvaren og deres lisenser benyttet på denne hjemmesiden.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/stylesheet.css">
+    <link href="/api/webmention" rel="webmention">
+</head>
+<body>
+<clueless-layout>
+    <section class="licenses">
+        <h2>Lisenser</h2>
+        <p>Denne siden inneholder en oversikt over all lisensiert programvare benyttet i forbindelse med utviklingen og
+            bruken av hjemmesiden min.</p>
+        <div class="license-grid">
+            <article class="license-card">
+                <h3>Node.js</h3>
+                <p class="license-reason">Benyttes til generering av <a href="/robots.txt">robots.txt</a>,
+                    <a href="/sitemap.xml">sitemap.xml</a> og til optimalisering av bilder.</p>
+                <a href="/lisenser/nodejs.txt" class="license-link" rel="license" target="_blank">Vis lisens</a>
+            </article>
+            <article class="license-card">
+                <h3>Express</h3>
+                <p class="license-reason">Benyttes som lokal webserver ved utvikling av hjemmesiden.</p>
+                <a href="/lisenser/express.txt" class="license-link" rel="license" target="_blank">Vis lisens</a>
+            </article>
+            <article class="license-card">
+                <h3>JSDOM</h3>
+                <p class="license-reason">Benyttes til testing av de forskjellige sidene på hjemmesiden.</p>
+                <a href="/lisenser/jsdom.txt" class="license-link" rel="license" target="_blank">Vis lisens</a>
+            </article>
+            <article class="license-card">
+                <h3>sharp</h3>
+                <p class="license-reason">Benyttes til optimalisering av bilder.</p>
+                <a href="/lisenser/sharp.txt" class="license-link" rel="license" target="_blank">Vis lisens</a>
+            </article>
+            <article class="license-card">
+                <h3>winston</h3>
+                <p class="license-reason">Benyttes til logging i de forskjellige Node.js-baserte støtteverktøyene som benyttes i forbindelse med utvikling av hjemmesiden.</p>
+                <a href="/lisenser/winston.txt" class="license-link" rel="license" target="_blank">Vis lisens</a>
+            </article>
+        </div>
+    </section>
+</clueless-layout>
+<script src="/components/layout.js" type="module"></script>
+</body>
+</html>

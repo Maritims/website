@@ -1,7 +1,7 @@
 /*noinspection CssUnknownTarget*/
 @font-face {
     font-family: 'MS-DOS';
-    src: url('/fonts/Perfect DOS VGA 437.ttf');
+    src: url('/fonts/Web437_IBM_VGA_9x16.woff');
 }
 
 html.ms-dos {
@@ -277,6 +277,24 @@ html.ms-dos {
                 &:nth-child(12wn+12) {
                     background-color: var(--ms-dos-gray);
                 }
+            }
+        }
+    }
+
+    section.licenses {
+        padding-block-end: calc(3 * var(--spacing));
+
+        .license-grid {
+            gap: calc(4 * var(--spacing));
+            margin-block-end: calc(2 * var(--spacing));
+            padding-inline-end: calc(2 * var(--spacing));
+
+            article {
+                background-color: var(--ms-dos-maroon);
+                border: 5px double var(--ms-dos-white);
+                box-shadow: calc(2 * var(--spacing)) calc(2 * var(--spacing)) 0 var(--ms-dos-black);
+                color: var(--ms-dos-white);
+                padding: calc(2 * var(--spacing));
             }
         }
     }
