@@ -145,54 +145,54 @@ html.ms-dos {
         }
     }
 
+    .notification-container {
+        display: none;
+
+        &:not(:empty) {
+            display: grid;
+            padding-inline-end: calc(2 * var(--spacing));
+            padding-block-end: calc(1 * var(--spacing));
+        }
+
+        .notification {
+            border: 5px double var(--ms-dos-white);
+            box-shadow: var(--shadow);
+            color: var(--ms-dos-white);
+            padding: var(--spacing);
+
+            &.success {
+                background-color: var(--ms-dos-green);
+            }
+
+            &.error {
+                background-color: var(--ms-dos-maroon);
+            }
+
+            .notification-header {
+                button.close {
+                    border: none;
+                    background-color: var(--ms-dos-gray);
+                    color: var(--ms-dos-white);
+                    font-family: var(--font-family);
+                    font-size: var(--font-size);
+                    padding: .25em;
+                    box-shadow: var(--button-shadow);
+
+                    &:active, &:focus {
+                        background-color: var(--ms-dos-black);
+                        box-shadow: none;
+                    }
+                }
+            }
+        }
+    }
+
     section.guestbook {
         padding-block-end: calc(3 * var(--spacing));
 
         form {
             .form-controls {
                 gap: calc(2 * var(--spacing)) var(--spacing);
-            }
-        }
-
-        .notification-container {
-            display: none;
-
-            &:not(:empty) {
-                display: grid;
-                padding-inline-end: calc(2 * var(--spacing));
-                padding-block-end: calc(1 * var(--spacing));
-            }
-
-            .notification {
-                border: 5px double var(--ms-dos-white);
-                box-shadow: var(--shadow);
-                color: var(--ms-dos-white);
-                padding: var(--spacing);
-
-                &.success {
-                    background-color: var(--ms-dos-green);
-                }
-
-                &.error {
-                    background-color: var(--ms-dos-maroon);
-                }
-
-                .notification-header {
-                    button.close {
-                        border: none;
-                        background-color: var(--ms-dos-gray);
-                        color: var(--ms-dos-white);
-                        font-family: var(--font-family);
-                        font-size: var(--font-size);
-                        padding: .25em;
-                        box-shadow: var(--button-shadow);
-
-                        &:active, &:focus {
-                            background-color: var(--ms-dos-black);
-                            box-shadow: none;
-                        }
-                    }
-                }
             }
         }
 

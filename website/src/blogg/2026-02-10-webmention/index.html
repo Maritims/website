@@ -26,8 +26,39 @@
             ut.</p>
         <p>Finn prosjektet på <a href="https://github.com/Maritims/webmention">GitHub</a>, prøv det ut og gi meg en
             <i>webmention</i> om hvordan det fungerer!</p>
+
+        <clueless-notification-container></clueless-notification-container>
+
+        <webmention-send endpoint="/api/webmention">
+            <p>Har du snakket om dette innlegget? Si ifra!</p>
+        </webmention-send>
     </article>
 </clueless-layout>
 <script src="/components/layout.js" type="module"></script>
+<script src="/components/clueless-notification.js" type="module"></script>
 <script src="/components/webmention-web-components/index.js" type="module"></script>
+<script type="module">
+    import {CluelessNotification, CluelessNotificationContainer} from '../../components/clueless-notification.js';
+
+    customElements.whenDefined('webmention-send').then(() => {
+        document.querySelector('webmention-send').addEventListener('webmention-sent',
+            /**
+             * @param {WebmentionEvent} webmentionEvent
+             */
+            (webmentionEvent) => {
+                /**
+                 * @type {CluelessNotificationContainer}
+                 */
+                const notificationContainer = document.querySelector('clueless-notification-container');
+
+                if(webmentionEvent.result === 'success') {
+                    const notification = new CluelessNotification('Webmention sendt!', 'Tusen takk for at du sendte en webmention!', 'success');
+                    notificationContainer.addNotification(notification);
+                } else {
+                    const notification = new CluelessNotification('Webmention feilet!', `<p>Det oppstod en feil under sendingen av webmention-en.`, 'error');
+                    notificationContainer.addNotification(notification);
+                }
+            });
+    });
+</script>
 </body>

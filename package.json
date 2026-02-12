@@ -13,19 +13,21 @@
     "license": "MIT",
     "author": "Martin Severin Steffensen <martin.severin.steffensen@proton.me> (https://clueless.no)",
     "type": "module",
-    "main": "optimize-images.js",
+    "main": "build-tools/optimize-images.js",
     "scripts": {
-        "test": "node test-suite.js",
-        "verify": "node document-verifier.js",
-        "optimize-images": "node optimize-images.js",
-        "generate-sitemap": "node generate-sitemap.js",
-        "generate-robots": "node generate-robots.js",
-        "build": "node index.js",
-        "dev": "node server.js"
+        "test": "node build-tools/test-suite.js",
+        "verify": "node build-tools/document-verifier.js",
+        "optimize-images": "node build-tools/optimize-images.js",
+        "generate-sitemap": "node build-tools/generate-sitemap.js",
+        "generate-robots": "node build-tools/generate-robots.js",
+        "build": "node build-tools/index.js",
+        "dev": "nodemon build-tools/server.js"
     },
     "devDependencies": {
         "express": "^5.2.1",
+        "http-proxy-middleware": "^3.0.5",
         "jsdom": "^28.0.0",
+        "nodemon": "^3.1.11",
         "sharp": "^0.34.5",
         "winston": "^3.19.0"
     }

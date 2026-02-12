@@ -71,6 +71,21 @@ nav.main-navigation {
     }
 }
 
+.notification-container {
+    display: grid;
+
+    .notification {
+        margin-block-end: var(--spacing);
+
+        .notification-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
 section.gallery {
     display: grid;
     grid-template-columns: repeat(2, minmax(200px, 1fr));
@@ -144,21 +159,6 @@ section.guestbook {
         .form-actions {
             display: flex;
             justify-content: flex-end;
-        }
-    }
-
-    .notification-container {
-        display: grid;
-
-        .notification {
-            margin-block-end: var(--spacing);
-
-            .notification-header {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
         }
     }
 
