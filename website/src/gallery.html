@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="ms-dos">
 <head>
-    <title>Gallery</title>
+    <title>Galleri</title>
     <meta charset="UTF-8">
     <meta name="description" content="Restene av min Instagram-konto.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,58 +12,25 @@
 <clueless-layout>
     <p>Dette er restene etter det som pleide å være min Instagram-konto.</p>
     <section class="gallery">
-        <div class="image">
-            <button popovertarget="img1">
-                <img src="./images/20241005_redcross.webp" width="953" height="1271"
-                     alt="En ryggsekk med en håndtholdt VHF-radio og en Kvikk Lunsj-sjokolade i skogen.">
-            </button>
-            <dialog id="img1" popover>
-                <figure>
-                    <img src="./images/20241005_redcross.webp" width="953" height="1271" alt="En ryggsekk med en håndholdt VHF-radio og en Kvikk Lunsj-sjokolade i skogen.">
-                    <figcaption>2024-10-05: Jeg var markør på Røde Kors-kurset "Kvalifisert søk og redning".</figcaption>
-                </figure>
-            </dialog>
-        </div>
-        <div class="image">
-            <button popovertarget="img2" command="showModal">
-                <img src="./images/20221123_zita.webp" width="618" height="1271"
-                     alt="A backpack with a handheld VHF radio and a Kvikk Lunsj chocolate in the woods.">
-            </button>
-            <dialog id="img2" popover>
-                <figure>
-                    <img src="./images/20221123_zita.webp" width="618" height="1271"
-                         alt="A backpack with a handheld VHF radio and a Kvikk Lunsj chocolate in the woods.">
-                    <figcaption>2024-10-05: I was helping with a Red Cross training course in search and rescue.
-                    </figcaption>
-                </figure>
-            </dialog>
-        </div>
-        <div class="image">
-            <button popovertarget="img3" command="showModal">
-                <img src="./images/20210626_veranda_drinks.webp" width="953" height="1271"
-                     alt="A glass of Coca-Cola and a dog toy looking like a fancy drink with a slice of lime.">
-            </button>
-            <dialog id="img3" popover>
-                <figure>
-                    <img src="./images/20210626_veranda_drinks.webp" width="953" height="1271"
-                         alt="A glass of Coca-Cola and a dog toy looking like a fancy drink with a slice of lime.">
-                    <figcaption>2021-06-26: I was drinking a glass of Coca-Cola and a dog toy in the summer heat.</figcaption>
-                </figure>
-            </dialog>
-        </div>
-        <div class="image">
-            <button popovertarget="img4" command="showModal">
-                <img src="./images/20190308_cookies.webp" width="953" height="1271"
-                     alt="24 cookies resting on the kitchen counter and a box of orange marmalade to the left.">
-            </button>
-            <dialog id="img4" popover>
-                <figure>
-                    <img src="./images/20190308_cookies.webp" width="953" height="1271"
-                         alt="24 cookies resting on the kitchen counter and a box of orange marmalade to the left.">
-                    <figcaption>2019-03-08: The night before I was to meet the woman who would later become my partner in life, I prepared one of her favorites snacks: Jaffa cakes. Six years later, I can safely say it was a good idea.</figcaption>
-                </figure>
-            </dialog>
-        </div>
+        <clueless-lightbox imageId="im1" src="./images/20241005_redcross.webp" width="953" height="1271"
+                           alt="En ryggsekk med en håndholdt VHF-radio og en Kvikk Lunsj-sjokolade i skogen."
+                           date="2024-10-05"
+                           caption="Jeg var markør på Rød Kors-kurset Kvalifisert søk og redning."></clueless-lightbox>
+
+        <clueless-lightbox imageId="img2" src="./images/20221123_zita.webp" width="618" height="1271"
+                           alt="Zita."
+                           date="2022-11-23"
+                           caption="Zita."></clueless-lightbox>
+
+        <clueless-lightbox imageId="img3" src="./images/20210626_veranda_drinks.webp" width="953" height="1271"
+                           alt="Et glass med Coca-Cola og en hundeleke som er ut som en fancy drink med ei limeskive."
+                           date="2021-06-26"
+                           caption="2021-06-26: Jeg drakk et glass Coca-Cola i sommervarmen.."></clueless-lightbox>
+
+        <clueless-lightbox imageId="img4" src="./images/20190308_cookies.webp" width="953" height="1271"
+                           alt="24 kjeks på kjøkkenbenken og en boks med appelsinmarmelade til venstre."
+                           date="2019-03-08"
+                           caption="2019-03-08: Kvelden før jeg skulle treffe kvinnen som skulle min livsledsager ble tilbragt på kjøkkenet hvor jeg laget en av hennes favoritter, hjemmelagede Jaffa-kjeks. Syv år senere kan jeg bekrefte at det var en god idé."></clueless-lightbox>
     </section>
 </clueless-layout>
 <script src="./components/layout.js" type="module"></script>

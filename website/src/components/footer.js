@@ -7,7 +7,7 @@ export default class Footer extends HTMLElement {
         this.innerHTML = `
             <footer>
                 <scroll-to-top></scroll-to-top>
-                <div>Contact me on <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> or <a href="https://github.com/Maritims">GitHub</a></div>
+                <div>Kontakt meg på <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> eller <a href="https://github.com/Maritims">GitHub</a></div>
                 <div class="badges">
                     <theme-switcher></theme-switcher>
                     <a href="https://pysj.party" target="_blank"><img src="./images/pysjparty-badge.webp" alt="pysjparty"></a>

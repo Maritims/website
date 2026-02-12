@@ -113,7 +113,7 @@ export default class Guestbook extends HTMLElement {
             <div class="notification ${type}" role="alert">
                 <div class="notification-header">
                     <span>${title}</span>
-                    <button type="button" class="close" aria-label="Close">Close</button>
+                    <button type="button" class="close" aria-label="Close">Lukk</button>
                 </div>
                 <div class="notification-body">${message}</div>
             </div>
@@ -127,17 +127,17 @@ export default class Guestbook extends HTMLElement {
         this.innerHTML = `
             <form id="guestbook-form">
                 <div class="form-controls">
-                    <label for="name">Name</label>
+                    <label for="name">Navn</label>
                     <input type="text" name="name" id="name" required autofocus autocomplete="name"/>
         
-                    <label for="message">Message</label>
+                    <label for="message">Melding</label>
                     <textarea name="message" id="message" required></textarea>
                     
                     <input type="text" name="token" style="display:none !important;" tabindex="-1" autocomplete="off">
                     <altcha-widget name="altcha" challengeUrl="${this._challengeUrl}" floating="top"></altcha-widget>
                 </div>
                 <div class="form-actions">
-                    <button type="submit">Submit message</button>
+                    <button type="submit">Signér</button>
                 </div>
             </form>
             

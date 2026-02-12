@@ -1,41 +1,43 @@
 <!DOCTYPE html>
 <html lang="en" class="ms-dos">
 <head>
-    <title>Projects</title>
+    <title>Prosjekter</title>
     <meta charset="UTF-8">
     <meta name="description"
-          content="This page contains a list of some projects I wanted to mention.">
+          content="En oversikt over noen prosjekter jeg hadde lyst å nevne.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/stylesheet.css">
     <link href="/api/webmention" rel="webmention">
 </head>
 <body>
 <clueless-layout>
-    <p>This page contains a list of some projects I wanted to mention.</p>
+    <p>En oversikt over noen prosjekter jeg hadde lyst å nevne.</p>
     <nav>
         <ul>
             <li><a href="https://github.com/Maritims/utm-lat-lng" target="_blank">utm-lat-lng</a>
-                <p>Sometimes SAR alerts are sent with a UTM coordinate describing where to link up or where to extract the
-                    patient. I could not find a practical app to convert UTM to latitude and longitude, so I wrote this Java
-                    package. The conversion is based on the Thompson-Lee series, a variant of Gauss-Krüger.</p>
+                <p>Noen ganger inneholder utkallinger til leteaksjoner en UTM-referanse som sier noe om hvor
+                    man skal møte opp, eller hvor pasienten skal hentes ut fra. Jeg greide ikke finne noen app som kunne
+                    konvertere UTM til lengde- og breddegrad, så da laget jeg denne Java-pakken. Konverteringen er
+                    basert på Thompson-Lee, en variant av Gauss-Krüger.</p>
                 <p>
-                    Features include:
+                    Pakken løser følgende oppgaver:
                 <ul>
-                    <li>Converting latitude and longitude to UTM coordinate</li>
-                    <li>Converting UTM coordinate to latitude and longitude</li>
-                    <li>Parsing UTM coordinate with latitude band</li>
-                    <li>Parsing UTM coordinate with hemisphere</li>
+                    <li>Konvertering av lengde- og breddegrad til UTM-referanse</li>
+                    <li>Konvertering av UTM-referanse til lengde- og breddegrad</li>
+                    <li>Tolkning av UTM-koordinat</li>
                 </ul>
                 </p>
             </li>
-            <li><a href="https://github.com/Maritims/clueless-infrastructure" target="_blank">clueless-infrastructure</a>
-                <p>How I've configured my container environment to host this website and other things.</p>
+            <li><a href="https://github.com/Maritims/clueless-infrastructure"
+                   target="_blank">clueless-infrastructure</a>
+                <p>Dette prosjektet inneholder konfigurasjonen til container-miljøet jeg bruker for å levere denne
+                    hjemmesiden og et par andre ting.</p>
             </li>
-            <li><a href="https://github.com/Maritims/norsk-programmering-badge" target="_blank">The Norsk Programmering
-                badge found in my footer</a>
-                <p>I was inspired by <a href="https://web.badges.world" target="_blank">Web Badges World</a> to create a web
-                    badge for Norsk Programmering which people can use on their websites. This is a simple web component
-                    written in JavaScript which anyone can download and use.</p>
+            <li><a href="https://github.com/Maritims/norsk-programmering-badge" target="_blank">Norsk
+                Programmering-knappen i bunnmenyen min.</a>
+                <p>Jeg ble inspirert av <a href="https://web.badges.world" target="_blank">Web Badges World</a> til å
+                    lage en "web badge" til Norsk Programmering som man kan bruke på hjemmesiden sin. Dette er en enkel
+                    web-komponent skrevet i JavaScript som hvem som helst kan laste ned og benytte seg av.</p>
             </li>
         </ul>
     </nav>
