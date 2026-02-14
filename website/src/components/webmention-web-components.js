@@ -1,0 +1,19 @@
+/* webmention-web-components v0.0.1-alpha.3 */
+(()=>{var h=async i=>{let t={webmentions:[],ok:!1};if(i)try{let e=await fetch(i);e.ok?t={webmentions:await e.json(),ok:!0}:console.error(`An error occurred while attempting to fetch webmentions from ${i}. Status code: ${e.status}.`)}catch(e){console.error(`An error occurred while attempting to fetch webmentions from ${i}.`,e)}else console.error("No endpoint specified Ensure that the endpoint attribute is set with a value pointing to the appropriate endpoint for fetching webmention entries.");return t};var r=class extends HTMLElement{_endpoint;_webmentions=[];_ok;constructor(){super()}static observedAttributes=["endpoint","heading","hide-when-empty"];#t(t){if(!t)return"";let e=document.createElement("div");return e.textContent=t,e.innerHTML}#e(t){try{let e=new URL(t,window.location.href).protocol;return e==="http:"||e==="https:"?t:"#"}catch{return"#"}}async attributeChangedCallback(t,e,n){if(e!==n){switch(t){case"endpoint":this._endpoint=n;break;case"heading":this._heading=n;break;case"hide-when-empty":this._hideWhenEmpty=n==="true";break;default:break}this.isConnected&&(t==="endpoint"&&await this.fetch(),this.render())}}connectedCallback(){this._hideWhenEmpty=this.getAttribute("hide-when-empty")==="true"||!1,this._endpoint=this.getAttribute("endpoint"),this._heading=this.getAttribute("heading")||"Mentions",this.fetch().then(()=>this.render())}render(){if(this._hideWhenEmpty&&this._webmentions.length===0){this.innerHTML="";return}this.innerHTML=`
+            <section class="webmention">
+                <h2>${this.#t(this._heading)}</h2>
+                <ul>${this._webmentions.map(t=>`
+                    <li>
+                        <a href="${this.#e(t.target)}">${this.#t(t.mentionText)}</a> (from: <a href="${this.#e(t.source)}">${this.#t(t.source)})</a>
+                    </li>
+                `).join("")}                
+                </ul>
+            </section>`}async fetch(){let t=h(this._endpoint),{webmentions:e,ok:n}=await t;this._webmentions=e,this._ok=n}};customElements.get("webmention-list")||customElements.define("webmention-list",r);var s=class extends Event{#t;#e;#n;constructor(t,e=void 0,n=void 0){if(super("webmention-sent",{bubbles:!0,composed:!0}),this.#t=t,t==="success"){if(e!==void 0||n!==void 0)throw new Error('Cannot set httpStatusCode or httpStatusText when result is "success"')}else if(t==="failure")this.#e=e,this.#n=n;else throw new Error(`Invalid result: ${t}`)}get result(){return this.#t}get httpStatusCode(){return this.#e}get httpStatusText(){return this.#n}},o=class extends HTMLElement{_endpoint;_descriptiveText;constructor(){super()}static get observedAttributes(){return["target"]}attributeChangedCallback(t,e,n){if(e!==n){if(t==="endpoint")this._endpoint=n;else throw new Error(`Unknown attribute: ${t}`);this.render()}}connectedCallback(){this._endpoint=this.getAttribute("endpoint"),this._descriptiveText=this.innerHTML,this.render()}render(){this.innerHTML=`
+        <form method="POST" action="${this._endpoint}">
+            ${this._descriptiveText}
+            <input type="hidden" name="target" value="${window.location.href}">
+            <label for="source">URL:</label>
+            <input type="url" name="source" id="source" required>
+            <button type="submit">Send Webmention</button>
+        </form>
+        `,this.querySelector("form").addEventListener("submit",async t=>{t.preventDefault(),t.target.querySelector("button").disabled=!0;try{let e=await fetch(t.target.action,{method:t.target.method,headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(new FormData(t.target)).toString()});e.ok?this.dispatchEvent(new s("success")):this.dispatchEvent(new s("failure",e.status,e.statusText))}catch(e){this.dispatchEvent(new s("failure",e.status,e.statusText))}t.target.querySelector("button").disabled=!1})}};customElements.define("webmention-send",o);})();
