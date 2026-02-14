@@ -5,31 +5,32 @@ import sharp from 'sharp';
 
 /**
  * Optimize the specified image.
- * @param {string} sourcePath The path to the image to optimize.
+ * @param {string} sourceFilePath The path to the image to optimize.
  * @returns {void}
  */
-export function optimizeImage(sourcePath) {
-    if (!sourcePath) {
+export function optimizeImage(sourceFilePath) {
+    if (!sourceFilePath) {
         throw new Error("sourcePath must be defined");
     }
-    if (!fs.existsSync(sourcePath)) {
-        throw new Error(`File ${sourcePath} not found.`);
+    if (!fs.existsSync(sourceFilePath)) {
+        throw new Error(`File ${sourceFilePath} not found.`);
     }
 
-    const fileName = path.basename(sourcePath);
+    const fileName = path.basename(sourceFilePath);
     const baseName = fileName.replace(/\.[^/.]+$/, '');
-    const targetPath = path.join(sourcePath, `${baseName}.webp`);
+    const targetDir = path.dirname(sourceFilePath);
+    const targetPath = path.join(targetDir, `${baseName}.webp`);
 
-    if (fs.existsSync(targetPath) && fs.statSync(sourcePath).mtimeMs <= fs.statSync(targetPath).mtimeMs) {
+    if (fs.existsSync(targetPath) && fs.statSync(sourceFilePath).mtimeMs <= fs.statSync(targetPath).mtimeMs) {
         log.info(`Skipping ${fileName}: Up to date.`);
         return;
     }
 
     log.info(`Converting: ${fileName} -> ${baseName}.webp`);
-    sharp(sourcePath).webp()
+    sharp(sourceFilePath).webp()
         .toFile(targetPath)
-        .then(() => fs.rmSync(sourcePath))
-        .catch(error => log.error(`FAILED: Could not process ${sourcePath}: ${error.message}`));
+        .then(() => fs.rmSync(sourceFilePath))
+        .catch(error => log.error(`FAILED: Could not process ${sourceFilePath}: ${error.message}`));
 }
 
 /**
@@ -39,7 +40,7 @@ export function optimizeImage(sourcePath) {
  * @returns {void}
  * @throws {Error} If the specified directory does not exist.
  */
-export function optimizeImages(targetDir = '../src/images', supportedFormats = ['jpg', 'jpeg', 'png', 'webp']) {
+export function optimizeImages(targetDir = 'website/src/images', supportedFormats = ['jpg', 'jpeg', 'png', 'webp']) {
     if (!targetDir) {
         throw new Error("Target directory not specified.");
     }

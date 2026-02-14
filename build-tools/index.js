@@ -27,8 +27,8 @@ const BuildAction = Object.freeze({
  */
 function resolveOptions() {
     return {
-        sourceDir: process.env.SOURCE_DIR || '../src',
-        outputDir: process.env.OUTPUT_DIR || '../src',
+        sourceDir: process.env.SOURCE_DIR || 'website/src/images',
+        outputDir: process.env.OUTPUT_DIR || 'website/src/images',
         siteUrl: process.env.SITE_URL || 'https://clueless.no',
         actions: process.env
             .ACTIONS

@@ -1,6 +1,6 @@
 {
-    "ignore": ["build-tools"],
     "ext": "html,js,webp",
+    "ignore": ["build-tools"],
     "verbose": true,
     "watch": ["website/src"]
 }

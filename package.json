@@ -21,7 +21,8 @@
         "generate-sitemap": "node build-tools/generate-sitemap.js",
         "generate-robots": "node build-tools/generate-robots.js",
         "build": "node build-tools/index.js",
-        "dev": "nodemon build-tools/server.js"
+        "serve": "node build-tools/server.js",
+        "dev": "nodemon --watch src --ext js,html,css --exec \"ACTIONS=OPTIMIZE_IMAGES npm run build && npm run serve\""
     },
     "devDependencies": {
         "express": "^5.2.1",

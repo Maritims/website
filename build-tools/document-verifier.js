@@ -71,6 +71,15 @@ function verifyDocumentHead(sourcePath) {
     }, {
         description: "Webmention endpoint must be set to /api/webmention",
         fn: () => assert.equal("/api/webmention", document.head.querySelector('link[rel="webmention"]')?.getAttribute('href'))
+    }, {
+        description: "Open Graph protocol meta tags must be present",
+        fn: () => {
+            assert.ok(document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'), 'Document Open Graph title not found.')
+            assert.ok(document.head.querySelector('meta[property="og:type"]')?.getAttribute('content'))
+            assert.ok(document.head.querySelector('meta[property="og:title"]')?.getAttribute('content'), 'Document Open Graph title not found.')
+            assert.ok(document.head.querySelector('meta[property="og:description"]')?.getAttribute('content'), 'Document Open Graph title not found.')
+            assert.ok(document.head.querySelector('meta[property="og:image"]')?.getAttribute('content'), 'Document Open Graph title not found.')
+        }
     }];
 
     const failures = assertions.map(assertion => assertSafely(assertion.description, assertion.fn)).filter(result => result === false).length;
@@ -91,4 +100,4 @@ function verifyFiles(sourceDir) {
     htmlFiles.forEach(file => verifyDocumentHead(path.join(sourceDir, file)));
 }
 
-verifyFiles('../src');
+verifyFiles('website/src');

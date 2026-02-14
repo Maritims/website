@@ -59,6 +59,17 @@ html.ms-dos {
         }
     }
 
+    .logo {
+        border: 5px double white;
+        padding: 1em;
+        background-color: var(--ms-dos-maroon);
+        box-shadow: var(--shadow);
+
+        img {
+            filter: contrast(150%) saturate(200%);
+        }
+    }
+
     input, textarea {
         background-color: var(--ms-dos-black);
         border: none;
