@@ -1,10 +1,10 @@
 export default class Footer extends HTMLElement {
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
-  render() {
-    this.innerHTML = `
+    render() {
+        this.innerHTML = `
             <footer>
                 <scroll-to-top></scroll-to-top>
                 <div>Kontakt meg på <a href="https://bsky.app/profile/maritims.bsky.social">Bluesky</a>, <a href="https://linkedin.com/in/martin-severin-steffensen">LinkedIn</a> eller <a href="https://github.com/Maritims">GitHub</a></div>
@@ -19,11 +19,11 @@ export default class Footer extends HTMLElement {
                 </div>
             </footer>
         `;
-  }
+    }
 
-  connectedCallback() {
-    this.render();
-  }
+    connectedCallback() {
+        this.render();
+    }
 }
 
-customElements.define("clueless-footer", Footer);
+customElements.define('clueless-footer', Footer);
