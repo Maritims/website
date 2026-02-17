@@ -18,6 +18,11 @@
     src: url('../fonts/PressStart2P-Regular.ttf');
 }
 
+@font-face {
+    font-family: 'JetBrainsMono Nerd';
+    src: url('../fonts/JetBrainsMonoNerdFontMono-Regular.ttf');
+}
+
 :root {
     --font-family: system-ui, sans-serif, serif;
     --font-size: 16px;
