@@ -1,24 +1,25 @@
-import './navigation.js';
-import './footer.js';
-import './frk-frontend-badge.js';
-import './norsk-programmering-badge.js';
-import './wiigen-badge.js';
-import './theme-switcher.js';
+import "./navigation.js";
+import "./footer.js";
+import "./frk-frontend-badge.js";
+import "./norsk-programmering-badge.js";
+import "./wiigen-badge.js";
+import "./augustg-dev-badge.js";
+import "./theme-switcher.js";
 
 class Layout extends HTMLElement {
-    constructor() {
-        super();
-        this._rendered = false;
+  constructor() {
+    super();
+    this._rendered = false;
+  }
+
+  render() {
+    if (this._rendered) {
+      return;
     }
 
-    render() {
-        if (this._rendered) {
-            return;
-        }
+    const htmlContent = this.innerHTML;
 
-        const htmlContent = this.innerHTML;
-
-        this.innerHTML = `
+    this.innerHTML = `
             <div class="page-container">
                 <header>
                     <clueless-navigation></clueless-navigation>
@@ -31,16 +32,17 @@ class Layout extends HTMLElement {
             </div>
         `;
 
-        this._rendered = true;
-    }
+    this._rendered = true;
+  }
 
-    connectedCallback() {
-        if(this.innerHTML.trim() === '') {
-            requestAnimationFrame(() => this.render());
-        } else {
-            this.render();
-        }
+  connectedCallback() {
+    if (this.innerHTML.trim() === "") {
+      requestAnimationFrame(() => this.render());
+    } else {
+      this.render();
     }
+  }
 }
 
-customElements.define('clueless-layout', Layout);
+customElements.define("clueless-layout", Layout);
+
