@@ -3,6 +3,7 @@ import './footer.js';
 import './frk-frontend-badge.js';
 import './norsk-programmering-badge.js';
 import './wiigen-badge.js';
+import './augustg-dev-badge.js'
 import './theme-switcher.js';
 
 class Layout extends HTMLElement {

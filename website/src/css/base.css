@@ -18,6 +18,11 @@
     src: url('../fonts/PressStart2P-Regular.ttf');
 }
 
+@font-face {
+    font-family: 'JetBrainsMono Nerd';
+    src: url('../fonts/JetBrainsMonoNerdFontMono-Regular.ttf');
+}
+
 :root {
     --font-family: system-ui, sans-serif, serif;
     --font-size: 16px;
@@ -212,28 +217,11 @@ footer {
     gap: calc(0.5 * var(--spacing)) var(--spacing);
 
     .badges {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
         gap: calc(0.5 * var(--spacing)) var(--spacing);
         align-content: center;
         line-height: 0;
-
-        @media (min-width: 768px) {
-            flex-direction: row;
-        }
-
-        & > * {
-            /*display: block;
-
-            @media (max-width: 767px) {
-                padding-block-start: var(--spacing);
-            }
-
-            @media (min-width: 768px) {
-                display: inline-block;
-                padding-inline-start: var(--spacing);
-            }*/
-        }
     }
 }
 

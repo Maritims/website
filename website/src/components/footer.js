@@ -14,6 +14,7 @@ export default class Footer extends HTMLElement {
                     <norsk-programmering-badge></norsk-programmering-badge>
                     <frk-frontend-badge></frk-frontend-badge>
                     <wiigen-badge></wiigen-badge>
+                    <augustg-dev-badge></augustg-dev-badge>
                     <a href="https://signup.upcloud.com/?promo=32BW92"><img src="/images/upcloud.webp" alt="UpCloud Badge"></a>
                 </div>
             </footer>
