@@ -14,7 +14,7 @@ export class WebGLEngine {
         }
 
         this.scene = null;
-        this.camera = new Camera(0.0, 1.6, 3.0);
+        this.camera = new Camera(-2.5, 2.5, 3, -0.82, -0.4, 0);
 
         this.keys = {};
 

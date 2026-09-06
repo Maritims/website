@@ -1,13 +1,13 @@
 import {Mat4} from "../math/mat4.js";
 
 export class Camera {
-    constructor(x = 0, y = 1.6, z = 3.0) {
+    constructor(x = 0, y = 1.6, z = 3.0, yaw = 0, pitch = 0, roll = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.yaw = 0;   // Rotation around the Y-axis: Turning left and right.
-        this.pitch = 0; // Rotation around the X-axis: Tilting up and down.
-        this.roll = 0;  // Rotation around the Z-axis: Tilt head side-to-side.
+        this.yaw = yaw;   // Rotation around the Y-axis: Turning left and right.
+        this.pitch = pitch; // Rotation around the X-axis: Tilting up and down.
+        this.roll = roll;  // Rotation around the Z-axis: Tilt head side-to-side.
 
         this.moveSpeed = 0.02;
         this.turnSpeed = 0.005;
