@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="ms-dos">
+	<head>
+		<title>Books</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="Jeg har sluttet å bruke Goodreads. Nå skriver jeg her i stedet.">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/css/stylesheet.css">
+		<link href="/api/webmention" rel="webmention">
+		<meta property="og:url" content="https://clueless.no/library.html">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="Bøker jeg har lyst og hva jeg synes om dem">
+		<meta property="og:description" content="Jeg har sluttet å bruke Goodreads. Nå skriver jeg her i stedet.">
+		<meta property="og:image" content="https://clueless.no/images/logo.webp">
+	</head>
+	<body>
+		<clueless-layout>
+			<p>Jeg har sluttet å bruke Goodreads. Nå skriver jeg her i stedet.</p>
+			<section class="library">
+				<!--<clueless-book title="A Game of Thrones" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="A Clash of Kings" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="A Storm of Swords" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="A Feast for Crows" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="A Dance with Dragons" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="A Dance with Dragons" author="George R. R. Martin" rating="6"></clueless-book>
+				<clueless-book title="Star Trek: A Time to Sow" author="Dayton Ward" rating="2"></clueless-book>
+				<clueless-book title="Star Trek: A Time to Be Born" author="John Vornholt" rating="4"></clueless-book>
+				<clueless-book title="The Fellowship of the Ring" author="J.R.R. Tolkien" rating="4"></clueless-book>
+				<clueless-book title="The Amulet of Samarkand" author="Jonathan Stroud" rating="5"></clueless-book>
+				<clueless-book title="Seppala: Alaskan Dog Driver" author="Elizabeth M. Ricker" rating="6"></clueless-book>
+				<clueless-book title="Mannen som elsket Yngve" author="Tore Renberg" rating="6"></clueless-book>
+				<clueless-book title="Eragon" author="Christopher Paolini" rating="2"></clueless-book>
+				<clueless-book title="Eldest" author="Christopher Paolini" rating="2"></clueless-book>
+				<clueless-book title="Brisingr" author="Christopher Paolini" rating="2"></clueless-book>
+				<clueless-book title="Inheritance" author="Christopher Paolini" rating="4"></clueless-book>-->
+
+				<canvas id="gl-canvas" width="640" height="480"></canvas>
+			</section>
+		</clueless-layout>
+		<script src="/components/layout.js" type="module"></script>
+		<script src="/components/book.js" type="module"></script>
+		<script type="module">
+			import {ShaderProgram} from "./3d/shader-program.js";
+			import {createBook} from "./3d/book.js";
+			import {Bookcase} from "./3d/bookcase.js";
+			import {Scene} from "./3d/scene.js";
+			import {CubeGeometry} from "./3d/cube-geometry.js";
+			import {WebGLEngine} from "./3d/webgl-engine.js";
+
+			(() => {
+				/** @type {HTMLCanvasElement} */
+				const canvas = document.querySelector('#gl-canvas');
+				const engine = new WebGLEngine(canvas);
+
+				const vertexShaderSource = `
+attribute vec3 a_position;
+attribute vec3 a_normal;
+attribute vec2 a_texCoord;
+
+uniform mat4 u_matrix;
+varying vec3 v_normal;
+varying vec2 v_texCoord;
+
+void main() {
+    gl_Position = u_matrix * vec4(a_position, 1.0);
+    v_normal = a_normal;
+    v_texCoord = a_texCoord;
+}
+`;
+				const fragmentShaderSource = `
+precision mediump float;
+uniform vec4 u_color;
+uniform sampler2D u_texture;
+uniform int u_useTexture;
+
+varying vec3 v_normal;
+varying vec2 v_texCoord;
+
+void main() {
+    vec3 lightDir = normalize(vec3(0.5, 0.7, 1.0));
+    float light = max(dot(v_normal, lightDir), 0.3);
+
+    vec4 baseColor;
+    if (u_useTexture == 1) {
+        baseColor = texture2D(u_texture, v_texCoord);
+    } else {
+        baseColor = u_color;
+    }
+
+    gl_FragColor = vec4(baseColor.rgb * light, baseColor.a);
+}
+`;
+				const shader = new ShaderProgram(engine.ctx, vertexShaderSource, fragmentShaderSource);
+				const mesh = new CubeGeometry(engine.ctx);
+
+				// Width: 2 meters, height: 2 meters, depth: 0.22 meters.
+
+				const bookcase = new Bookcase(engine.ctx, 0.765, 2.0, 0.15, 0.02, 4, shader, mesh);
+
+				const bookList = [{
+					title: 'A Game of Thrones', width: 6.1, height: 23.5, depth: 16.2, color: [0.2, 0.53, 0.8, 1.0]
+				}, {
+					title: 'A Clash of Kings', width: 5.2, height: 24.3, depth: 16.3, color: [0.9, 0.72, 0.04, 1.0]
+				}, {
+					title: 'A Storm of Swords', width: 6.4, height: 24.7, depth: 16.4, color: [0.1, 0.5, 0.2, 1.0]
+				}, {
+					title: 'A Feast for Crows', width: 5.8, height: 23.8, depth: 16.4, color: [0.7, 0.1, 0.1, 1.0]
+				}, {
+					title: 'A Dance with Dragons', width: 6.4, height: 24.3, depth: 16.5, color: [0.8, 0.8, 0.8, 1.0]
+				}];
+
+				bookList.map(data => createBook(engine.ctx, data.title, data.width, data.height, data.depth, data.color)).forEach(book => bookcase.addBookToShelf(0, book));
+
+				const scene = new Scene();
+				scene.add(bookcase);
+
+				scene.renderAll = (ctx, viewProjectionMatrix) => scene.render(ctx, shader, viewProjectionMatrix);
+
+				engine.setScene(scene);
+				engine.start();
+			})();
+		</script>
+	</body>
+</html>

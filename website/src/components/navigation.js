@@ -41,6 +41,9 @@ class Navigation extends HTMLElement {
             label: 'Galleri',
             href: '/gallery.html',
         }, {
+            label: 'Bibliotek',
+            href: '/library.html'
+        }, {
             label: 'CV',
             href: '/cv.html',
         }, {
