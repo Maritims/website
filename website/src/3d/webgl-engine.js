@@ -1,4 +1,5 @@
-import {Mat4} from "./mat4.js";
+import {Mat4} from "./math/mat4.js";
+import {Camera} from "./geometry/camera.js";
 
 export class WebGLEngine {
     /**
@@ -13,66 +14,39 @@ export class WebGLEngine {
         }
 
         this.scene = null;
+        this.camera = new Camera(0.0, 1.6, 3.0);
 
-        // Camera state.
-        this.cameraX = 0.0;
-        this.cameraY = -1.0;
-        this.cameraZ = -4.5;
-        this.cameraYaw = 0.0;
-
-        // Input state.
-        this.isDragging = false;
-        this.lastMouseX = 0;
-        this.lastMouseY = 0;
         this.keys = {};
 
-        this._configureKeyBindings();
+        window.addEventListener('keydown', (e) => {
+            this.keys[e.key.toLowerCase()] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            this.keys[e.key.toLowerCase()] = false;
+        });
+
+        /**
+         * @type {CameraHUD}
+         */
+        this.cameraHUD = document.querySelector('camera-hud');
+
+        if (this.cameraHUD) {
+            this.cameraHUD.addEventListener('camera-reset', (event) => {
+                if (event.detail.target === 'position') {
+                    this.camera.x = 0;
+                    this.camera.y = 1.6;
+                    this.camera.z = 3.0;
+                } else if (event.detail.target === 'rotation') {
+                    this.camera.yaw = 0;
+                    this.camera.pitch = 0;
+                    this.camera.roll = 0;
+                }
+            })
+        }
     }
 
     get ctx() {
         return this._ctx;
-    }
-
-    _configureKeyBindings() {
-        this.canvas.addEventListener('wheel', (event) => {
-            event.preventDefault();
-            this.cameraZ -= event.deltaY * 0.003;
-            this.cameraZ = Math.max(-10.0, Math.min(-2.0, this.cameraZ));
-        });
-
-        this.canvas.addEventListener('mousedown', (event) => {
-            this.isDragging = true;
-            this.lastMouseX = event.clientX;
-            this.lastMouseY = event.clientY;
-        });
-
-        window.addEventListener('mousemove', (event) => {
-            if (!this.isDragging) return;
-
-            const deltaX = event.clientX - this.lastMouseX;
-            const deltaY = event.clientY - this.lastMouseY;
-            this.lastMouseX = event.clientX;
-            this.lastMouseY = event.clientY;
-
-            const speed = 0.002 * Math.abs(this.cameraZ);
-            this.cameraX += deltaX * speed;
-            this.cameraY -= deltaY * speed;
-        });
-
-        window.addEventListener('mouseup', () => {
-            this.isDragging = false;
-        });
-
-        window.addEventListener('keydown', (event) => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'a', 's', 'd', 'q', 'e', 'x'].includes(event.key)) {
-                event.preventDefault();
-            }
-            this.keys[event.key] = true;
-        });
-
-        window.addEventListener('keyup', (event) => {
-            this.keys[event.key] = false;
-        });
     }
 
     /**
@@ -84,25 +58,9 @@ export class WebGLEngine {
         return this;
     }
 
-    _updateCamera() {
-        const xSpeed = 0.005;
-        const ySpeed = 0.005;
-        const zSpeed = 0.005;
-        const turnSpeed = 0.005;
-
-        if (this.keys['q']) this.cameraX += xSpeed;
-        if (this.keys['e']) this.cameraX -= xSpeed;
-        if (this.keys['w']) this.cameraZ += zSpeed;
-        if (this.keys['a']) this.cameraYaw -= turnSpeed;
-        if (this.keys['s']) this.cameraZ -= zSpeed;
-        if (this.keys['d']) this.cameraYaw += turnSpeed;
-        if (this.keys['x']) this.cameraY += ySpeed;
-        if (this.keys[' ']) this.cameraY -= ySpeed;
-    }
-
     start = () => {
         const loop = () => {
-            this._updateCamera();
+            this.camera.update(this.keys);
 
             const ctx = this.ctx;
             ctx.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -112,15 +70,24 @@ export class WebGLEngine {
 
             // Compute generic camera view-projection matrix
             const aspect = this.canvas.width / this.canvas.height;
-            const projection = Mat4.perspective(Math.PI / 4, aspect, 0.1, 100.0);
-            const viewMatrix = new Mat4()
-                .rotateY(this.cameraYaw)
-                .translate(this.cameraX, this.cameraY, this.cameraZ);
-            const viewProjectionMatrix = projection.multiply(viewMatrix);
+            const projectMatrix = Mat4.perspective(Math.PI / 4, aspect, 0.1, 100.0);
+            const viewMatrix = this.camera.getViewMatrix();
+            const viewProjectionMatrix = projectMatrix.multiply(viewMatrix);
 
             // If a scene is attached, let it render using its shader/components
             if (this.scene && typeof this.scene.renderAll === 'function') {
                 this.scene.renderAll(ctx, viewProjectionMatrix);
+            }
+
+            if (this.cameraHUD) {
+                const radToDeg = 180 / Math.PI;
+
+                this.cameraHUD.setAttribute('x', this.camera.x.toFixed(2));
+                this.cameraHUD.setAttribute('y', this.camera.y.toFixed(2));
+                this.cameraHUD.setAttribute('z', this.camera.z.toFixed(2));
+                this.cameraHUD.setAttribute('yaw', (this.camera.yaw * radToDeg).toFixed(0));
+                this.cameraHUD.setAttribute('pitch', (this.camera.pitch * radToDeg).toFixed(0));
+                this.cameraHUD.setAttribute('roll', (this.camera.roll * radToDeg).toFixed(0));
             }
 
             requestAnimationFrame(loop);

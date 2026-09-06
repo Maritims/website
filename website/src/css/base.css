@@ -204,6 +204,12 @@ section.licenses {
     }
 }
 
+section.library {
+    .position-and-rotation, .button-container {
+        margin-block-start: var(--spacing);
+    }
+}
+
 ul {
     &.horizontal-list {
         display: flex;

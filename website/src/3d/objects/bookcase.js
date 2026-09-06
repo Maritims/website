@@ -1,17 +1,17 @@
-import {Mat4} from "./mat4.js";
+import {Mat4} from "../math/mat4.js";
 
 export class Bookcase {
     /**
      * @param {WebGLRenderingContext} ctx
-     * @param {number} width
-     * @param {number} height
-     * @param {number} depth
-     * @param {number} thickness
+     * @param {number} width - Width of the book case.
+     * @param {number} height - Height of the book case.
+     * @param {number} depth - Depth of the book case.
+     * @param {number} thickness - Thickness of the book case's boards.
      * @param {number} shelfCount - Total number of horizontal shelves.
      * @param {ShaderProgram} shader
-     * @param {CubeGeometry} cubeGeometry
+     * @param {CubeMesh} mesh
      */
-    constructor(ctx, width, height, depth, thickness, shelfCount, shader, cubeGeometry) {
+    constructor(ctx, width, height, depth, thickness, shelfCount, shader, mesh) {
         this.ctx = ctx;
         this.width = width;
         this.height = height;
@@ -19,7 +19,7 @@ export class Bookcase {
         this.thickness = thickness;
         this.shelfCount = shelfCount;
         this.shader = shader;
-        this.cubeGeometry = cubeGeometry;
+        this.mesh = mesh;
 
         this.woodColor = [139 / 255, 69 / 255, 19 / 255, 1.0];
         this.shelves = Array.from({length: shelfCount}, () => []);
@@ -131,7 +131,7 @@ export class Bookcase {
             this.shader.setUniform1i('u_useTexture', 0); // Wood frame uses solid color
             this.shader.setUniform4f('u_color', ...this.woodColor);
 
-            this.cubeGeometry.draw(posLoc, normLoc, texCoordLoc);
+            this.mesh.draw(posLoc, normLoc, texCoordLoc);
         };
 
         // 1. Outer Frame
@@ -164,7 +164,7 @@ export class Bookcase {
                     this.shader.setUniform4f('u_color', ...book._color);
                 }
 
-                this.cubeGeometry.draw(posLoc, normLoc, texCoordLoc);
+                this.mesh.draw(posLoc, normLoc, texCoordLoc);
             }
         }
     }

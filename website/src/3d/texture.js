@@ -74,37 +74,3 @@ export function createTextTexture(webglCtx, text, options = {}) {
 
     return createTextureFromCanvas(webglCtx, canvas);
 }
-
-/**
- * @param {WebGLRenderingContext} webglCtx
- * @param {string} text
- * @param {number[]} backgroundRgbColor
- */
-export function create2DTexture(webglCtx, text, backgroundRgbColor) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-
-    // Convert color safely
-    ctx.fillStyle = convertRgbToCss(backgroundRgbColor);
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.scale(1, -1);
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 28px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, 0, 0);
-    ctx.restore();
-
-    return createTextureFromCanvas(webglCtx, canvas);
-}

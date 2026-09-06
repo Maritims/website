@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		<clueless-layout>
-			<p>Jeg har sluttet å bruke Goodreads. Nå skriver jeg her i stedet.</p>
+			<p>Jeg har sluttet å bruke Goodreads. Ta en titt i mitt tredimensjonale bibliotek i stedet.</p>
 			<section class="library">
 				<!--<clueless-book title="A Game of Thrones" author="George R. R. Martin" rating="6"></clueless-book>
 				<clueless-book title="A Clash of Kings" author="George R. R. Martin" rating="6"></clueless-book>
@@ -34,18 +34,27 @@
 				<clueless-book title="Brisingr" author="Christopher Paolini" rating="2"></clueless-book>
 				<clueless-book title="Inheritance" author="Christopher Paolini" rating="4"></clueless-book>-->
 
-				<canvas id="gl-canvas" width="640" height="480"></canvas>
+				<div style="display: grid; grid-template-columns: max-content auto; gap: calc(2 * var(--spacing))">
+					<canvas id="gl-canvas" width="800" height="600"></canvas>
+					<key-bindings-hud></key-bindings-hud>
+				</div>
+				<camera-hud></camera-hud>
 			</section>
 		</clueless-layout>
 		<script src="/components/layout.js" type="module"></script>
 		<script src="/components/book.js" type="module"></script>
+		<script src="/3d/ui/camera-hud.js"></script>
+		<script src="/3d/ui/key-bindings-hud.js"></script>
 		<script type="module">
 			import {ShaderProgram} from "./3d/shader-program.js";
-			import {createBook} from "./3d/book.js";
-			import {Bookcase} from "./3d/bookcase.js";
-			import {Scene} from "./3d/scene.js";
-			import {CubeGeometry} from "./3d/cube-geometry.js";
+			import {createBook} from "./3d/objects/book.js";
+			import {Bookcase} from "./3d/objects/bookcase.js";
+			import {Scene} from "./3d/objects/scene.js";
 			import {WebGLEngine} from "./3d/webgl-engine.js";
+			import {Floor} from "./3d/objects/floor.js";
+			import {PlaneMesh} from "./3d/geometry/plane-mesh.js";
+			import {Wall} from "./3d/objects/wall.js";
+			import {CubeMesh} from "./3d/geometry/cube-mesh.js";
 
 			(() => {
 				/** @type {HTMLCanvasElement} */
@@ -91,11 +100,12 @@ void main() {
 }
 `;
 				const shader = new ShaderProgram(engine.ctx, vertexShaderSource, fragmentShaderSource);
-				const mesh = new CubeGeometry(engine.ctx);
+				const cubeGeometry = new CubeMesh(engine.ctx);
+				const planeGeometry = new PlaneMesh(engine.ctx, 1.0, 1.0);
 
 				// Width: 2 meters, height: 2 meters, depth: 0.22 meters.
 
-				const bookcase = new Bookcase(engine.ctx, 0.765, 2.0, 0.15, 0.02, 4, shader, mesh);
+				const bookcase = new Bookcase(engine.ctx, 0.765, 2.0, 0.15, 0.02, 4, shader, cubeGeometry);
 
 				const bookList = [{
 					title: 'A Game of Thrones', width: 6.1, height: 23.5, depth: 16.2, color: [0.2, 0.53, 0.8, 1.0]
@@ -112,6 +122,14 @@ void main() {
 				bookList.map(data => createBook(engine.ctx, data.title, data.width, data.height, data.depth, data.color)).forEach(book => bookcase.addBookToShelf(0, book));
 
 				const scene = new Scene();
+				const floor = new Floor(engine.ctx, 6.0, 6.0, shader, planeGeometry,
+						[0.45, 0.35, 0.25, 1.0] // Warmer, lighter oak wood floor
+				);
+				const backWall = new Wall(engine.ctx, 6.0, 3.0, shader, planeGeometry,
+						[0.3, 0.35, 0.4, 1.0]   // A soft, visible muted blue-gray wallpaper tone
+				).setPosition(0, 0, -3.0);
+				scene.add(floor);
+				scene.add(backWall);
 				scene.add(bookcase);
 
 				scene.renderAll = (ctx, viewProjectionMatrix) => scene.render(ctx, shader, viewProjectionMatrix);

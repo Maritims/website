@@ -1,7 +1,7 @@
 import {Mesh} from "./mesh.js";
 import {GeometryBuilder} from "./geometry-builder.js";
 
-export class CubeGeometry extends Mesh {
+export class CubeMesh extends Mesh {
     /**
      * @param {WebGLRenderingContext} ctx
      * @param {number} vMin

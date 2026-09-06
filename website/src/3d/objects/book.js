@@ -1,13 +1,13 @@
-import {convertRgbToCss, createTextTexture} from "./texture.js";
-import {Mat4} from "./mat4.js";
+import {convertRgbToCss, createTextTexture} from "../texture.js";
+import {Mat4} from "../math/mat4.js";
 
 export class Book {
     /**
-     * @param {string} title
-     * @param {number} width
-     * @param {number} height
-     * @param {number} depth
-     * @param {number[]} color - [red, green, blue, alpha]
+     * @param {string} title - Title of the book.
+     * @param {number} width - Width of the book's spine.
+     * @param {number} height - Height of the book.
+     * @param {number} depth - Depth of the book, i.e the width of the book's front and back faces.
+     * @param {number[]} color - Color of the book in RGBA: [red, green, blue, alpha].
      */
     constructor(title, width, height, depth, color) {
         this._title = title;
