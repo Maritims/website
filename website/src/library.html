@@ -117,6 +117,8 @@ void main() {
 					title: 'A Feast for Crows', width: 5.8, height: 23.8, depth: 16.4, color: [0.7, 0.1, 0.1, 1.0]
 				}, {
 					title: 'A Dance with Dragons', width: 6.4, height: 24.3, depth: 16.5, color: [0.8, 0.8, 0.8, 1.0]
+				}, {
+					title: 'The Fellowship of the Ring', width: 3.9, height: 22.2, depth: 14.3, color: [0.9, 0.72, 0.04, 1.0]
 				}];
 
 				bookList.map(data => createBook(engine.ctx, data.title, data.width, data.height, data.depth, data.color)).forEach(book => bookcase.addBookToShelf(0, book));
